@@ -1,0 +1,65 @@
+---
+# Reusable workflow: build multi-platform provider binaries and publish a GitHub Release.
+# Called by release.yml (on manual tag push) and sync.yml (after automated commit).
+#
+# Signing behaviour:
+#   - Cosign (keyless, Sigstore): always runs — no secrets required.
+#   - GPG: runs only when secrets.GPG_PRIVATE_KEY is set — required for Terraform Registry.
+name: Publish
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+
+jobs:
+  publish:
+    name: Publish ${{ inputs.version }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write       # create GitHub Release
+      id-token: write       # cosign keyless signing via GitHub OIDC
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.version }}
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Import GPG key
+        if: env.GPG_PRIVATE_KEY != ''
+        id: import_gpg
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+
+      - name: Resolve GoReleaser flags
+        id: flags
+        run: |
+          if [ -n "${{ steps.import_gpg.outputs.fingerprint }}" ]; then
+            echo "extra=" >> "$GITHUB_OUTPUT"
+          else
+            echo "extra=--skip=sign" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          version: latest
+          args: release --clean ${{ steps.flags.outputs.extra }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}

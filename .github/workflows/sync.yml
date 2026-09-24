@@ -1,0 +1,133 @@
+---
+name: Sync upstream NICo release
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+jobs:
+  check:
+    name: Find oldest missing upstream release
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.missing.outputs.version }}
+      has_missing: ${{ steps.missing.outputs.has_missing }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Find oldest missing upstream release
+        id: missing
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          upstream=$(gh api repos/dsx-ai-factory/infra-controller/tags --paginate \
+            --jq '.[] | select(.name | test("^v[2-9][0-9]*\\.[0-9]+\\.[0-9]+$")) | .name | ltrimstr("v")' \
+            | sort -Vu)
+
+          git fetch --tags
+          published=$(git tag | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -Vu)
+
+          echo "Upstream: $(echo "${upstream}" | tr '\n' ' ')"
+          echo "Published: $(echo "${published}" | tr '\n' ' ')"
+
+          version=$(comm -23 \
+            <(echo "${upstream}") \
+            <(echo "${published}") \
+            | head -1)
+
+          if [ -n "${version}" ]; then
+            echo "Oldest missing: ${version}"
+            echo "version=${version}" >> "$GITHUB_OUTPUT"
+            echo "has_missing=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "All upstream releases are published."
+            echo "has_missing=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  sync:
+    name: Sync ${{ needs.check.outputs.version }}
+    needs: check
+    if: needs.check.outputs.has_missing == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: pip install pyyaml
+
+      - name: Download upstream spec
+        run: |
+          curl -fsSL \
+            "https://raw.githubusercontent.com/dsx-ai-factory/infra-controller/v${VERSION}/rest-api/openapi/spec.yaml" \
+            -o /tmp/spec.yaml
+
+      - name: Install tfplugindocs
+        run: go install github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs@latest
+
+      - name: Regenerate provider files and examples
+        run: python scripts/generate.py --spec /tmp/spec.yaml --output internal/provider
+
+      - name: Format generated Go files
+        run: go fmt ./internal/provider/...
+
+      - name: Verify provider builds
+        run: go build ./...
+
+      - name: Generate docs
+        run: tfplugindocs generate --provider-name nvidia_infra_controller
+
+      - name: Update README badges
+        run: |
+          python3 -c "
+          import re, os
+          v = os.environ['VERSION']
+          for path, pattern, repl in [
+              ('README.md', r'version-[\d.]+-blue', f'version-{v}-blue'),
+              ('README.md', r'spec-[\d.]+-blue',    f'spec-{v}-blue'),
+          ]:
+              try:
+                  txt = open(path).read()
+                  txt = re.sub(pattern, repl, txt, flags=re.MULTILINE)
+                  open(path, 'w').write(txt)
+              except FileNotFoundError:
+                  pass
+          "
+
+      - name: Commit, tag and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add internal/provider/ examples/ docs/ README.md
+          git diff --cached --stat
+          git commit -s -m "Regenerate provider for upstream release v${VERSION}
+
+          Co-Authored-By: github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
+          git tag "${VERSION}" -m "Release ${VERSION}"
+          git push origin main "${VERSION}"
+
+  publish:
+    name: Publish ${{ needs.check.outputs.version }}
+    needs: [check, sync]
+    uses: ./.github/workflows/_publish.yml
+    with:
+      version: ${{ needs.check.outputs.version }}
+    permissions:
+      contents: write
+      id-token: write
