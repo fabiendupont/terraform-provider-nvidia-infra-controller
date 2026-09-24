@@ -45,7 +45,7 @@ type MachineDataSourceModel struct {
 	Capacity types.String `tfsdk:"capacity"`
 	Vendor types.String `tfsdk:"vendor"`
 	InactiveDevices types.String `tfsdk:"inactive_devices"`
-	Count types.String `tfsdk:"count"`
+	CountValue types.String `tfsdk:"count_value"`
 	MachineId types.String `tfsdk:"machine_id"`
 	InfrastructureProviderId types.String `tfsdk:"infrastructure_provider_id"`
 	InstanceId types.String `tfsdk:"instance_id"`
@@ -307,7 +307,7 @@ func (d *MachineDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 				Computed:    true,
 				Description: "Filter Capabilities by Inactive Devices value. Since the value is an array, multiple query parameters should be specified in the correct order. For example, to filter for [1, 3], specify inactiveDevices=1&inactiveDevices=3",
 			},
-			"count": schema.StringAttribute{
+			"count_value": schema.StringAttribute{
 				Required:    false,
 				Optional:    true,
 				Computed:    true,

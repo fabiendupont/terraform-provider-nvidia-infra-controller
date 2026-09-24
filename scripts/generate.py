@@ -169,6 +169,18 @@ def group_paths_by_tag(spec):
     return groups
 
 
+# Terraform meta-argument names that cannot be used as resource attribute names.
+_RESERVED_TF_NAMES = frozenset({
+    'count', 'depends_on', 'for_each', 'lifecycle',
+    'provider', 'provisioner', 'connection',
+})
+
+
+def safe_tf_name(name):
+    """Append _value to any name that clashes with a Terraform meta-argument."""
+    return (name + '_value') if name in _RESERVED_TF_NAMES else name
+
+
 # ---------------------------------------------------------------------------
 # Resource analysis
 # ---------------------------------------------------------------------------
@@ -298,9 +310,7 @@ _RESERVED_TF_NAMES = frozenset({
 
 def analyze_field(prop_name, prop_schema, spec, resource_pascal, required_fields):
     """Return a field descriptor dict for one OpenAPI property."""
-    snake_name = camel_to_snake(prop_name)
-    if snake_name in _RESERVED_TF_NAMES:
-        snake_name = snake_name + '_value'
+    snake_name = safe_tf_name(camel_to_snake(prop_name))
     pascal_name = snake_to_pascal(snake_name)
     schema_type = get_schema_type(prop_schema)
     description = prop_schema.get('description', '%s attribute.' % snake_name).replace('\n', ' ').replace('\r', ' ')
@@ -418,7 +428,7 @@ def merge_resource_fields(resource_info, spec):
     for path in (resource_info.get('collection_path') or '', resource_info.get('item_path') or ''):
         for match in _PATH_PARAM_RE.findall(path):
             if match != 'org':
-                path_params.add(camel_to_snake(match))
+                path_params.add(safe_tf_name(camel_to_snake(match)))
 
     return list(field_map.values()), path_params
 
@@ -773,8 +783,8 @@ def go_path_params(item_path, resource_info):
         for match in _PATH_PARAM_RE.findall(item_path):
             if match == 'org':
                 continue
-            snake_param = camel_to_snake(match)
-            if snake_param == camel_to_snake(id_param):
+            snake_param = safe_tf_name(camel_to_snake(match))
+            if snake_param == safe_tf_name(camel_to_snake(id_param)):
                 params.append('"%s": data.Id.ValueString()' % match)
             else:
                 params.append('"%s": data.%s.ValueString()' % (match, snake_to_pascal(snake_param)))
@@ -827,6 +837,7 @@ def generate_resource_file(resource_info, spec, overrides):
     # Add path-param-only fields (scope fields that aren't in any schema)
     field_snake_names = {f['snake_name'] for f in fields}
     for pp in sorted(path_params):
+        pp = safe_tf_name(pp)
         if pp not in field_snake_names and pp != 'id':
             pf = {
                 'snake_name': pp,
@@ -1166,7 +1177,7 @@ def generate_datasource_file(resource_info, spec, overrides):
     filter_fields = []
     for param in resource_info.get('list_query_params', []):
         pname = param.get('name', '')
-        sname = camel_to_snake(pname)
+        sname = safe_tf_name(camel_to_snake(pname))
         filter_fields.append({
             'snake_name': sname,
             'pascal_name': snake_to_pascal(sname),
@@ -1189,9 +1200,9 @@ def generate_datasource_file(resource_info, spec, overrides):
         for match in _PATH_PARAM_RE.findall(path):
             if match == 'org':
                 continue
-            sname = camel_to_snake(match)
+            sname = safe_tf_name(camel_to_snake(match))
             id_param = resource_info.get('id_param') or 'id'
-            if sname == camel_to_snake(id_param) or sname in existing_filter_names:
+            if sname == safe_tf_name(camel_to_snake(id_param)) or sname in existing_filter_names:
                 continue
             existing_filter_names.add(sname)
             filter_fields.append({
