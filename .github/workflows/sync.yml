@@ -91,7 +91,7 @@ jobs:
         run: go build ./...
 
       - name: Generate docs
-        run: tfplugindocs generate --provider-name nvidia_infra_controller
+        run: tfplugindocs generate --provider-name nvidia-infra-controller
 
       - name: Update README badges
         run: |
