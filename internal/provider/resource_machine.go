@@ -92,7 +92,7 @@ type MachineMachineCapabilitiesItem struct {
 	Vendor types.String `tfsdk:"vendor"`
 	HardwareRevision types.String `tfsdk:"hardware_revision"`
 	InactiveDevices types.List `tfsdk:"inactive_devices"`
-	Count types.Int64 `tfsdk:"count"`
+	CountValue types.Int64 `tfsdk:"count_value"`
 	DeviceType types.String `tfsdk:"device_type"`
 }
 
@@ -447,7 +447,7 @@ func (r *MachineResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 							Computed:    true,
 							Description: "A list of inactive devices",
 						},
-						"count": schema.Int64Attribute{
+						"count_value": schema.Int64Attribute{
 							Required:    false,
 							Optional:    false,
 							Computed:    true,
@@ -1105,7 +1105,7 @@ func (r *MachineResource) Read(ctx context.Context, req resource.ReadRequest, re
 			items_machine_capabilities[i_machine_capabilities].Vendor = StringFromAPI(m_machine_capabilities["vendor"])
 			items_machine_capabilities[i_machine_capabilities].HardwareRevision = StringFromAPI(m_machine_capabilities["hardwareRevision"])
 			// inactiveDevices: nested field — expand manually if needed
-			items_machine_capabilities[i_machine_capabilities].Count = Int64FromAPI(m_machine_capabilities["count"])
+			items_machine_capabilities[i_machine_capabilities].CountValue = Int64FromAPI(m_machine_capabilities["count"])
 			items_machine_capabilities[i_machine_capabilities].DeviceType = StringFromAPI(m_machine_capabilities["deviceType"])
 		}
 		data.MachineCapabilities = items_machine_capabilities
@@ -1303,7 +1303,7 @@ func (r *MachineResource) Update(ctx context.Context, req resource.UpdateRequest
 			items_machine_capabilities[i_machine_capabilities].Vendor = StringFromAPI(m_machine_capabilities["vendor"])
 			items_machine_capabilities[i_machine_capabilities].HardwareRevision = StringFromAPI(m_machine_capabilities["hardwareRevision"])
 			// inactiveDevices: nested field — expand manually if needed
-			items_machine_capabilities[i_machine_capabilities].Count = Int64FromAPI(m_machine_capabilities["count"])
+			items_machine_capabilities[i_machine_capabilities].CountValue = Int64FromAPI(m_machine_capabilities["count"])
 			items_machine_capabilities[i_machine_capabilities].DeviceType = StringFromAPI(m_machine_capabilities["deviceType"])
 		}
 		data.MachineCapabilities = items_machine_capabilities
@@ -1467,7 +1467,7 @@ func (r *MachineResource) populateModel(ctx context.Context, data *MachineResour
 			items_machine_capabilities[i_machine_capabilities].Vendor = StringFromAPI(m_machine_capabilities["vendor"])
 			items_machine_capabilities[i_machine_capabilities].HardwareRevision = StringFromAPI(m_machine_capabilities["hardwareRevision"])
 			// inactiveDevices: nested field — expand manually if needed
-			items_machine_capabilities[i_machine_capabilities].Count = Int64FromAPI(m_machine_capabilities["count"])
+			items_machine_capabilities[i_machine_capabilities].CountValue = Int64FromAPI(m_machine_capabilities["count"])
 			items_machine_capabilities[i_machine_capabilities].DeviceType = StringFromAPI(m_machine_capabilities["deviceType"])
 		}
 		data.MachineCapabilities = items_machine_capabilities

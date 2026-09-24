@@ -56,7 +56,7 @@ type InstanceTypeMachineCapabilitiesItem struct {
 	Vendor types.String `tfsdk:"vendor"`
 	HardwareRevision types.String `tfsdk:"hardware_revision"`
 	InactiveDevices types.List `tfsdk:"inactive_devices"`
-	Count types.Int64 `tfsdk:"count"`
+	CountValue types.Int64 `tfsdk:"count_value"`
 	DeviceType types.String `tfsdk:"device_type"`
 }
 
@@ -202,7 +202,7 @@ func (r *InstanceTypeResource) Schema(_ context.Context, _ resource.SchemaReques
 							Computed:    true,
 							Description: "A list of inactive devices",
 						},
-						"count": schema.Int64Attribute{
+						"count_value": schema.Int64Attribute{
 							Required:    false,
 							Optional:    false,
 							Computed:    true,
@@ -547,7 +547,7 @@ func (r *InstanceTypeResource) Create(ctx context.Context, req resource.CreateRe
 			items_machine_capabilities[i_machine_capabilities].Vendor = StringFromAPI(m_machine_capabilities["vendor"])
 			items_machine_capabilities[i_machine_capabilities].HardwareRevision = StringFromAPI(m_machine_capabilities["hardwareRevision"])
 			// inactiveDevices: nested field — expand manually if needed
-			items_machine_capabilities[i_machine_capabilities].Count = Int64FromAPI(m_machine_capabilities["count"])
+			items_machine_capabilities[i_machine_capabilities].CountValue = Int64FromAPI(m_machine_capabilities["count"])
 			items_machine_capabilities[i_machine_capabilities].DeviceType = StringFromAPI(m_machine_capabilities["deviceType"])
 		}
 		data.MachineCapabilities = items_machine_capabilities
@@ -675,7 +675,7 @@ func (r *InstanceTypeResource) Read(ctx context.Context, req resource.ReadReques
 			items_machine_capabilities[i_machine_capabilities].Vendor = StringFromAPI(m_machine_capabilities["vendor"])
 			items_machine_capabilities[i_machine_capabilities].HardwareRevision = StringFromAPI(m_machine_capabilities["hardwareRevision"])
 			// inactiveDevices: nested field — expand manually if needed
-			items_machine_capabilities[i_machine_capabilities].Count = Int64FromAPI(m_machine_capabilities["count"])
+			items_machine_capabilities[i_machine_capabilities].CountValue = Int64FromAPI(m_machine_capabilities["count"])
 			items_machine_capabilities[i_machine_capabilities].DeviceType = StringFromAPI(m_machine_capabilities["deviceType"])
 		}
 		data.MachineCapabilities = items_machine_capabilities
@@ -785,7 +785,7 @@ func (r *InstanceTypeResource) Update(ctx context.Context, req resource.UpdateRe
 			if !item_machine_capabilities.Vendor.IsNull() { m_machine_capabilities["vendor"] = item_machine_capabilities.Vendor.ValueString() }
 			if !item_machine_capabilities.HardwareRevision.IsNull() { m_machine_capabilities["hardwareRevision"] = item_machine_capabilities.HardwareRevision.ValueString() }
 			// inactiveDevices: complex nested field — expand manually if needed
-			if !item_machine_capabilities.Count.IsNull() { m_machine_capabilities["count"] = item_machine_capabilities.Count.ValueInt64() }
+			if !item_machine_capabilities.CountValue.IsNull() { m_machine_capabilities["count"] = item_machine_capabilities.CountValue.ValueInt64() }
 			if !item_machine_capabilities.DeviceType.IsNull() { m_machine_capabilities["deviceType"] = item_machine_capabilities.DeviceType.ValueString() }
 			items_machine_capabilities[i_machine_capabilities] = m_machine_capabilities
 		}
@@ -831,7 +831,7 @@ func (r *InstanceTypeResource) Update(ctx context.Context, req resource.UpdateRe
 			items_machine_capabilities[i_machine_capabilities].Vendor = StringFromAPI(m_machine_capabilities["vendor"])
 			items_machine_capabilities[i_machine_capabilities].HardwareRevision = StringFromAPI(m_machine_capabilities["hardwareRevision"])
 			// inactiveDevices: nested field — expand manually if needed
-			items_machine_capabilities[i_machine_capabilities].Count = Int64FromAPI(m_machine_capabilities["count"])
+			items_machine_capabilities[i_machine_capabilities].CountValue = Int64FromAPI(m_machine_capabilities["count"])
 			items_machine_capabilities[i_machine_capabilities].DeviceType = StringFromAPI(m_machine_capabilities["deviceType"])
 		}
 		data.MachineCapabilities = items_machine_capabilities
@@ -954,7 +954,7 @@ func (r *InstanceTypeResource) populateModel(ctx context.Context, data *Instance
 			items_machine_capabilities[i_machine_capabilities].Vendor = StringFromAPI(m_machine_capabilities["vendor"])
 			items_machine_capabilities[i_machine_capabilities].HardwareRevision = StringFromAPI(m_machine_capabilities["hardwareRevision"])
 			// inactiveDevices: nested field — expand manually if needed
-			items_machine_capabilities[i_machine_capabilities].Count = Int64FromAPI(m_machine_capabilities["count"])
+			items_machine_capabilities[i_machine_capabilities].CountValue = Int64FromAPI(m_machine_capabilities["count"])
 			items_machine_capabilities[i_machine_capabilities].DeviceType = StringFromAPI(m_machine_capabilities["deviceType"])
 		}
 		data.MachineCapabilities = items_machine_capabilities

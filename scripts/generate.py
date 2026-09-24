@@ -289,9 +289,18 @@ def analyze_resource(tag, group, spec):
 # Field analysis: OpenAPI schema -> Terraform field descriptors
 # ---------------------------------------------------------------------------
 
+# Terraform meta-argument names that cannot be used as resource attribute names.
+_RESERVED_TF_NAMES = frozenset({
+    'count', 'depends_on', 'for_each', 'lifecycle',
+    'provider', 'provisioner', 'connection',
+})
+
+
 def analyze_field(prop_name, prop_schema, spec, resource_pascal, required_fields):
     """Return a field descriptor dict for one OpenAPI property."""
     snake_name = camel_to_snake(prop_name)
+    if snake_name in _RESERVED_TF_NAMES:
+        snake_name = snake_name + '_value'
     pascal_name = snake_to_pascal(snake_name)
     schema_type = get_schema_type(prop_schema)
     description = prop_schema.get('description', '%s attribute.' % snake_name).replace('\n', ' ').replace('\r', ' ')

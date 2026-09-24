@@ -77,27 +77,27 @@ type ExpectedMachineDsSkuComponentsCpusItem struct {
 	Vendor types.String `tfsdk:"vendor"`
 	Model types.String `tfsdk:"model"`
 	ThreadCount types.Int64 `tfsdk:"thread_count"`
-	Count types.Int64 `tfsdk:"count"`
+	CountValue types.Int64 `tfsdk:"count_value"`
 }
 
 type ExpectedMachineDsSkuComponentsGpusItem struct {
 	Vendor types.String `tfsdk:"vendor"`
 	Model types.String `tfsdk:"model"`
 	TotalMemory types.String `tfsdk:"total_memory"`
-	Count types.Int64 `tfsdk:"count"`
+	CountValue types.Int64 `tfsdk:"count_value"`
 }
 
 type ExpectedMachineDsSkuComponentsMemoryItem struct {
 	CapacityMb types.Int64 `tfsdk:"capacity_mb"`
 	MemoryType types.String `tfsdk:"memory_type"`
-	Count types.Int64 `tfsdk:"count"`
+	CountValue types.Int64 `tfsdk:"count_value"`
 }
 
 type ExpectedMachineDsSkuComponentsStorageItem struct {
 	Vendor types.String `tfsdk:"vendor"`
 	Model types.String `tfsdk:"model"`
 	CapacityMb types.Int64 `tfsdk:"capacity_mb"`
-	Count types.Int64 `tfsdk:"count"`
+	CountValue types.Int64 `tfsdk:"count_value"`
 	MinSizeMiB types.Int64 `tfsdk:"min_size_mi_b"`
 	MaxSizeMiB types.Int64 `tfsdk:"max_size_mi_b"`
 	PciPatterns types.List `tfsdk:"pci_patterns"`
@@ -112,14 +112,14 @@ type ExpectedMachineDsSkuComponentsChassis struct {
 type ExpectedMachineDsSkuComponentsEthernetDevicesItem struct {
 	Vendor types.String `tfsdk:"vendor"`
 	Model types.String `tfsdk:"model"`
-	Count types.Int64 `tfsdk:"count"`
+	CountValue types.Int64 `tfsdk:"count_value"`
 	IsConnected types.Bool `tfsdk:"is_connected"`
 }
 
 type ExpectedMachineDsSkuComponentsInfinibandDevicesItem struct {
 	Vendor types.String `tfsdk:"vendor"`
 	Model types.String `tfsdk:"model"`
-	Count types.Int64 `tfsdk:"count"`
+	CountValue types.Int64 `tfsdk:"count_value"`
 	InactiveDevices types.List `tfsdk:"inactive_devices"`
 }
 
@@ -258,7 +258,7 @@ func (d *ExpectedMachineDataSource) Schema(_ context.Context, _ datasource.Schem
 											Computed:    true,
 											Description: "Number of threads for the CPU",
 										},
-										"count": schema.Int64Attribute{
+										"count_value": schema.Int64Attribute{
 											Required:    false,
 											Optional:    false,
 											Computed:    true,
@@ -292,7 +292,7 @@ func (d *ExpectedMachineDataSource) Schema(_ context.Context, _ datasource.Schem
 											Computed:    true,
 											Description: "Total memory of the GPU (e.g. \"80GB HBM3\")",
 										},
-										"count": schema.Int64Attribute{
+										"count_value": schema.Int64Attribute{
 											Required:    false,
 											Optional:    false,
 											Computed:    true,
@@ -320,7 +320,7 @@ func (d *ExpectedMachineDataSource) Schema(_ context.Context, _ datasource.Schem
 											Computed:    true,
 											Description: "Type of memory (e.g. \"DDR4\", \"DDR5\")",
 										},
-										"count": schema.Int64Attribute{
+										"count_value": schema.Int64Attribute{
 											Required:    false,
 											Optional:    false,
 											Computed:    true,
@@ -354,7 +354,7 @@ func (d *ExpectedMachineDataSource) Schema(_ context.Context, _ datasource.Schem
 											Computed:    true,
 											Description: "Storage capacity in megabytes used for schema version 4 matching. Read-only in REST mutation requests and preserved in responses for legacy SKUs. Schema version 5 uses minSizeMiB and maxSizeMiB instead.",
 										},
-										"count": schema.Int64Attribute{
+										"count_value": schema.Int64Attribute{
 											Required:    false,
 											Optional:    false,
 											Computed:    true,
@@ -427,7 +427,7 @@ func (d *ExpectedMachineDataSource) Schema(_ context.Context, _ datasource.Schem
 											Computed:    true,
 											Description: "Model of the ethernet device",
 										},
-										"count": schema.Int64Attribute{
+										"count_value": schema.Int64Attribute{
 											Required:    false,
 											Optional:    false,
 											Computed:    true,
@@ -461,7 +461,7 @@ func (d *ExpectedMachineDataSource) Schema(_ context.Context, _ datasource.Schem
 											Computed:    true,
 											Description: "Model of the infiniband device",
 										},
-										"count": schema.Int64Attribute{
+										"count_value": schema.Int64Attribute{
 											Required:    false,
 											Optional:    false,
 											Computed:    true,

@@ -28,7 +28,7 @@ type InstanceResource struct {
 type InstanceResourceModel struct {
 	Id types.String `tfsdk:"id"`
 	NamePrefix types.String `tfsdk:"name_prefix"`
-	Count types.Int64 `tfsdk:"count"`
+	CountValue types.Int64 `tfsdk:"count_value"`
 	Description types.String `tfsdk:"description"`
 	TenantId types.String `tfsdk:"tenant_id"`
 	InstanceTypeId types.String `tfsdk:"instance_type_id"`
@@ -225,7 +225,7 @@ func (r *InstanceResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 				Computed:    false,
 				Description: "Prefix for instance names. Instances will be named with this prefix followed by a random 6-character suffix (e.g., \"worker\" becomes \"worker-abc123\")",
 			},
-			"count": schema.Int64Attribute{
+			"count_value": schema.Int64Attribute{
 				Required:    true,
 				Optional:    false,
 				Computed:    false,
@@ -1114,9 +1114,6 @@ func (r *InstanceResource) Create(ctx context.Context, req resource.CreateReques
 	if !data.NamePrefix.IsNull() && !data.NamePrefix.IsUnknown() {
 		body["namePrefix"] = data.NamePrefix.ValueString()
 	}
-	if !data.Count.IsNull() && !data.Count.IsUnknown() {
-		body["count"] = data.Count.ValueInt64()
-	}
 	if !data.Description.IsNull() && !data.Description.IsUnknown() {
 		body["description"] = data.Description.ValueString()
 	}
@@ -1252,7 +1249,7 @@ func (r *InstanceResource) Create(ctx context.Context, req resource.CreateReques
 	data.Id = StringFromAPI(result["id"])
 	diags := resp.Diagnostics
 	data.NamePrefix = StringFromAPI(result["namePrefix"])
-	data.Count = Int64FromAPI(result["count"])
+	data.CountValue = Int64FromAPI(result["count"])
 	data.Description = StringFromAPI(result["description"])
 	data.TenantId = StringFromAPI(result["tenantId"])
 	data.InstanceTypeId = StringFromAPI(result["instanceTypeId"])
@@ -1476,7 +1473,7 @@ func (r *InstanceResource) Read(ctx context.Context, req resource.ReadRequest, r
 	data.Id = StringFromAPI(result["id"])
 	diags := resp.Diagnostics
 	data.NamePrefix = StringFromAPI(result["namePrefix"])
-	data.Count = Int64FromAPI(result["count"])
+	data.CountValue = Int64FromAPI(result["count"])
 	data.Description = StringFromAPI(result["description"])
 	data.TenantId = StringFromAPI(result["tenantId"])
 	data.InstanceTypeId = StringFromAPI(result["instanceTypeId"])
@@ -1817,7 +1814,7 @@ func (r *InstanceResource) Update(ctx context.Context, req resource.UpdateReques
 	data.Id = StringFromAPI(result["id"])
 	diags := resp.Diagnostics
 	data.NamePrefix = StringFromAPI(result["namePrefix"])
-	data.Count = Int64FromAPI(result["count"])
+	data.CountValue = Int64FromAPI(result["count"])
 	data.Description = StringFromAPI(result["description"])
 	data.TenantId = StringFromAPI(result["tenantId"])
 	data.InstanceTypeId = StringFromAPI(result["instanceTypeId"])
@@ -2037,7 +2034,7 @@ func (r *InstanceResource) Delete(ctx context.Context, req resource.DeleteReques
 
 func (r *InstanceResource) populateModel(ctx context.Context, data *InstanceResourceModel, result map[string]interface{}, diags diag.Diagnostics) {
 	data.NamePrefix = StringFromAPI(result["namePrefix"])
-	data.Count = Int64FromAPI(result["count"])
+	data.CountValue = Int64FromAPI(result["count"])
 	data.Description = StringFromAPI(result["description"])
 	data.TenantId = StringFromAPI(result["tenantId"])
 	data.InstanceTypeId = StringFromAPI(result["instanceTypeId"])
