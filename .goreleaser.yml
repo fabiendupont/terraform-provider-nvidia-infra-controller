@@ -32,13 +32,6 @@ checksum:
   name_template: "{{ .ProjectName }}_{{ .Version }}_SHA256SUMS"
   algorithm: sha256
 
-# Keyless signing via Sigstore/cosign — always runs in GitHub Actions using the
-# OIDC token. Produces a .sig and .pem (certificate) alongside the checksum file.
-# Verifiable with: cosign verify-blob --bundle <artifact>.bundle <artifact>
-cosigns:
-  - artifacts: checksum
-    output: true
-
 # GPG signing of the checksum — required for Terraform Registry publication.
 # Only runs when GPG_FINGERPRINT is set (i.e., secrets.GPG_PRIVATE_KEY is configured).
 # Pass --skip=sign to goreleaser when no GPG key is available.

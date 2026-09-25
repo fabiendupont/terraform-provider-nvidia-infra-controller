@@ -3,7 +3,7 @@
 # Called by release.yml (on manual tag push) and sync.yml (after automated commit).
 #
 # Signing behaviour:
-#   - Cosign (keyless, Sigstore): always runs — no secrets required.
+#   - GitHub artifact attestations (SLSA): always runs — no secrets required.
 #   - GPG: runs only when secrets.GPG_PRIVATE_KEY is set — required for Terraform Registry.
 name: Publish
 
@@ -20,7 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write       # create GitHub Release
-      id-token: write       # cosign keyless signing via GitHub OIDC
+      id-token: write       # SLSA attestations via GitHub OIDC
+      attestations: write   # GitHub artifact attestations
 
     steps:
       - name: Checkout
@@ -32,9 +33,6 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
-
-      - name: Install cosign
-        uses: sigstore/cosign-installer@v3
 
       - name: Import GPG key
         if: env.GPG_PRIVATE_KEY != ''
@@ -56,6 +54,7 @@ jobs:
           fi
 
       - name: Run GoReleaser
+        id: goreleaser
         uses: goreleaser/goreleaser-action@v6
         with:
           version: latest
@@ -63,3 +62,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: dist/*.zip
