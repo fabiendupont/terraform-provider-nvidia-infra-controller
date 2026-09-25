@@ -64,7 +64,7 @@ Read-Only:
 - `serial_number` (String) Serial number of the component
 - `slot_id` (Number) Slot ID of the component within the rack
 - `tray_idx` (Number) Tray index of the component
-- `type` (String) Type of the component (e.g. ComponentTypeCompute, ComponentTypeNVSwitch)
+- `type` (String) Type of the component (e.g. Compute, NVSwitch, PowerShelf)
 
 <a id="nestedatt--components--bmcs"></a>
 ### Nested Schema for `components.bmcs`

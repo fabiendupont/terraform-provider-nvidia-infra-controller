@@ -197,7 +197,7 @@ func (d *RackDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 							Required:    false,
 							Optional:    false,
 							Computed:    true,
-							Description: "Type of the component (e.g. ComponentTypeCompute, ComponentTypeNVSwitch)",
+							Description: "Type of the component (e.g. Compute, NVSwitch, PowerShelf)",
 						},
 						"name": schema.StringAttribute{
 							Required:    false,
