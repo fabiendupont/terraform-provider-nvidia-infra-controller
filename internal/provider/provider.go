@@ -36,7 +36,7 @@ func New(version string) func() provider.Provider {
 }
 
 func (p *NicoProvider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
-	resp.TypeName = "nvidia_infra_controller"
+	resp.TypeName = "nico"
 	resp.Version = p.version
 }
 

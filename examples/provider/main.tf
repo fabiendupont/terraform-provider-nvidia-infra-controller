@@ -3,14 +3,14 @@
 
 terraform {
   required_providers {
-    nvidia-infra-controller = {
+    nico = {
       source  = "fabiendupont/nvidia-infra-controller"
       version = "~> 2.0"
     }
   }
 }
 
-provider "nvidia-infra-controller" {
+provider "nico" {
   # endpoint = "https://nico-rest-api.example.com"  # or NICO_ENDPOINT env var
   # token    = "your-bearer-token"                  # or NICO_TOKEN env var
   # org      = "your-org-name"                      # or NICO_ORG env var

@@ -5,7 +5,7 @@
 ![License](https://img.shields.io/badge/license-Apache--2.0-green)
 ![Terraform](https://img.shields.io/badge/terraform-%3E%3D1.0-purple)
 
-The `nvidia-infra-controller` provider manages resources on
+The `nico` provider manages resources on
 [NVIDIA Infra Controller](https://github.com/dsx-ai-factory/infra-controller) (NICo)
 — GPU bare-metal provisioning, VPC networking, instance lifecycle, and more.
 All resources and data sources are generated directly from the NICo OpenAPI
@@ -29,7 +29,7 @@ specification and track the upstream API version exactly.
 ```hcl
 terraform {
   required_providers {
-    nvidia_infra_controller = {
+    nico = {
       source  = "fabiendupont/nvidia-infra-controller"
       version = "~> 2.0"
     }
@@ -49,7 +49,7 @@ page and place it in your
 Configure the provider in your Terraform root module:
 
 ```hcl
-provider "nvidia_infra_controller" {
+provider "nico" {
   endpoint = "https://nico-rest-api.example.com"
   token    = var.nico_token
   org      = "my-org"
@@ -80,7 +80,7 @@ export NICO_TOKEN=$(curl -s -X POST "$SSA_TOKEN_URL" \
 ### Create a VPC and provision an instance
 
 ```hcl
-resource "nvidia_infra_controller_vpc" "lab" {
+resource "nico_vpc" "lab" {
   name                       = "lab-vpc"
   site_id                    = var.site_id
   network_virtualization_type = "FNN"
@@ -89,23 +89,23 @@ resource "nvidia_infra_controller_vpc" "lab" {
   }
 }
 
-resource "nvidia_infra_controller_ip_block" "lab" {
+resource "nico_ip_block" "lab" {
   site_id = var.site_id
   # ...
 }
 
-resource "nvidia_infra_controller_vpc_prefix" "lab" {
+resource "nico_vpc_prefix" "lab" {
   name         = "lab-prefix"
-  vpc_id       = nvidia_infra_controller_vpc.lab.id
-  ip_block_id  = nvidia_infra_controller_ip_block.lab.id
+  vpc_id       = nico_vpc.lab.id
+  ip_block_id  = nico_ip_block.lab.id
   prefix_length = 24
 }
 
-resource "nvidia_infra_controller_instance" "gpu_worker" {
+resource "nico_instance" "gpu_worker" {
   name               = "gpu-worker-01"
   tenant_id          = var.tenant_id
   instance_type_id   = var.instance_type_id
-  vpc_id             = nvidia_infra_controller_vpc.lab.id
+  vpc_id             = nico_vpc.lab.id
   operating_system_id = var.os_id
   ssh_key_group_ids  = [var.ssh_key_group_id]
   labels = {
@@ -118,16 +118,16 @@ resource "nvidia_infra_controller_instance" "gpu_worker" {
 ### Read existing resources
 
 ```hcl
-data "nvidia_infra_controller_site" "main" {
+data "nico_site" "main" {
   id = var.site_id
 }
 
-data "nvidia_infra_controller_vpc" "existing" {
+data "nico_vpc" "existing" {
   id = var.vpc_id
 }
 
 output "site_name" {
-  value = data.nvidia_infra_controller_site.main.name
+  value = data.nico_site.main.name
 }
 ```
 

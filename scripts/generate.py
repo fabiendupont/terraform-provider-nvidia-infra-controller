@@ -1460,7 +1460,7 @@ def generate_resource_example(resource_name, resource_info, spec, overrides):
     fields, path_params = merge_resource_fields(resource_info, spec)
     scope_fields = set(overrides.get('scope_fields', []))
 
-    lines = ['resource "nvidia_infra_controller_%s" "example" {' % resource_name]
+    lines = ['resource "nico_%s" "example" {' % resource_name]
 
     shown = set()
 
@@ -1493,12 +1493,12 @@ def generate_resource_example(resource_name, resource_info, spec, overrides):
 def generate_datasource_example(resource_name, resource_info):
     """Generate an example data-source.tf for a data source."""
     lines = [
-        'data "nvidia_infra_controller_%s" "example" {' % resource_name,
+        'data "nico_%s" "example" {' % resource_name,
         '  id = "resource-uuid"',
         '}',
         '',
         'output "%s_name" {' % resource_name,
-        '  value = data.nvidia_infra_controller_%s.example.name' % resource_name,
+        '  value = data.nico_%s.example.name' % resource_name,
         '}',
     ]
     return '\n'.join(lines) + '\n'
@@ -1507,13 +1507,13 @@ def generate_datasource_example(resource_name, resource_info):
 def write_example_files(resource_name, resource_info, spec, overrides, output_root, is_read_only):
     """Write example .tf files for a resource and/or data source."""
     if not is_read_only:
-        res_dir = os.path.join(output_root, 'examples', 'resources', 'nvidia_infra_controller_%s' % resource_name)
+        res_dir = os.path.join(output_root, 'examples', 'resources', 'nico_%s' % resource_name)
         os.makedirs(res_dir, exist_ok=True)
         example = generate_resource_example(resource_name, resource_info, spec, overrides)
         with open(os.path.join(res_dir, 'resource.tf'), 'w') as f:
             f.write(example)
 
-    ds_dir = os.path.join(output_root, 'examples', 'data-sources', 'nvidia_infra_controller_%s' % resource_name)
+    ds_dir = os.path.join(output_root, 'examples', 'data-sources', 'nico_%s' % resource_name)
     os.makedirs(ds_dir, exist_ok=True)
     example = generate_datasource_example(resource_name, resource_info)
     with open(os.path.join(ds_dir, 'data-source.tf'), 'w') as f:

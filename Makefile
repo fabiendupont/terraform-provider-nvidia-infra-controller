@@ -18,7 +18,7 @@ fetch-spec:
 generate: fetch-spec
 	python scripts/generate.py --spec $(SPEC) --output $(PROVIDER_DIR)
 	go fmt ./$(PROVIDER_DIR)/...
-	tfplugindocs generate --provider-name nvidia-infra-controller
+	tfplugindocs generate --provider-name nico
 
 build: generate
 	go build -v ./...

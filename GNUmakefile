@@ -34,7 +34,7 @@ tidy:
 .PHONY: docs
 docs:
 	go generate ./...
-	tfplugindocs generate --provider-name nvidia-infra-controller
+	tfplugindocs generate --provider-name nico
 
 .PHONY: clean
 clean:
