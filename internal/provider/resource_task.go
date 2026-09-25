@@ -26,19 +26,18 @@ type TaskResource struct {
 }
 
 type TaskResourceModel struct {
-	Id types.String `tfsdk:"id"`
-	SiteId types.String `tfsdk:"site_id"`
-	Status types.String `tfsdk:"status"`
+	Id          types.String `tfsdk:"id"`
+	SiteId      types.String `tfsdk:"site_id"`
+	Status      types.String `tfsdk:"status"`
 	Description types.String `tfsdk:"description"`
-	Message types.String `tfsdk:"message"`
-	RuleId types.String `tfsdk:"rule_id"`
-	Started types.String `tfsdk:"started"`
-	Finished types.String `tfsdk:"finished"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
-	Report types.String `tfsdk:"report"`
+	Message     types.String `tfsdk:"message"`
+	RuleId      types.String `tfsdk:"rule_id"`
+	Started     types.String `tfsdk:"started"`
+	Finished    types.String `tfsdk:"finished"`
+	Created     types.String `tfsdk:"created"`
+	Updated     types.String `tfsdk:"updated"`
+	Report      types.String `tfsdk:"report"`
 }
-
 
 func (r *TaskResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_task"

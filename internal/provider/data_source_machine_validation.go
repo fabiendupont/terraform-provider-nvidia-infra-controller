@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,22 +26,21 @@ type MachineValidationDataSource struct {
 }
 
 type MachineValidationDataSourceModel struct {
-	MachineId types.String `tfsdk:"machine_id"`
-	ValidationId types.String `tfsdk:"validation_id"`
-	StartTime types.String `tfsdk:"start_time"`
-	EndTime types.String `tfsdk:"end_time"`
-	Name types.String `tfsdk:"name"`
-	Context types.String `tfsdk:"context"`
-	Status *MachineValidationDsStatus `tfsdk:"status"`
-	DurationToCompleteSecs types.Int64 `tfsdk:"duration_to_complete_secs"`
+	MachineId              types.String               `tfsdk:"machine_id"`
+	ValidationId           types.String               `tfsdk:"validation_id"`
+	StartTime              types.String               `tfsdk:"start_time"`
+	EndTime                types.String               `tfsdk:"end_time"`
+	Name                   types.String               `tfsdk:"name"`
+	Context                types.String               `tfsdk:"context"`
+	Status                 *MachineValidationDsStatus `tfsdk:"status"`
+	DurationToCompleteSecs types.Int64                `tfsdk:"duration_to_complete_secs"`
 }
 
 type MachineValidationDsStatus struct {
-	State types.String `tfsdk:"state"`
-	Total types.Int64 `tfsdk:"total"`
-	Completed types.Int64 `tfsdk:"completed"`
+	State     types.String `tfsdk:"state"`
+	Total     types.Int64  `tfsdk:"total"`
+	Completed types.Int64  `tfsdk:"completed"`
 }
-
 
 func (d *MachineValidationDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_machine_validation"

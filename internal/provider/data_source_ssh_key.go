@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,17 +26,16 @@ type SshKeyDataSource struct {
 }
 
 type SshKeyDataSourceModel struct {
-	Id types.String `tfsdk:"id"`
+	Id            types.String `tfsdk:"id"`
 	SshKeyGroupId types.String `tfsdk:"ssh_key_group_id"`
-	Query types.String `tfsdk:"query"`
-	Name types.String `tfsdk:"name"`
-	Org types.String `tfsdk:"org"`
-	TenantId types.String `tfsdk:"tenant_id"`
-	Fingerprint types.String `tfsdk:"fingerprint"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
+	Query         types.String `tfsdk:"query"`
+	Name          types.String `tfsdk:"name"`
+	Org           types.String `tfsdk:"org"`
+	TenantId      types.String `tfsdk:"tenant_id"`
+	Fingerprint   types.String `tfsdk:"fingerprint"`
+	Created       types.String `tfsdk:"created"`
+	Updated       types.String `tfsdk:"updated"`
 }
-
 
 func (d *SshKeyDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_ssh_key"
@@ -153,12 +152,12 @@ func (d *SshKeyDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 			data.Id = StringFromAPI(result["id"])
 			diags := resp.Diagnostics
 			data.Name = StringFromAPI(result["name"])
-		data.Org = StringFromAPI(result["org"])
-		data.TenantId = StringFromAPI(result["tenantId"])
-		data.Fingerprint = StringFromAPI(result["fingerprint"])
-		data.Created = StringFromAPI(result["created"])
-		data.Updated = StringFromAPI(result["updated"])
-		_ = diags
+			data.Org = StringFromAPI(result["org"])
+			data.TenantId = StringFromAPI(result["tenantId"])
+			data.Fingerprint = StringFromAPI(result["fingerprint"])
+			data.Created = StringFromAPI(result["created"])
+			data.Updated = StringFromAPI(result["updated"])
+			_ = diags
 		}
 	}
 

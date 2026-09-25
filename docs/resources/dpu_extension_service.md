@@ -3,12 +3,12 @@
 page_title: "nico_dpu_extension_service Resource - nico"
 subcategory: ""
 description: |-
-  DPU Extension Service allows users to run custom services in the DPUs of their Instances. KubernetesPod is delivered through the DPU agent; DpfHelmChart is reconciled through DPF.
+  DPU Extension Service allows users to run custom services in the DPUs of their Instances. Currently K8s pods are the only supported service type.
 ---
 
 # nico_dpu_extension_service (Resource)
 
-DPU Extension Service allows users to run custom services in the DPUs of their Instances. KubernetesPod is delivered through the DPU agent; DpfHelmChart is reconciled through DPF.
+DPU Extension Service allows users to run custom services in the DPUs of their Instances. Currently K8s pods are the only supported service type.
 
 ## Example Usage
 
@@ -27,18 +27,17 @@ resource "nico_dpu_extension_service" "example" {
 
 ### Required
 
-- `data` (String) Deployment specification as a string, limited to 131072 UTF-8 bytes. Use a YAML/JSON Pod manifest for KubernetesPod or JSON-encoded Helm configuration for DpfHelmChart. The object schema documents the Helm structure; requests must still send a string.
+- `data` (String) Deployment spec for the DPU Extension Service
 - `name` (String) Name for the DPU Extension Service. Must be unique for a given Tenant
 - `service_type` (String) Type of the DPU Extension Service
 - `site_id` (String) ID for the Site the DPU Extension Service belongs to
 
 ### Optional
 
-- `credentials` (Attributes) Credentials to download resources specified in DPU Extension Service data; unsupported for DpfHelmChart (see [below for nested schema](#nestedatt--credentials))
+- `credentials` (Attributes) Credentials to download resources specified in DPU Extension Service data (see [below for nested schema](#nestedatt--credentials))
 - `description` (String) Optional description for the DPU Extension Service
 - `dpu_extension_service_id` (String) Path parameter: dpu_extension_service_id.
-- `dpu_target` (String) Required for DpfHelmChart services and unsupported for KubernetesPod services
-- `observability` (Attributes) Observability configuration for the DPU Extension Service version; unsupported for DpfHelmChart (see [below for nested schema](#nestedatt--observability))
+- `observability` (Attributes) Observability configuration for the DPU Extension Service version (see [below for nested schema](#nestedatt--observability))
 
 ### Read-Only
 

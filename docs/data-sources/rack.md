@@ -41,10 +41,7 @@ output "rack_name" {
 - `description` (String) Description of the Rack
 - `location` (Attributes) Physical or logical location of the Rack (see [below for nested schema](#nestedatt--location))
 - `model` (String) Model of the Rack
-- `nv_link_domain_ids` (List of String) IDs of the NVLink Domains containing this Rack. Empty when the Rack is not assigned to an NVLink Domain.
-- `operation_status` (String) Operability phase aggregated from tray operationStatus values.
 - `serial_number` (String) Serial number of the Rack
-- `task_stats` (Attributes) Counts of non-terminal tasks currently associated with a rack or tray. Rack stats include component-scoped tasks on the rack; tray stats include only tasks that explicitly target the tray. (see [below for nested schema](#nestedatt--task_stats))
 
 <a id="nestedatt--components"></a>
 ### Nested Schema for `components`
@@ -52,22 +49,22 @@ output "rack_name" {
 Read-Only:
 
 - `bmcs` (Attributes List) BMC (Baseboard Management Controller) entries for the component (see [below for nested schema](#nestedatt--components--bmcs))
+- `component_id` (String) ID of the component
 - `description` (String) Description of the component (JSON string)
 - `firmware_version` (String) Firmware version of the component
 - `host_id` (Number) Host ID of the component
-- `id` (String) Component ID
-- `leak_handling_status` (String) Flow's leakage-handling status. Unknown means Flow could not determine the status; None means no supported handling task exists; ShuttingDown means a forced-shutdown task is waiting, pending, or running; Down means it completed; and Failed means the latest supported handling task failed or was terminated. Down describes handling progress, not the component's current power state.
+- `id` (String) Unique identifier of the component
 - `leak_status` (String) Whether the component is considered leaking coolant
 - `manufacturer` (String) Manufacturer of the component
 - `model` (String) Model of the component
 - `name` (String) Name of the component
 - `operation_status` (String) Flow-derived operability phase of the component
 - `power_state` (String) Current power state of the component
-- `rack_id` (String) ID of the Rack this component belongs to
+- `rack_id` (String) ID of the rack this component belongs to
 - `serial_number` (String) Serial number of the component
 - `slot_id` (Number) Slot ID of the component within the rack
 - `tray_idx` (Number) Tray index of the component
-- `type` (String) Type of the component (e.g. Compute, NVSwitch, PowerShelf)
+- `type` (String) Type of the component (e.g. ComponentTypeCompute, ComponentTypeNVSwitch)
 
 <a id="nestedatt--components--bmcs"></a>
 ### Nested Schema for `components.bmcs`
@@ -89,12 +86,3 @@ Read-Only:
 - `position` (String) Position of the rack within the room
 - `region` (String) Region where the rack is located
 - `room` (String) Room within the datacenter
-
-
-<a id="nestedatt--task_stats"></a>
-### Nested Schema for `task_stats`
-
-Read-Only:
-
-- `active_task_count` (Number) Number of associated tasks in Running state.
-- `pending_task_count` (Number) Number of associated tasks in Waiting or Pending state.

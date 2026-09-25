@@ -17,7 +17,6 @@ resource "nico_subnet" "example" {
   vpc_id                         = "vpc-id-uuid"
   site_id                        = "site-id-uuid"
   name                           = "name-value"
-  ipv4_block_id                  = "ipv4-block-id-value"
   prefix_length                  = 0
   description                    = "description-value"
 }
@@ -28,15 +27,16 @@ resource "nico_subnet" "example" {
 
 ### Required
 
-- `ipv4_block_id` (String) ID of the Ready, derived Tenant IPv4 Block from an Allocation
 - `name` (String) Name of the Subnet
-- `prefix_length` (Number) Length of the IPv4 prefix, from 8 through 30
+- `prefix_length` (Number) Length of the prefix
 
 ### Optional
 
 - `description` (String) Description of the Subnet
+- `ipv4_block_id` (String) ID of the derived Tenant IPv4 Block from an Allocation
+- `ipv6_block_id` (String) ID of the derived Tenant IPv6 Block from an Allocation
 - `subnet_id` (String) Path parameter: subnet_id.
-- `vpc_id` (String) ID of the Ethernet virtualizer VPC containing the Subnet
+- `vpc_id` (String) ID of the VPC containing the Subnet
 
 ### Read-Only
 
@@ -45,7 +45,6 @@ resource "nico_subnet" "example" {
 - `id` (String) The resource ID.
 - `ipv4_gateway` (String) Address of the IPv4 gateway in the Subnet
 - `ipv4_prefix` (String) The prefix that gets assigned to the subnet if ipv4 block is chosen
-- `ipv6_block_id` (String) ID of the derived Tenant IPv6 Block from an Allocation
 - `ipv6_gateway` (String) Address of the IPv6 gateway in the Subnet
 - `ipv6_prefix` (String) Prefix of the network in CIDR notation
 - `mtu` (Number) Maximum Transmission Unit size in bytes. This property is system-determined and read-only.
@@ -74,6 +73,6 @@ Read-Only:
 
 - `acquired_i_ps` (Number) Number of individual IP addresses acquired from the block
 - `acquired_prefixes` (Number) Total number of prefixes (of any size) acquired from this block
-- `available_i_ps` (Number) Total number of IP addresses in the block (acquired and unused), capped at 2,147,483,647. An IP Block allocated to one child prefix of the same size reports zero.
+- `available_i_ps` (Number) Total number of IP addresses in the block (acquired and unused)
 - `available_prefixes` (List of String) Example prefixes available to acquire
-- `available_smallest_prefixes` (Number) Number of complete `/30` IPv4 prefixes or `/126` IPv6 prefixes remaining after acquired child prefixes are excluded. Both prefix sizes contain four addresses. The count is capped at 2,147,483,647. The `acquiredIPs` count is not subtracted.
+- `available_smallest_prefixes` (Number) Total number of /30 prefixes that can still be acquired from this block (only reduced if prefixes are acquired, not reduced by acquired IPs)

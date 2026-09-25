@@ -26,24 +26,23 @@ type TaskRunResource struct {
 }
 
 type TaskRunResourceModel struct {
-	Id types.String `tfsdk:"id"`
-	SiteId types.String `tfsdk:"site_id"`
-	Reason types.String `tfsdk:"reason"`
-	Name types.String `tfsdk:"name"`
-	Description types.String `tfsdk:"description"`
+	Id            types.String `tfsdk:"id"`
+	SiteId        types.String `tfsdk:"site_id"`
+	Reason        types.String `tfsdk:"reason"`
+	Name          types.String `tfsdk:"name"`
+	Description   types.String `tfsdk:"description"`
 	OperationType types.String `tfsdk:"operation_type"`
 	OperationCode types.String `tfsdk:"operation_code"`
-	Status types.String `tfsdk:"status"`
-	StatusReason types.String `tfsdk:"status_reason"`
+	Status        types.String `tfsdk:"status"`
+	StatusReason  types.String `tfsdk:"status_reason"`
 	StatusMessage types.String `tfsdk:"status_message"`
-	TotalPhases types.Int64 `tfsdk:"total_phases"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
-	Started types.String `tfsdk:"started"`
-	Finished types.String `tfsdk:"finished"`
-	Stats types.String `tfsdk:"stats"`
+	TotalPhases   types.Int64  `tfsdk:"total_phases"`
+	Created       types.String `tfsdk:"created"`
+	Updated       types.String `tfsdk:"updated"`
+	Started       types.String `tfsdk:"started"`
+	Finished      types.String `tfsdk:"finished"`
+	Stats         types.String `tfsdk:"stats"`
 }
-
 
 func (r *TaskRunResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_task_run"

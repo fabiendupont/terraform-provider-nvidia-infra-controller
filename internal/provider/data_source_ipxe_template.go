@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,18 +26,17 @@ type IpxeTemplateDataSource struct {
 }
 
 type IpxeTemplateDataSourceModel struct {
-	Id types.String `tfsdk:"id"`
-	SiteId types.String `tfsdk:"site_id"`
-	Name types.String `tfsdk:"name"`
-	Template types.String `tfsdk:"template"`
-	RequiredParams types.List `tfsdk:"required_params"`
-	ReservedParams types.List `tfsdk:"reserved_params"`
-	RequiredArtifacts types.List `tfsdk:"required_artifacts"`
-	Visibility types.String `tfsdk:"visibility"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
+	Id                types.String `tfsdk:"id"`
+	SiteId            types.String `tfsdk:"site_id"`
+	Name              types.String `tfsdk:"name"`
+	Template          types.String `tfsdk:"template"`
+	RequiredParams    types.List   `tfsdk:"required_params"`
+	ReservedParams    types.List   `tfsdk:"reserved_params"`
+	RequiredArtifacts types.List   `tfsdk:"required_artifacts"`
+	Visibility        types.String `tfsdk:"visibility"`
+	Created           types.String `tfsdk:"created"`
+	Updated           types.String `tfsdk:"updated"`
 }
-
 
 func (d *IpxeTemplateDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_ipxe_template"
@@ -183,32 +182,32 @@ func (d *IpxeTemplateDataSource) Read(ctx context.Context, req datasource.ReadRe
 			data.Id = StringFromAPI(result["id"])
 			diags := resp.Diagnostics
 			data.Name = StringFromAPI(result["name"])
-		data.Template = StringFromAPI(result["template"])
-		if rawSlice_required_params := StringSliceFromAPI(result["requiredParams"]); rawSlice_required_params != nil {
-			lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_required_params)
-			diags.Append(d...)
-			data.RequiredParams = lv
-		} else {
-			data.RequiredParams = types.ListNull(types.StringType)
-		}
-		if rawSlice_reserved_params := StringSliceFromAPI(result["reservedParams"]); rawSlice_reserved_params != nil {
-			lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_reserved_params)
-			diags.Append(d...)
-			data.ReservedParams = lv
-		} else {
-			data.ReservedParams = types.ListNull(types.StringType)
-		}
-		if rawSlice_required_artifacts := StringSliceFromAPI(result["requiredArtifacts"]); rawSlice_required_artifacts != nil {
-			lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_required_artifacts)
-			diags.Append(d...)
-			data.RequiredArtifacts = lv
-		} else {
-			data.RequiredArtifacts = types.ListNull(types.StringType)
-		}
-		data.Visibility = StringFromAPI(result["visibility"])
-		data.Created = StringFromAPI(result["created"])
-		data.Updated = StringFromAPI(result["updated"])
-		_ = diags
+			data.Template = StringFromAPI(result["template"])
+			if rawSlice_required_params := StringSliceFromAPI(result["requiredParams"]); rawSlice_required_params != nil {
+				lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_required_params)
+				diags.Append(d...)
+				data.RequiredParams = lv
+			} else {
+				data.RequiredParams = types.ListNull(types.StringType)
+			}
+			if rawSlice_reserved_params := StringSliceFromAPI(result["reservedParams"]); rawSlice_reserved_params != nil {
+				lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_reserved_params)
+				diags.Append(d...)
+				data.ReservedParams = lv
+			} else {
+				data.ReservedParams = types.ListNull(types.StringType)
+			}
+			if rawSlice_required_artifacts := StringSliceFromAPI(result["requiredArtifacts"]); rawSlice_required_artifacts != nil {
+				lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_required_artifacts)
+				diags.Append(d...)
+				data.RequiredArtifacts = lv
+			} else {
+				data.RequiredArtifacts = types.ListNull(types.StringType)
+			}
+			data.Visibility = StringFromAPI(result["visibility"])
+			data.Created = StringFromAPI(result["created"])
+			data.Updated = StringFromAPI(result["updated"])
+			_ = diags
 		}
 	}
 

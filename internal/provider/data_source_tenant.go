@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,29 +26,18 @@ type TenantDataSource struct {
 }
 
 type TenantDataSourceModel struct {
-	SiteId types.String `tfsdk:"site_id"`
-	Id types.String `tfsdk:"id"`
-	Org types.String `tfsdk:"org"`
-	OrgDisplayName types.String `tfsdk:"org_display_name"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
-	Capabilities *TenantDsCapabilities `tfsdk:"capabilities"`
-	Deprecations []TenantDsDeprecationsItem `tfsdk:"deprecations"`
+	SiteId         types.String          `tfsdk:"site_id"`
+	Id             types.String          `tfsdk:"id"`
+	Org            types.String          `tfsdk:"org"`
+	OrgDisplayName types.String          `tfsdk:"org_display_name"`
+	Created        types.String          `tfsdk:"created"`
+	Updated        types.String          `tfsdk:"updated"`
+	Capabilities   *TenantDsCapabilities `tfsdk:"capabilities"`
 }
 
 type TenantDsCapabilities struct {
 	TargetedInstanceCreation types.Bool `tfsdk:"targeted_instance_creation"`
 }
-
-type TenantDsDeprecationsItem struct {
-	Attribute types.String `tfsdk:"attribute"`
-	QueryParam types.String `tfsdk:"query_param"`
-	Endpoint types.String `tfsdk:"endpoint"`
-	ReplacedBy types.String `tfsdk:"replaced_by"`
-	TakeActionBy types.String `tfsdk:"take_action_by"`
-	Notice types.String `tfsdk:"notice"`
-}
-
 
 func (d *TenantDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_tenant"
@@ -62,7 +51,7 @@ func (d *TenantDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "ID of the Site where the VPC will be created",
+				Description: "ID of the Site",
 			},
 			"id": schema.StringAttribute{Computed: true, Description: "The resource ID."},
 			"org": schema.StringAttribute{
@@ -93,59 +82,13 @@ func (d *TenantDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
-				Description: "Deprecated read-only aggregate of tenant-wide feature flags. Source of truth is Tenant Account `siteCapabilities`.",
+				Description: "Features that are enabled/disabled for Tenant",
 				Attributes: map[string]schema.Attribute{
 					"targeted_instance_creation": schema.BoolAttribute{
 						Required:    false,
 						Optional:    false,
 						Computed:    true,
-						Description: "Deprecated in favor of TenantAccount.siteCapabilities. On GET `/tenant/current`, the property is present and true only when every Ready Tenant Account enables TargetedInstanceCreation and no Tenant Site explicitly disables it; otherwise it is omitted. It is also omitted from embedded TenantSummary objects.",
-					},
-				},
-			},
-			"deprecations": schema.ListNestedAttribute{
-				Required:    false,
-				Optional:    false,
-				Computed:    true,
-				Description: "Deprecation notices for Tenant fields",
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"attribute": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Name of the attribute that is deprecated. Omitted if queryParam or endpoint is being deprecated.",
-						},
-						"query_param": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Query parameter that is deprecated. Omitted if attribute or endpoint is being deprecated.",
-						},
-						"endpoint": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "API endpoint that is deprecated. Omitted if attribute or queryParam is being deprecated.",
-						},
-						"replaced_by": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Name of the attribute, query parameter, or endpoint that replaces the deprecated item. Omitted if no replacement is available.",
-						},
-						"take_action_by": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Date/time by which clients should migrate away from the deprecated API surface",
-						},
-						"notice": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Message describing the deprecation",
-						},
+						Description: "Indicates whether Tenant can create Instances by specifying Machine ID",
 					},
 				},
 			},
@@ -201,22 +144,6 @@ func (d *TenantDataSource) populateModel(ctx context.Context, data *TenantDataSo
 		data.Capabilities = obj_capabilities
 	} else {
 		data.Capabilities = nil
-	}
-	if rawItems_deprecations, ok := result["deprecations"].([]interface{}); ok && rawItems_deprecations != nil {
-		items_deprecations := make([]TenantDsDeprecationsItem, len(rawItems_deprecations))
-		for i_deprecations, raw_deprecations := range rawItems_deprecations {
-			m_deprecations, _ := raw_deprecations.(map[string]interface{})
-			if m_deprecations == nil { m_deprecations = map[string]interface{}{} }
-			items_deprecations[i_deprecations].Attribute = StringFromAPI(m_deprecations["attribute"])
-			items_deprecations[i_deprecations].QueryParam = StringFromAPI(m_deprecations["queryParam"])
-			items_deprecations[i_deprecations].Endpoint = StringFromAPI(m_deprecations["endpoint"])
-			items_deprecations[i_deprecations].ReplacedBy = StringFromAPI(m_deprecations["replacedBy"])
-			items_deprecations[i_deprecations].TakeActionBy = StringFromAPI(m_deprecations["takeActionBy"])
-			items_deprecations[i_deprecations].Notice = StringFromAPI(m_deprecations["notice"])
-		}
-		data.Deprecations = items_deprecations
-	} else {
-		data.Deprecations = nil
 	}
 	_ = diags
 }

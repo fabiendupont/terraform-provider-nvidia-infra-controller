@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,45 +26,44 @@ type SubnetDataSource struct {
 }
 
 type SubnetDataSourceModel struct {
-	Id types.String `tfsdk:"id"`
-	SiteId types.String `tfsdk:"site_id"`
-	VpcId types.String `tfsdk:"vpc_id"`
-	Status types.String `tfsdk:"status"`
-	Query types.String `tfsdk:"query"`
-	IncludeUsageStats types.String `tfsdk:"include_usage_stats"`
-	Name types.String `tfsdk:"name"`
-	Description types.String `tfsdk:"description"`
-	ControllerNetworkSegmentId types.String `tfsdk:"controller_network_segment_id"`
-	Ipv4Prefix types.String `tfsdk:"ipv4_prefix"`
-	Ipv4BlockId types.String `tfsdk:"ipv4_block_id"`
-	Ipv4Gateway types.String `tfsdk:"ipv4_gateway"`
-	Ipv6Prefix types.String `tfsdk:"ipv6_prefix"`
-	Ipv6BlockId types.String `tfsdk:"ipv6_block_id"`
-	Ipv6Gateway types.String `tfsdk:"ipv6_gateway"`
-	Mtu types.Int64 `tfsdk:"mtu"`
-	PrefixLength types.Int64 `tfsdk:"prefix_length"`
-	RoutingType types.String `tfsdk:"routing_type"`
-	UsageStats *SubnetDsUsageStats `tfsdk:"usage_stats"`
-	StatusHistory []SubnetDsStatusHistoryItem `tfsdk:"status_history"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
+	Id                         types.String                `tfsdk:"id"`
+	SiteId                     types.String                `tfsdk:"site_id"`
+	VpcId                      types.String                `tfsdk:"vpc_id"`
+	Status                     types.String                `tfsdk:"status"`
+	Query                      types.String                `tfsdk:"query"`
+	IncludeUsageStats          types.String                `tfsdk:"include_usage_stats"`
+	Name                       types.String                `tfsdk:"name"`
+	Description                types.String                `tfsdk:"description"`
+	ControllerNetworkSegmentId types.String                `tfsdk:"controller_network_segment_id"`
+	Ipv4Prefix                 types.String                `tfsdk:"ipv4_prefix"`
+	Ipv4BlockId                types.String                `tfsdk:"ipv4_block_id"`
+	Ipv4Gateway                types.String                `tfsdk:"ipv4_gateway"`
+	Ipv6Prefix                 types.String                `tfsdk:"ipv6_prefix"`
+	Ipv6BlockId                types.String                `tfsdk:"ipv6_block_id"`
+	Ipv6Gateway                types.String                `tfsdk:"ipv6_gateway"`
+	Mtu                        types.Int64                 `tfsdk:"mtu"`
+	PrefixLength               types.Int64                 `tfsdk:"prefix_length"`
+	RoutingType                types.String                `tfsdk:"routing_type"`
+	UsageStats                 *SubnetDsUsageStats         `tfsdk:"usage_stats"`
+	StatusHistory              []SubnetDsStatusHistoryItem `tfsdk:"status_history"`
+	Created                    types.String                `tfsdk:"created"`
+	Updated                    types.String                `tfsdk:"updated"`
 }
 
 type SubnetDsUsageStats struct {
-	AvailableIPs types.Int64 `tfsdk:"available_i_ps"`
-	AcquiredIPs types.Int64 `tfsdk:"acquired_i_ps"`
-	AvailablePrefixes types.List `tfsdk:"available_prefixes"`
+	AvailableIPs              types.Int64 `tfsdk:"available_i_ps"`
+	AcquiredIPs               types.Int64 `tfsdk:"acquired_i_ps"`
+	AvailablePrefixes         types.List  `tfsdk:"available_prefixes"`
 	AvailableSmallestPrefixes types.Int64 `tfsdk:"available_smallest_prefixes"`
-	AcquiredPrefixes types.Int64 `tfsdk:"acquired_prefixes"`
+	AcquiredPrefixes          types.Int64 `tfsdk:"acquired_prefixes"`
 }
 
 type SubnetDsStatusHistoryItem struct {
-	Status types.String `tfsdk:"status"`
+	Status  types.String `tfsdk:"status"`
 	Message types.String `tfsdk:"message"`
 	Created types.String `tfsdk:"created"`
 	Updated types.String `tfsdk:"updated"`
 }
-
 
 func (d *SubnetDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_subnet"
@@ -187,7 +186,7 @@ func (d *SubnetDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 						Required:    false,
 						Optional:    false,
 						Computed:    true,
-						Description: "Total number of IP addresses in the block (acquired and unused), capped at 2,147,483,647. An IP Block allocated to one child prefix of the same size reports zero. ",
+						Description: "Total number of IP addresses in the block (acquired and unused)",
 					},
 					"acquired_i_ps": schema.Int64Attribute{
 						Required:    false,
@@ -206,7 +205,7 @@ func (d *SubnetDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 						Required:    false,
 						Optional:    false,
 						Computed:    true,
-						Description: "Number of complete `/30` IPv4 prefixes or `/126` IPv6 prefixes remaining after acquired child prefixes are excluded. Both prefix sizes contain four addresses. The count is capped at 2,147,483,647. The `acquiredIPs` count is not subtracted. ",
+						Description: "Total number of /30 prefixes that can still be acquired from this block (only reduced if prefixes are acquired, not reduced by acquired IPs) ",
 					},
 					"acquired_prefixes": schema.Int64Attribute{
 						Required:    false,
@@ -329,7 +328,9 @@ func (d *SubnetDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 			items_status_history := make([]SubnetDsStatusHistoryItem, len(rawItems_status_history))
 			for i_status_history, raw_status_history := range rawItems_status_history {
 				m_status_history, _ := raw_status_history.(map[string]interface{})
-				if m_status_history == nil { m_status_history = map[string]interface{}{} }
+				if m_status_history == nil {
+					m_status_history = map[string]interface{}{}
+				}
 				items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 				items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 				items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -354,46 +355,48 @@ func (d *SubnetDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 			data.Id = StringFromAPI(result["id"])
 			diags := resp.Diagnostics
 			data.Name = StringFromAPI(result["name"])
-		data.Description = StringFromAPI(result["description"])
-		data.ControllerNetworkSegmentId = StringFromAPI(result["controllerNetworkSegmentId"])
-		data.Ipv4Prefix = StringFromAPI(result["ipv4Prefix"])
-		data.Ipv4BlockId = StringFromAPI(result["ipv4BlockId"])
-		data.Ipv4Gateway = StringFromAPI(result["ipv4Gateway"])
-		data.Ipv6Prefix = StringFromAPI(result["ipv6Prefix"])
-		data.Ipv6BlockId = StringFromAPI(result["ipv6BlockId"])
-		data.Ipv6Gateway = StringFromAPI(result["ipv6Gateway"])
-		data.Mtu = Int64FromAPI(result["mtu"])
-		data.PrefixLength = Int64FromAPI(result["prefixLength"])
-		data.RoutingType = StringFromAPI(result["routingType"])
-		if rawObj_usage_stats, ok := result["usageStats"].(map[string]interface{}); ok {
-			obj_usage_stats := &SubnetDsUsageStats{}
-			obj_usage_stats.AvailableIPs = Int64FromAPI(rawObj_usage_stats["availableIPs"])
-			obj_usage_stats.AcquiredIPs = Int64FromAPI(rawObj_usage_stats["acquiredIPs"])
-			// availablePrefixes: nested field — expand manually if needed
-			obj_usage_stats.AvailableSmallestPrefixes = Int64FromAPI(rawObj_usage_stats["availableSmallestPrefixes"])
-			obj_usage_stats.AcquiredPrefixes = Int64FromAPI(rawObj_usage_stats["acquiredPrefixes"])
-			_ = rawObj_usage_stats
-			data.UsageStats = obj_usage_stats
-		} else {
-			data.UsageStats = nil
-		}
-		if rawItems_status_history, ok := result["statusHistory"].([]interface{}); ok && rawItems_status_history != nil {
-			items_status_history := make([]SubnetDsStatusHistoryItem, len(rawItems_status_history))
-			for i_status_history, raw_status_history := range rawItems_status_history {
-				m_status_history, _ := raw_status_history.(map[string]interface{})
-				if m_status_history == nil { m_status_history = map[string]interface{}{} }
-				items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
-				items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
-				items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
-				items_status_history[i_status_history].Updated = StringFromAPI(m_status_history["updated"])
+			data.Description = StringFromAPI(result["description"])
+			data.ControllerNetworkSegmentId = StringFromAPI(result["controllerNetworkSegmentId"])
+			data.Ipv4Prefix = StringFromAPI(result["ipv4Prefix"])
+			data.Ipv4BlockId = StringFromAPI(result["ipv4BlockId"])
+			data.Ipv4Gateway = StringFromAPI(result["ipv4Gateway"])
+			data.Ipv6Prefix = StringFromAPI(result["ipv6Prefix"])
+			data.Ipv6BlockId = StringFromAPI(result["ipv6BlockId"])
+			data.Ipv6Gateway = StringFromAPI(result["ipv6Gateway"])
+			data.Mtu = Int64FromAPI(result["mtu"])
+			data.PrefixLength = Int64FromAPI(result["prefixLength"])
+			data.RoutingType = StringFromAPI(result["routingType"])
+			if rawObj_usage_stats, ok := result["usageStats"].(map[string]interface{}); ok {
+				obj_usage_stats := &SubnetDsUsageStats{}
+				obj_usage_stats.AvailableIPs = Int64FromAPI(rawObj_usage_stats["availableIPs"])
+				obj_usage_stats.AcquiredIPs = Int64FromAPI(rawObj_usage_stats["acquiredIPs"])
+				// availablePrefixes: nested field — expand manually if needed
+				obj_usage_stats.AvailableSmallestPrefixes = Int64FromAPI(rawObj_usage_stats["availableSmallestPrefixes"])
+				obj_usage_stats.AcquiredPrefixes = Int64FromAPI(rawObj_usage_stats["acquiredPrefixes"])
+				_ = rawObj_usage_stats
+				data.UsageStats = obj_usage_stats
+			} else {
+				data.UsageStats = nil
 			}
-			data.StatusHistory = items_status_history
-		} else {
-			data.StatusHistory = nil
-		}
-		data.Created = StringFromAPI(result["created"])
-		data.Updated = StringFromAPI(result["updated"])
-		_ = diags
+			if rawItems_status_history, ok := result["statusHistory"].([]interface{}); ok && rawItems_status_history != nil {
+				items_status_history := make([]SubnetDsStatusHistoryItem, len(rawItems_status_history))
+				for i_status_history, raw_status_history := range rawItems_status_history {
+					m_status_history, _ := raw_status_history.(map[string]interface{})
+					if m_status_history == nil {
+						m_status_history = map[string]interface{}{}
+					}
+					items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
+					items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
+					items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
+					items_status_history[i_status_history].Updated = StringFromAPI(m_status_history["updated"])
+				}
+				data.StatusHistory = items_status_history
+			} else {
+				data.StatusHistory = nil
+			}
+			data.Created = StringFromAPI(result["created"])
+			data.Updated = StringFromAPI(result["updated"])
+			_ = diags
 		}
 	}
 
@@ -429,7 +432,9 @@ func (d *SubnetDataSource) populateModel(ctx context.Context, data *SubnetDataSo
 		items_status_history := make([]SubnetDsStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])

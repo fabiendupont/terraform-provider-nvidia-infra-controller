@@ -26,33 +26,32 @@ type CredentialRotationResource struct {
 }
 
 type CredentialRotationResourceModel struct {
-	Id types.String `tfsdk:"id"`
-	SiteId types.String `tfsdk:"site_id"`
-	CredentialType types.String `tfsdk:"credential_type"`
-	Password types.String `tfsdk:"password"`
-	Reason types.String `tfsdk:"reason"`
-	TargetVersion types.Int64 `tfsdk:"target_version"`
-	Converged types.Int64 `tfsdk:"converged"`
-	Pending types.Int64 `tfsdk:"pending"`
-	Quarantined types.Int64 `tfsdk:"quarantined"`
-	QuarantinedDeviceMacs types.List `tfsdk:"quarantined_device_macs"`
-	Started types.String `tfsdk:"started"`
-	Complete types.Bool `tfsdk:"complete"`
-	Device *CredentialRotationDevice `tfsdk:"device"`
+	Id                    types.String              `tfsdk:"id"`
+	SiteId                types.String              `tfsdk:"site_id"`
+	CredentialType        types.String              `tfsdk:"credential_type"`
+	Password              types.String              `tfsdk:"password"`
+	Reason                types.String              `tfsdk:"reason"`
+	TargetVersion         types.Int64               `tfsdk:"target_version"`
+	Converged             types.Int64               `tfsdk:"converged"`
+	Pending               types.Int64               `tfsdk:"pending"`
+	Quarantined           types.Int64               `tfsdk:"quarantined"`
+	QuarantinedDeviceMacs types.List                `tfsdk:"quarantined_device_macs"`
+	Started               types.String              `tfsdk:"started"`
+	Complete              types.Bool                `tfsdk:"complete"`
+	Device                *CredentialRotationDevice `tfsdk:"device"`
 }
 
 type CredentialRotationDevice struct {
-	DeviceMac types.String `tfsdk:"device_mac"`
-	CurrentVersion types.Int64 `tfsdk:"current_version"`
-	RotatingToVersion types.Int64 `tfsdk:"rotating_to_version"`
-	Converged types.Bool `tfsdk:"converged"`
-	Quarantined types.Bool `tfsdk:"quarantined"`
-	QuarantinedUntil types.String `tfsdk:"quarantined_until"`
-	RotateAttempts types.Int64 `tfsdk:"rotate_attempts"`
-	LastAttempted types.String `tfsdk:"last_attempted"`
-	LastError types.String `tfsdk:"last_error"`
+	DeviceMac         types.String `tfsdk:"device_mac"`
+	CurrentVersion    types.Int64  `tfsdk:"current_version"`
+	RotatingToVersion types.Int64  `tfsdk:"rotating_to_version"`
+	Converged         types.Bool   `tfsdk:"converged"`
+	Quarantined       types.Bool   `tfsdk:"quarantined"`
+	QuarantinedUntil  types.String `tfsdk:"quarantined_until"`
+	RotateAttempts    types.Int64  `tfsdk:"rotate_attempts"`
+	LastAttempted     types.String `tfsdk:"last_attempted"`
+	LastError         types.String `tfsdk:"last_error"`
 }
-
 
 func (r *CredentialRotationResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_credential_rotation"

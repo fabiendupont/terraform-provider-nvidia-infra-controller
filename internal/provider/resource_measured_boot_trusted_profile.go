@@ -26,16 +26,15 @@ type MeasuredBootTrustedProfileResource struct {
 }
 
 type MeasuredBootTrustedProfileResourceModel struct {
-	Id types.String `tfsdk:"id"`
-	SiteId types.String `tfsdk:"site_id"`
-	ProfileId types.String `tfsdk:"profile_id"`
+	Id           types.String `tfsdk:"id"`
+	SiteId       types.String `tfsdk:"site_id"`
+	ProfileId    types.String `tfsdk:"profile_id"`
 	ApprovalType types.String `tfsdk:"approval_type"`
 	PcrRegisters types.String `tfsdk:"pcr_registers"`
-	Comments types.String `tfsdk:"comments"`
-	ApprovalId types.String `tfsdk:"approval_id"`
-	Created types.String `tfsdk:"created"`
+	Comments     types.String `tfsdk:"comments"`
+	ApprovalId   types.String `tfsdk:"approval_id"`
+	Created      types.String `tfsdk:"created"`
 }
-
 
 func (r *MeasuredBootTrustedProfileResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_measured_boot_trusted_profile"

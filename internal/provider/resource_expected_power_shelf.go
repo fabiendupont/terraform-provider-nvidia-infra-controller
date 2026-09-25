@@ -26,27 +26,26 @@ type ExpectedPowerShelfResource struct {
 }
 
 type ExpectedPowerShelfResourceModel struct {
-	Id types.String `tfsdk:"id"`
-	SiteId types.String `tfsdk:"site_id"`
-	BmcMacAddress types.String `tfsdk:"bmc_mac_address"`
-	DefaultBmcUsername types.String `tfsdk:"default_bmc_username"`
-	DefaultBmcPassword types.String `tfsdk:"default_bmc_password"`
-	ShelfSerialNumber types.String `tfsdk:"shelf_serial_number"`
-	BmcIpAddress types.String `tfsdk:"bmc_ip_address"`
-	RackId types.String `tfsdk:"rack_id"`
-	Name types.String `tfsdk:"name"`
-	Manufacturer types.String `tfsdk:"manufacturer"`
-	Model types.String `tfsdk:"model"`
-	Description types.String `tfsdk:"description"`
-	SlotId types.Int64 `tfsdk:"slot_id"`
-	TrayIdx types.Int64 `tfsdk:"tray_idx"`
-	HostId types.Int64 `tfsdk:"host_id"`
-	Labels types.Map `tfsdk:"labels"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
+	Id                   types.String `tfsdk:"id"`
+	SiteId               types.String `tfsdk:"site_id"`
+	BmcMacAddress        types.String `tfsdk:"bmc_mac_address"`
+	DefaultBmcUsername   types.String `tfsdk:"default_bmc_username"`
+	DefaultBmcPassword   types.String `tfsdk:"default_bmc_password"`
+	ShelfSerialNumber    types.String `tfsdk:"shelf_serial_number"`
+	BmcIpAddress         types.String `tfsdk:"bmc_ip_address"`
+	RackId               types.String `tfsdk:"rack_id"`
+	Name                 types.String `tfsdk:"name"`
+	Manufacturer         types.String `tfsdk:"manufacturer"`
+	Model                types.String `tfsdk:"model"`
+	Description          types.String `tfsdk:"description"`
+	SlotId               types.Int64  `tfsdk:"slot_id"`
+	TrayIdx              types.Int64  `tfsdk:"tray_idx"`
+	HostId               types.Int64  `tfsdk:"host_id"`
+	Labels               types.Map    `tfsdk:"labels"`
+	Created              types.String `tfsdk:"created"`
+	Updated              types.String `tfsdk:"updated"`
 	ExpectedPowerShelfId types.String `tfsdk:"expected_power_shelf_id"`
 }
-
 
 func (r *ExpectedPowerShelfResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_expected_power_shelf"

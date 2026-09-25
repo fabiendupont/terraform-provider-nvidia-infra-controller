@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,16 +26,16 @@ type DpuExtensionServiceDataSource struct {
 }
 
 type DpuExtensionServiceDataSourceModel struct {
-	Id types.String `tfsdk:"id"`
-	SiteId types.String `tfsdk:"site_id"`
-	Status types.String `tfsdk:"status"`
-	Query types.String `tfsdk:"query"`
-	DpuExtensionServiceId types.String `tfsdk:"dpu_extension_service_id"`
-	Version types.String `tfsdk:"version"`
-	Data types.String `tfsdk:"data"`
-	HasCredentials types.Bool `tfsdk:"has_credentials"`
-	Created types.String `tfsdk:"created"`
-	Observability *DpuExtensionServiceDsObservability `tfsdk:"observability"`
+	Id                    types.String                        `tfsdk:"id"`
+	SiteId                types.String                        `tfsdk:"site_id"`
+	Status                types.String                        `tfsdk:"status"`
+	Query                 types.String                        `tfsdk:"query"`
+	DpuExtensionServiceId types.String                        `tfsdk:"dpu_extension_service_id"`
+	Version               types.String                        `tfsdk:"version"`
+	Data                  types.String                        `tfsdk:"data"`
+	HasCredentials        types.Bool                          `tfsdk:"has_credentials"`
+	Created               types.String                        `tfsdk:"created"`
+	Observability         *DpuExtensionServiceDsObservability `tfsdk:"observability"`
 }
 
 type DpuExtensionServiceDsObservability struct {
@@ -43,20 +43,19 @@ type DpuExtensionServiceDsObservability struct {
 }
 
 type DpuExtensionServiceDsObservabilityConfigsItem struct {
-	Name types.String `tfsdk:"name"`
+	Name       types.String                                             `tfsdk:"name"`
 	Prometheus *DpuExtensionServiceDsObservabilityConfigsItemPrometheus `tfsdk:"prometheus"`
-	Logging *DpuExtensionServiceDsObservabilityConfigsItemLogging `tfsdk:"logging"`
+	Logging    *DpuExtensionServiceDsObservabilityConfigsItemLogging    `tfsdk:"logging"`
 }
 
 type DpuExtensionServiceDsObservabilityConfigsItemPrometheus struct {
-	ScrapeIntervalSeconds types.Int64 `tfsdk:"scrape_interval_seconds"`
-	Endpoint types.String `tfsdk:"endpoint"`
+	ScrapeIntervalSeconds types.Int64  `tfsdk:"scrape_interval_seconds"`
+	Endpoint              types.String `tfsdk:"endpoint"`
 }
 
 type DpuExtensionServiceDsObservabilityConfigsItemLogging struct {
 	Path types.String `tfsdk:"path"`
 }
-
 
 func (d *DpuExtensionServiceDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_dpu_extension_service"
@@ -64,7 +63,7 @@ func (d *DpuExtensionServiceDataSource) Metadata(_ context.Context, req datasour
 
 func (d *DpuExtensionServiceDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "DPU Extension Service allows users to run custom services in the DPUs of their Instances. KubernetesPod is delivered through the DPU agent; DpfHelmChart is reconciled through DPF.",
+		Description: "DPU Extension Service allows users to run custom services in the DPUs of their Instances. Currently K8s pods are the only supported service type.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{Optional: true, Computed: true, Description: "ID of the resource to retrieve. When set, returns a single resource."},
 			"site_id": schema.StringAttribute{
@@ -237,18 +236,18 @@ func (d *DpuExtensionServiceDataSource) Read(ctx context.Context, req datasource
 			data.Id = StringFromAPI(result["id"])
 			diags := resp.Diagnostics
 			data.Version = StringFromAPI(result["version"])
-		data.Data = StringFromAPI(result["data"])
-		data.HasCredentials = BoolFromAPI(result["hasCredentials"])
-		data.Created = StringFromAPI(result["created"])
-		if rawObj_observability, ok := result["observability"].(map[string]interface{}); ok {
-			obj_observability := &DpuExtensionServiceDsObservability{}
-			// configs: nested field — expand manually if needed
-			_ = rawObj_observability
-			data.Observability = obj_observability
-		} else {
-			data.Observability = nil
-		}
-		_ = diags
+			data.Data = StringFromAPI(result["data"])
+			data.HasCredentials = BoolFromAPI(result["hasCredentials"])
+			data.Created = StringFromAPI(result["created"])
+			if rawObj_observability, ok := result["observability"].(map[string]interface{}); ok {
+				obj_observability := &DpuExtensionServiceDsObservability{}
+				// configs: nested field — expand manually if needed
+				_ = rawObj_observability
+				data.Observability = obj_observability
+			} else {
+				data.Observability = nil
+			}
+			_ = diags
 		}
 	}
 

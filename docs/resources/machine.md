@@ -33,7 +33,6 @@ resource "nico_machine" "example" {
 - `maintenance_message` (String) Optional message describing the reason for moving Machine into maintenance mode. Can be updated by Provider or privileged Tenant.
 - `online_repair` (Attributes) Request to enter/exit online repair (see [below for nested schema](#nestedatt--online_repair))
 - `set_maintenance_mode` (Boolean) Set to `true` to enable maintenance mode and to `false` to disable maintenance mode. Can be set by Provider or privileged Tenant.
-- `source` (String) Path parameter: source.
 
 ### Read-Only
 
@@ -46,13 +45,12 @@ resource "nico_machine" "example" {
 - `id` (String) The resource ID.
 - `infrastructure_provider_id` (String) ID of the Provider that owns the Machine
 - `instance_id` (String) ID of the Instance if this Machine is assigned to one
-- `is_usable_by_tenant` (Boolean) Indicates whether the machine is usable by or currently in use by a tenant. It does not indicate that a Machine is available for Instance creation.
+- `is_usable_by_tenant` (Boolean) Indicates whether the machine is usable by or currently in use by a tenant.
 - `machine_capabilities` (Attributes List) List of capabilities of the machine (see [below for nested schema](#nestedatt--machine_capabilities))
 - `machine_interfaces` (Attributes List) List of admin interfaces of the machine (see [below for nested schema](#nestedatt--machine_interfaces))
 - `metadata` (Attributes) Only available to Providers. Returned if the `includeMetadata` query parameter is specified. Otherwise attribute is omitted from response. (see [below for nested schema](#nestedatt--metadata))
 - `placement_in_rack` (Attributes) Physical placement of the Machine within its Rack, when known (see [below for nested schema](#nestedatt--placement_in_rack))
 - `product_name` (String) Product name of the Machine
-- `scout_version` (String) Scout version reported by the Machine, if known
 - `serial_number` (String) Serial number of the Machine, only visible to Provider
 - `site_id` (String) ID of the Site the Machine belongs to
 - `status` (String) Status represents the status of the machine
@@ -178,7 +176,6 @@ Read-Only:
 - `dmi_data` (Attributes) DMI data of the machine (see [below for nested schema](#nestedatt--metadata--dmi_data))
 - `gpus` (Attributes List) GPU inventory reported for the Machine (see [below for nested schema](#nestedatt--metadata--gpus))
 - `infiniband_interfaces` (Attributes List) List of InfiniBand interfaces of the machine (see [below for nested schema](#nestedatt--metadata--infiniband_interfaces))
-- `lifecycle_state` (String) Lifecycle state details for the Machine
 - `network_interfaces` (Attributes List) List of Ethernet interfaces of the machine (see [below for nested schema](#nestedatt--metadata--network_interfaces))
 
 <a id="nestedatt--metadata--bmc_info"></a>
@@ -187,7 +184,7 @@ Read-Only:
 Read-Only:
 
 - `firmware_revision` (String) Firmware revision reported by the Machine BMC
-- `ip` (String) IPv4 or IPv6 address of the Machine BMC
+- `ip` (String) IP address of the Machine BMC
 - `mac` (String) MAC address of the Machine BMC
 - `version` (String) Version reported by the Machine BMC
 

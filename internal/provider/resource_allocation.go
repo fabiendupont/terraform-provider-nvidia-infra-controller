@@ -26,36 +26,35 @@ type AllocationResource struct {
 }
 
 type AllocationResourceModel struct {
-	Id types.String `tfsdk:"id"`
-	Name types.String `tfsdk:"name"`
-	Description types.String `tfsdk:"description"`
-	TenantId types.String `tfsdk:"tenant_id"`
-	SiteId types.String `tfsdk:"site_id"`
-	AllocationConstraints []AllocationAllocationConstraintsItem `tfsdk:"allocation_constraints"`
-	ConstraintValue types.Int64 `tfsdk:"constraint_value"`
-	InfrastructureProviderId types.String `tfsdk:"infrastructure_provider_id"`
-	Status types.String `tfsdk:"status"`
-	StatusHistory []AllocationStatusHistoryItem `tfsdk:"status_history"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
-	AllocationConstraintId types.String `tfsdk:"allocation_constraint_id"`
-	AllocationId types.String `tfsdk:"allocation_id"`
+	Id                       types.String                          `tfsdk:"id"`
+	Name                     types.String                          `tfsdk:"name"`
+	Description              types.String                          `tfsdk:"description"`
+	TenantId                 types.String                          `tfsdk:"tenant_id"`
+	SiteId                   types.String                          `tfsdk:"site_id"`
+	AllocationConstraints    []AllocationAllocationConstraintsItem `tfsdk:"allocation_constraints"`
+	ConstraintValue          types.Int64                           `tfsdk:"constraint_value"`
+	InfrastructureProviderId types.String                          `tfsdk:"infrastructure_provider_id"`
+	Status                   types.String                          `tfsdk:"status"`
+	StatusHistory            []AllocationStatusHistoryItem         `tfsdk:"status_history"`
+	Created                  types.String                          `tfsdk:"created"`
+	Updated                  types.String                          `tfsdk:"updated"`
+	AllocationConstraintId   types.String                          `tfsdk:"allocation_constraint_id"`
+	AllocationId             types.String                          `tfsdk:"allocation_id"`
 }
 
 type AllocationAllocationConstraintsItem struct {
-	ResourceType types.String `tfsdk:"resource_type"`
-	ResourceTypeId types.String `tfsdk:"resource_type_id"`
-	ConstraintType types.String `tfsdk:"constraint_type"`
-	ConstraintValue types.Int64 `tfsdk:"constraint_value"`
+	ResourceType    types.String `tfsdk:"resource_type"`
+	ResourceTypeId  types.String `tfsdk:"resource_type_id"`
+	ConstraintType  types.String `tfsdk:"constraint_type"`
+	ConstraintValue types.Int64  `tfsdk:"constraint_value"`
 }
 
 type AllocationStatusHistoryItem struct {
-	Status types.String `tfsdk:"status"`
+	Status  types.String `tfsdk:"status"`
 	Message types.String `tfsdk:"message"`
 	Created types.String `tfsdk:"created"`
 	Updated types.String `tfsdk:"updated"`
 }
-
 
 func (r *AllocationResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_allocation"
@@ -244,10 +243,18 @@ func (r *AllocationResource) Create(ctx context.Context, req resource.CreateRequ
 		items_allocation_constraints := make([]map[string]interface{}, len(data.AllocationConstraints))
 		for i_allocation_constraints, item_allocation_constraints := range data.AllocationConstraints {
 			m_allocation_constraints := map[string]interface{}{}
-			if !item_allocation_constraints.ResourceType.IsNull() { m_allocation_constraints["resourceType"] = item_allocation_constraints.ResourceType.ValueString() }
-			if !item_allocation_constraints.ResourceTypeId.IsNull() { m_allocation_constraints["resourceTypeId"] = item_allocation_constraints.ResourceTypeId.ValueString() }
-			if !item_allocation_constraints.ConstraintType.IsNull() { m_allocation_constraints["constraintType"] = item_allocation_constraints.ConstraintType.ValueString() }
-			if !item_allocation_constraints.ConstraintValue.IsNull() { m_allocation_constraints["constraintValue"] = item_allocation_constraints.ConstraintValue.ValueInt64() }
+			if !item_allocation_constraints.ResourceType.IsNull() {
+				m_allocation_constraints["resourceType"] = item_allocation_constraints.ResourceType.ValueString()
+			}
+			if !item_allocation_constraints.ResourceTypeId.IsNull() {
+				m_allocation_constraints["resourceTypeId"] = item_allocation_constraints.ResourceTypeId.ValueString()
+			}
+			if !item_allocation_constraints.ConstraintType.IsNull() {
+				m_allocation_constraints["constraintType"] = item_allocation_constraints.ConstraintType.ValueString()
+			}
+			if !item_allocation_constraints.ConstraintValue.IsNull() {
+				m_allocation_constraints["constraintValue"] = item_allocation_constraints.ConstraintValue.ValueInt64()
+			}
 			items_allocation_constraints[i_allocation_constraints] = m_allocation_constraints
 		}
 		body["allocationConstraints"] = items_allocation_constraints
@@ -270,7 +277,9 @@ func (r *AllocationResource) Create(ctx context.Context, req resource.CreateRequ
 		items_allocation_constraints := make([]AllocationAllocationConstraintsItem, len(rawItems_allocation_constraints))
 		for i_allocation_constraints, raw_allocation_constraints := range rawItems_allocation_constraints {
 			m_allocation_constraints, _ := raw_allocation_constraints.(map[string]interface{})
-			if m_allocation_constraints == nil { m_allocation_constraints = map[string]interface{}{} }
+			if m_allocation_constraints == nil {
+				m_allocation_constraints = map[string]interface{}{}
+			}
 			items_allocation_constraints[i_allocation_constraints].ResourceType = StringFromAPI(m_allocation_constraints["resourceType"])
 			items_allocation_constraints[i_allocation_constraints].ResourceTypeId = StringFromAPI(m_allocation_constraints["resourceTypeId"])
 			items_allocation_constraints[i_allocation_constraints].ConstraintType = StringFromAPI(m_allocation_constraints["constraintType"])
@@ -287,7 +296,9 @@ func (r *AllocationResource) Create(ctx context.Context, req resource.CreateRequ
 		items_status_history := make([]AllocationStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -333,7 +344,9 @@ func (r *AllocationResource) Read(ctx context.Context, req resource.ReadRequest,
 		items_allocation_constraints := make([]AllocationAllocationConstraintsItem, len(rawItems_allocation_constraints))
 		for i_allocation_constraints, raw_allocation_constraints := range rawItems_allocation_constraints {
 			m_allocation_constraints, _ := raw_allocation_constraints.(map[string]interface{})
-			if m_allocation_constraints == nil { m_allocation_constraints = map[string]interface{}{} }
+			if m_allocation_constraints == nil {
+				m_allocation_constraints = map[string]interface{}{}
+			}
 			items_allocation_constraints[i_allocation_constraints].ResourceType = StringFromAPI(m_allocation_constraints["resourceType"])
 			items_allocation_constraints[i_allocation_constraints].ResourceTypeId = StringFromAPI(m_allocation_constraints["resourceTypeId"])
 			items_allocation_constraints[i_allocation_constraints].ConstraintType = StringFromAPI(m_allocation_constraints["constraintType"])
@@ -350,7 +363,9 @@ func (r *AllocationResource) Read(ctx context.Context, req resource.ReadRequest,
 		items_status_history := make([]AllocationStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -397,7 +412,9 @@ func (r *AllocationResource) Update(ctx context.Context, req resource.UpdateRequ
 		items_allocation_constraints := make([]AllocationAllocationConstraintsItem, len(rawItems_allocation_constraints))
 		for i_allocation_constraints, raw_allocation_constraints := range rawItems_allocation_constraints {
 			m_allocation_constraints, _ := raw_allocation_constraints.(map[string]interface{})
-			if m_allocation_constraints == nil { m_allocation_constraints = map[string]interface{}{} }
+			if m_allocation_constraints == nil {
+				m_allocation_constraints = map[string]interface{}{}
+			}
 			items_allocation_constraints[i_allocation_constraints].ResourceType = StringFromAPI(m_allocation_constraints["resourceType"])
 			items_allocation_constraints[i_allocation_constraints].ResourceTypeId = StringFromAPI(m_allocation_constraints["resourceTypeId"])
 			items_allocation_constraints[i_allocation_constraints].ConstraintType = StringFromAPI(m_allocation_constraints["constraintType"])
@@ -414,7 +431,9 @@ func (r *AllocationResource) Update(ctx context.Context, req resource.UpdateRequ
 		items_status_history := make([]AllocationStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -455,7 +474,9 @@ func (r *AllocationResource) populateModel(ctx context.Context, data *Allocation
 		items_allocation_constraints := make([]AllocationAllocationConstraintsItem, len(rawItems_allocation_constraints))
 		for i_allocation_constraints, raw_allocation_constraints := range rawItems_allocation_constraints {
 			m_allocation_constraints, _ := raw_allocation_constraints.(map[string]interface{})
-			if m_allocation_constraints == nil { m_allocation_constraints = map[string]interface{}{} }
+			if m_allocation_constraints == nil {
+				m_allocation_constraints = map[string]interface{}{}
+			}
 			items_allocation_constraints[i_allocation_constraints].ResourceType = StringFromAPI(m_allocation_constraints["resourceType"])
 			items_allocation_constraints[i_allocation_constraints].ResourceTypeId = StringFromAPI(m_allocation_constraints["resourceTypeId"])
 			items_allocation_constraints[i_allocation_constraints].ConstraintType = StringFromAPI(m_allocation_constraints["constraintType"])
@@ -472,7 +493,9 @@ func (r *AllocationResource) populateModel(ctx context.Context, data *Allocation
 		items_status_history := make([]AllocationStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])

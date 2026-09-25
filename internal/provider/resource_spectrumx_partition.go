@@ -26,47 +26,47 @@ type SpectrumxPartitionResource struct {
 }
 
 type SpectrumxPartitionResourceModel struct {
-	Id types.String `tfsdk:"id"`
-	Name types.String `tfsdk:"name"`
-	Description types.String `tfsdk:"description"`
-	SiteId types.String `tfsdk:"site_id"`
-	Vni types.Int64 `tfsdk:"vni"`
-	Labels types.Map `tfsdk:"labels"`
-	Site *SpectrumxPartitionSite `tfsdk:"site"`
-	TenantId types.String `tfsdk:"tenant_id"`
-	Tenant *SpectrumxPartitionTenant `tfsdk:"tenant"`
-	Status types.String `tfsdk:"status"`
-	StatusHistory []SpectrumxPartitionStatusHistoryItem `tfsdk:"status_history"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
-	SpectrumXPartitionId types.String `tfsdk:"spectrum_x_partition_id"`
+	Id                   types.String                          `tfsdk:"id"`
+	Name                 types.String                          `tfsdk:"name"`
+	Description          types.String                          `tfsdk:"description"`
+	SiteId               types.String                          `tfsdk:"site_id"`
+	Vni                  types.Int64                           `tfsdk:"vni"`
+	Labels               types.Map                             `tfsdk:"labels"`
+	Site                 *SpectrumxPartitionSite               `tfsdk:"site"`
+	TenantId             types.String                          `tfsdk:"tenant_id"`
+	Tenant               *SpectrumxPartitionTenant             `tfsdk:"tenant"`
+	Status               types.String                          `tfsdk:"status"`
+	StatusHistory        []SpectrumxPartitionStatusHistoryItem `tfsdk:"status_history"`
+	Created              types.String                          `tfsdk:"created"`
+	Updated              types.String                          `tfsdk:"updated"`
+	SpectrumXPartitionId types.String                          `tfsdk:"spectrum_x_partition_id"`
 }
 
 type SpectrumxPartitionSite struct {
-	Id types.String `tfsdk:"id"`
-	Name types.String `tfsdk:"name"`
-	InfrastructureProviderId types.String `tfsdk:"infrastructure_provider_id"`
-	IsSerialConsoleEnabled types.Bool `tfsdk:"is_serial_console_enabled"`
-	IsOnline types.Bool `tfsdk:"is_online"`
-	Capabilities *SpectrumxPartitionSiteCapabilities `tfsdk:"capabilities"`
-	Status types.String `tfsdk:"status"`
+	Id                       types.String                        `tfsdk:"id"`
+	Name                     types.String                        `tfsdk:"name"`
+	InfrastructureProviderId types.String                        `tfsdk:"infrastructure_provider_id"`
+	IsSerialConsoleEnabled   types.Bool                          `tfsdk:"is_serial_console_enabled"`
+	IsOnline                 types.Bool                          `tfsdk:"is_online"`
+	Capabilities             *SpectrumxPartitionSiteCapabilities `tfsdk:"capabilities"`
+	Status                   types.String                        `tfsdk:"status"`
 }
 
 type SpectrumxPartitionSiteCapabilities struct {
-	NativeNetworking types.Bool `tfsdk:"native_networking"`
-	NetworkSecurityGroup types.Bool `tfsdk:"network_security_group"`
-	NvLinkPartition types.Bool `tfsdk:"nv_link_partition"`
-	Flow types.Bool `tfsdk:"flow"`
+	NativeNetworking          types.Bool `tfsdk:"native_networking"`
+	NetworkSecurityGroup      types.Bool `tfsdk:"network_security_group"`
+	NvLinkPartition           types.Bool `tfsdk:"nv_link_partition"`
+	Flow                      types.Bool `tfsdk:"flow"`
 	ImageBasedOperatingSystem types.Bool `tfsdk:"image_based_operating_system"`
-	VpcSlaac types.Bool `tfsdk:"vpc_slaac"`
-	DpsPowerManagement types.Bool `tfsdk:"dps_power_management"`
+	VpcSlaac                  types.Bool `tfsdk:"vpc_slaac"`
+	DpsPowerManagement        types.Bool `tfsdk:"dps_power_management"`
 }
 
 type SpectrumxPartitionTenant struct {
-	Org types.String `tfsdk:"org"`
-	OrgDisplayName types.String `tfsdk:"org_display_name"`
-	Capabilities *SpectrumxPartitionTenantCapabilities `tfsdk:"capabilities"`
-	Deprecations []SpectrumxPartitionTenantDeprecationsItem `tfsdk:"deprecations"`
+	Org            types.String                               `tfsdk:"org"`
+	OrgDisplayName types.String                               `tfsdk:"org_display_name"`
+	Capabilities   *SpectrumxPartitionTenantCapabilities      `tfsdk:"capabilities"`
+	Deprecations   []SpectrumxPartitionTenantDeprecationsItem `tfsdk:"deprecations"`
 }
 
 type SpectrumxPartitionTenantCapabilities struct {
@@ -74,21 +74,20 @@ type SpectrumxPartitionTenantCapabilities struct {
 }
 
 type SpectrumxPartitionTenantDeprecationsItem struct {
-	Attribute types.String `tfsdk:"attribute"`
-	QueryParam types.String `tfsdk:"query_param"`
-	Endpoint types.String `tfsdk:"endpoint"`
-	ReplacedBy types.String `tfsdk:"replaced_by"`
+	Attribute    types.String `tfsdk:"attribute"`
+	QueryParam   types.String `tfsdk:"query_param"`
+	Endpoint     types.String `tfsdk:"endpoint"`
+	ReplacedBy   types.String `tfsdk:"replaced_by"`
 	TakeActionBy types.String `tfsdk:"take_action_by"`
-	Notice types.String `tfsdk:"notice"`
+	Notice       types.String `tfsdk:"notice"`
 }
 
 type SpectrumxPartitionStatusHistoryItem struct {
-	Status types.String `tfsdk:"status"`
+	Status  types.String `tfsdk:"status"`
 	Message types.String `tfsdk:"message"`
 	Created types.String `tfsdk:"created"`
 	Updated types.String `tfsdk:"updated"`
 }
-
 
 func (r *SpectrumxPartitionResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_spectrumx_partition"
@@ -465,7 +464,9 @@ func (r *SpectrumxPartitionResource) Create(ctx context.Context, req resource.Cr
 		items_status_history := make([]SpectrumxPartitionStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -544,7 +545,9 @@ func (r *SpectrumxPartitionResource) Read(ctx context.Context, req resource.Read
 		items_status_history := make([]SpectrumxPartitionStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -622,7 +625,9 @@ func (r *SpectrumxPartitionResource) populateModel(ctx context.Context, data *Sp
 		items_status_history := make([]SpectrumxPartitionStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])

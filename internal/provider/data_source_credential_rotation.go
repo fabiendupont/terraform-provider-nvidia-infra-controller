@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,31 +26,30 @@ type CredentialRotationDataSource struct {
 }
 
 type CredentialRotationDataSourceModel struct {
-	SiteId types.String `tfsdk:"site_id"`
-	CredentialType types.String `tfsdk:"credential_type"`
-	DeviceMac types.String `tfsdk:"device_mac"`
-	TargetVersion types.Int64 `tfsdk:"target_version"`
-	Converged types.Int64 `tfsdk:"converged"`
-	Pending types.Int64 `tfsdk:"pending"`
-	Quarantined types.Int64 `tfsdk:"quarantined"`
-	QuarantinedDeviceMacs types.List `tfsdk:"quarantined_device_macs"`
-	Started types.String `tfsdk:"started"`
-	Complete types.Bool `tfsdk:"complete"`
-	Device *CredentialRotationDsDevice `tfsdk:"device"`
+	SiteId                types.String                `tfsdk:"site_id"`
+	CredentialType        types.String                `tfsdk:"credential_type"`
+	DeviceMac             types.String                `tfsdk:"device_mac"`
+	TargetVersion         types.Int64                 `tfsdk:"target_version"`
+	Converged             types.Int64                 `tfsdk:"converged"`
+	Pending               types.Int64                 `tfsdk:"pending"`
+	Quarantined           types.Int64                 `tfsdk:"quarantined"`
+	QuarantinedDeviceMacs types.List                  `tfsdk:"quarantined_device_macs"`
+	Started               types.String                `tfsdk:"started"`
+	Complete              types.Bool                  `tfsdk:"complete"`
+	Device                *CredentialRotationDsDevice `tfsdk:"device"`
 }
 
 type CredentialRotationDsDevice struct {
-	DeviceMac types.String `tfsdk:"device_mac"`
-	CurrentVersion types.Int64 `tfsdk:"current_version"`
-	RotatingToVersion types.Int64 `tfsdk:"rotating_to_version"`
-	Converged types.Bool `tfsdk:"converged"`
-	Quarantined types.Bool `tfsdk:"quarantined"`
-	QuarantinedUntil types.String `tfsdk:"quarantined_until"`
-	RotateAttempts types.Int64 `tfsdk:"rotate_attempts"`
-	LastAttempted types.String `tfsdk:"last_attempted"`
-	LastError types.String `tfsdk:"last_error"`
+	DeviceMac         types.String `tfsdk:"device_mac"`
+	CurrentVersion    types.Int64  `tfsdk:"current_version"`
+	RotatingToVersion types.Int64  `tfsdk:"rotating_to_version"`
+	Converged         types.Bool   `tfsdk:"converged"`
+	Quarantined       types.Bool   `tfsdk:"quarantined"`
+	QuarantinedUntil  types.String `tfsdk:"quarantined_until"`
+	RotateAttempts    types.Int64  `tfsdk:"rotate_attempts"`
+	LastAttempted     types.String `tfsdk:"last_attempted"`
+	LastError         types.String `tfsdk:"last_error"`
 }
-
 
 func (d *CredentialRotationDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_credential_rotation"

@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,50 +26,49 @@ type NetworkSecurityGroupDataSource struct {
 }
 
 type NetworkSecurityGroupDataSourceModel struct {
-	Id types.String `tfsdk:"id"`
-	SiteId types.String `tfsdk:"site_id"`
-	Status types.String `tfsdk:"status"`
-	Query types.String `tfsdk:"query"`
-	IncludeAttachmentStats types.String `tfsdk:"include_attachment_stats"`
-	Name types.String `tfsdk:"name"`
-	Description types.String `tfsdk:"description"`
-	TenantId types.String `tfsdk:"tenant_id"`
-	StatusHistory []NetworkSecurityGroupDsStatusHistoryItem `tfsdk:"status_history"`
-	StatefulEgress types.Bool `tfsdk:"stateful_egress"`
-	Rules []NetworkSecurityGroupDsRulesItem `tfsdk:"rules"`
-	RuleCount types.Int64 `tfsdk:"rule_count"`
-	AttachmentStats *NetworkSecurityGroupDsAttachmentStats `tfsdk:"attachment_stats"`
-	Labels types.Map `tfsdk:"labels"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
+	Id                     types.String                              `tfsdk:"id"`
+	SiteId                 types.String                              `tfsdk:"site_id"`
+	Status                 types.String                              `tfsdk:"status"`
+	Query                  types.String                              `tfsdk:"query"`
+	IncludeAttachmentStats types.String                              `tfsdk:"include_attachment_stats"`
+	Name                   types.String                              `tfsdk:"name"`
+	Description            types.String                              `tfsdk:"description"`
+	TenantId               types.String                              `tfsdk:"tenant_id"`
+	StatusHistory          []NetworkSecurityGroupDsStatusHistoryItem `tfsdk:"status_history"`
+	StatefulEgress         types.Bool                                `tfsdk:"stateful_egress"`
+	Rules                  []NetworkSecurityGroupDsRulesItem         `tfsdk:"rules"`
+	RuleCount              types.Int64                               `tfsdk:"rule_count"`
+	AttachmentStats        *NetworkSecurityGroupDsAttachmentStats    `tfsdk:"attachment_stats"`
+	Labels                 types.Map                                 `tfsdk:"labels"`
+	Created                types.String                              `tfsdk:"created"`
+	Updated                types.String                              `tfsdk:"updated"`
 }
 
 type NetworkSecurityGroupDsStatusHistoryItem struct {
-	Status types.String `tfsdk:"status"`
+	Status  types.String `tfsdk:"status"`
 	Message types.String `tfsdk:"message"`
 	Created types.String `tfsdk:"created"`
 	Updated types.String `tfsdk:"updated"`
 }
 
 type NetworkSecurityGroupDsRulesItem struct {
-	Name types.String `tfsdk:"name"`
-	Direction types.String `tfsdk:"direction"`
-	SourcePortRange types.String `tfsdk:"source_port_range"`
+	Name                 types.String `tfsdk:"name"`
+	Direction            types.String `tfsdk:"direction"`
+	SourcePortRange      types.String `tfsdk:"source_port_range"`
 	DestinationPortRange types.String `tfsdk:"destination_port_range"`
-	Protocol types.String `tfsdk:"protocol"`
-	Action types.String `tfsdk:"action"`
-	Priority types.Int64 `tfsdk:"priority"`
-	SourcePrefix types.String `tfsdk:"source_prefix"`
-	DestinationPrefix types.String `tfsdk:"destination_prefix"`
+	Protocol             types.String `tfsdk:"protocol"`
+	Action               types.String `tfsdk:"action"`
+	Priority             types.Int64  `tfsdk:"priority"`
+	SourcePrefix         types.String `tfsdk:"source_prefix"`
+	DestinationPrefix    types.String `tfsdk:"destination_prefix"`
 }
 
 type NetworkSecurityGroupDsAttachmentStats struct {
-	InUse types.Bool `tfsdk:"in_use"`
-	DirectVpcAttachmentCount types.Int64 `tfsdk:"direct_vpc_attachment_count"`
+	InUse                         types.Bool  `tfsdk:"in_use"`
+	DirectVpcAttachmentCount      types.Int64 `tfsdk:"direct_vpc_attachment_count"`
 	DirectInstanceAttachmentCount types.Int64 `tfsdk:"direct_instance_attachment_count"`
-	TotalDirectAttachmentCount types.Int64 `tfsdk:"total_direct_attachment_count"`
+	TotalDirectAttachmentCount    types.Int64 `tfsdk:"total_direct_attachment_count"`
 }
-
 
 func (d *NetworkSecurityGroupDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_network_security_group"
@@ -329,7 +328,9 @@ func (d *NetworkSecurityGroupDataSource) Read(ctx context.Context, req datasourc
 			items_status_history := make([]NetworkSecurityGroupDsStatusHistoryItem, len(rawItems_status_history))
 			for i_status_history, raw_status_history := range rawItems_status_history {
 				m_status_history, _ := raw_status_history.(map[string]interface{})
-				if m_status_history == nil { m_status_history = map[string]interface{}{} }
+				if m_status_history == nil {
+					m_status_history = map[string]interface{}{}
+				}
 				items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 				items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 				items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -344,7 +345,9 @@ func (d *NetworkSecurityGroupDataSource) Read(ctx context.Context, req datasourc
 			items_rules := make([]NetworkSecurityGroupDsRulesItem, len(rawItems_rules))
 			for i_rules, raw_rules := range rawItems_rules {
 				m_rules, _ := raw_rules.(map[string]interface{})
-				if m_rules == nil { m_rules = map[string]interface{}{} }
+				if m_rules == nil {
+					m_rules = map[string]interface{}{}
+				}
 				items_rules[i_rules].Name = StringFromAPI(m_rules["name"])
 				items_rules[i_rules].Direction = StringFromAPI(m_rules["direction"])
 				items_rules[i_rules].SourcePortRange = StringFromAPI(m_rules["sourcePortRange"])
@@ -393,64 +396,68 @@ func (d *NetworkSecurityGroupDataSource) Read(ctx context.Context, req datasourc
 			data.Id = StringFromAPI(result["id"])
 			diags := resp.Diagnostics
 			data.Name = StringFromAPI(result["name"])
-		data.Description = StringFromAPI(result["description"])
-		data.TenantId = StringFromAPI(result["tenantId"])
-		if rawItems_status_history, ok := result["statusHistory"].([]interface{}); ok && rawItems_status_history != nil {
-			items_status_history := make([]NetworkSecurityGroupDsStatusHistoryItem, len(rawItems_status_history))
-			for i_status_history, raw_status_history := range rawItems_status_history {
-				m_status_history, _ := raw_status_history.(map[string]interface{})
-				if m_status_history == nil { m_status_history = map[string]interface{}{} }
-				items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
-				items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
-				items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
-				items_status_history[i_status_history].Updated = StringFromAPI(m_status_history["updated"])
+			data.Description = StringFromAPI(result["description"])
+			data.TenantId = StringFromAPI(result["tenantId"])
+			if rawItems_status_history, ok := result["statusHistory"].([]interface{}); ok && rawItems_status_history != nil {
+				items_status_history := make([]NetworkSecurityGroupDsStatusHistoryItem, len(rawItems_status_history))
+				for i_status_history, raw_status_history := range rawItems_status_history {
+					m_status_history, _ := raw_status_history.(map[string]interface{})
+					if m_status_history == nil {
+						m_status_history = map[string]interface{}{}
+					}
+					items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
+					items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
+					items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
+					items_status_history[i_status_history].Updated = StringFromAPI(m_status_history["updated"])
+				}
+				data.StatusHistory = items_status_history
+			} else {
+				data.StatusHistory = nil
 			}
-			data.StatusHistory = items_status_history
-		} else {
-			data.StatusHistory = nil
-		}
-		data.StatefulEgress = BoolFromAPI(result["statefulEgress"])
-		if rawItems_rules, ok := result["rules"].([]interface{}); ok && rawItems_rules != nil {
-			items_rules := make([]NetworkSecurityGroupDsRulesItem, len(rawItems_rules))
-			for i_rules, raw_rules := range rawItems_rules {
-				m_rules, _ := raw_rules.(map[string]interface{})
-				if m_rules == nil { m_rules = map[string]interface{}{} }
-				items_rules[i_rules].Name = StringFromAPI(m_rules["name"])
-				items_rules[i_rules].Direction = StringFromAPI(m_rules["direction"])
-				items_rules[i_rules].SourcePortRange = StringFromAPI(m_rules["sourcePortRange"])
-				items_rules[i_rules].DestinationPortRange = StringFromAPI(m_rules["destinationPortRange"])
-				items_rules[i_rules].Protocol = StringFromAPI(m_rules["protocol"])
-				items_rules[i_rules].Action = StringFromAPI(m_rules["action"])
-				items_rules[i_rules].Priority = Int64FromAPI(m_rules["priority"])
-				items_rules[i_rules].SourcePrefix = StringFromAPI(m_rules["sourcePrefix"])
-				items_rules[i_rules].DestinationPrefix = StringFromAPI(m_rules["destinationPrefix"])
+			data.StatefulEgress = BoolFromAPI(result["statefulEgress"])
+			if rawItems_rules, ok := result["rules"].([]interface{}); ok && rawItems_rules != nil {
+				items_rules := make([]NetworkSecurityGroupDsRulesItem, len(rawItems_rules))
+				for i_rules, raw_rules := range rawItems_rules {
+					m_rules, _ := raw_rules.(map[string]interface{})
+					if m_rules == nil {
+						m_rules = map[string]interface{}{}
+					}
+					items_rules[i_rules].Name = StringFromAPI(m_rules["name"])
+					items_rules[i_rules].Direction = StringFromAPI(m_rules["direction"])
+					items_rules[i_rules].SourcePortRange = StringFromAPI(m_rules["sourcePortRange"])
+					items_rules[i_rules].DestinationPortRange = StringFromAPI(m_rules["destinationPortRange"])
+					items_rules[i_rules].Protocol = StringFromAPI(m_rules["protocol"])
+					items_rules[i_rules].Action = StringFromAPI(m_rules["action"])
+					items_rules[i_rules].Priority = Int64FromAPI(m_rules["priority"])
+					items_rules[i_rules].SourcePrefix = StringFromAPI(m_rules["sourcePrefix"])
+					items_rules[i_rules].DestinationPrefix = StringFromAPI(m_rules["destinationPrefix"])
+				}
+				data.Rules = items_rules
+			} else {
+				data.Rules = nil
 			}
-			data.Rules = items_rules
-		} else {
-			data.Rules = nil
-		}
-		data.RuleCount = Int64FromAPI(result["ruleCount"])
-		if rawObj_attachment_stats, ok := result["attachmentStats"].(map[string]interface{}); ok {
-			obj_attachment_stats := &NetworkSecurityGroupDsAttachmentStats{}
-			obj_attachment_stats.InUse = BoolFromAPI(rawObj_attachment_stats["inUse"])
-			obj_attachment_stats.DirectVpcAttachmentCount = Int64FromAPI(rawObj_attachment_stats["directVpcAttachmentCount"])
-			obj_attachment_stats.DirectInstanceAttachmentCount = Int64FromAPI(rawObj_attachment_stats["directInstanceAttachmentCount"])
-			obj_attachment_stats.TotalDirectAttachmentCount = Int64FromAPI(rawObj_attachment_stats["totalDirectAttachmentCount"])
-			_ = rawObj_attachment_stats
-			data.AttachmentStats = obj_attachment_stats
-		} else {
-			data.AttachmentStats = nil
-		}
-		if rawMap_labels := StringMapFromAPI(result["labels"]); rawMap_labels != nil {
-			mv, d := types.MapValueFrom(ctx, types.StringType, rawMap_labels)
-			diags.Append(d...)
-			data.Labels = mv
-		} else {
-			data.Labels = types.MapNull(types.StringType)
-		}
-		data.Created = StringFromAPI(result["created"])
-		data.Updated = StringFromAPI(result["updated"])
-		_ = diags
+			data.RuleCount = Int64FromAPI(result["ruleCount"])
+			if rawObj_attachment_stats, ok := result["attachmentStats"].(map[string]interface{}); ok {
+				obj_attachment_stats := &NetworkSecurityGroupDsAttachmentStats{}
+				obj_attachment_stats.InUse = BoolFromAPI(rawObj_attachment_stats["inUse"])
+				obj_attachment_stats.DirectVpcAttachmentCount = Int64FromAPI(rawObj_attachment_stats["directVpcAttachmentCount"])
+				obj_attachment_stats.DirectInstanceAttachmentCount = Int64FromAPI(rawObj_attachment_stats["directInstanceAttachmentCount"])
+				obj_attachment_stats.TotalDirectAttachmentCount = Int64FromAPI(rawObj_attachment_stats["totalDirectAttachmentCount"])
+				_ = rawObj_attachment_stats
+				data.AttachmentStats = obj_attachment_stats
+			} else {
+				data.AttachmentStats = nil
+			}
+			if rawMap_labels := StringMapFromAPI(result["labels"]); rawMap_labels != nil {
+				mv, d := types.MapValueFrom(ctx, types.StringType, rawMap_labels)
+				diags.Append(d...)
+				data.Labels = mv
+			} else {
+				data.Labels = types.MapNull(types.StringType)
+			}
+			data.Created = StringFromAPI(result["created"])
+			data.Updated = StringFromAPI(result["updated"])
+			_ = diags
 		}
 	}
 
@@ -465,7 +472,9 @@ func (d *NetworkSecurityGroupDataSource) populateModel(ctx context.Context, data
 		items_status_history := make([]NetworkSecurityGroupDsStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -480,7 +489,9 @@ func (d *NetworkSecurityGroupDataSource) populateModel(ctx context.Context, data
 		items_rules := make([]NetworkSecurityGroupDsRulesItem, len(rawItems_rules))
 		for i_rules, raw_rules := range rawItems_rules {
 			m_rules, _ := raw_rules.(map[string]interface{})
-			if m_rules == nil { m_rules = map[string]interface{}{} }
+			if m_rules == nil {
+				m_rules = map[string]interface{}{}
+			}
 			items_rules[i_rules].Name = StringFromAPI(m_rules["name"])
 			items_rules[i_rules].Direction = StringFromAPI(m_rules["direction"])
 			items_rules[i_rules].SourcePortRange = StringFromAPI(m_rules["sourcePortRange"])

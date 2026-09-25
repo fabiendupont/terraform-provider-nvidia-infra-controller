@@ -26,12 +26,11 @@ type UefiCredentialResource struct {
 }
 
 type UefiCredentialResourceModel struct {
-	Id types.String `tfsdk:"id"`
-	SiteId types.String `tfsdk:"site_id"`
-	Kind types.String `tfsdk:"kind"`
+	Id       types.String `tfsdk:"id"`
+	SiteId   types.String `tfsdk:"site_id"`
+	Kind     types.String `tfsdk:"kind"`
 	Password types.String `tfsdk:"password"`
 }
-
 
 func (r *UefiCredentialResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_uefi_credential"

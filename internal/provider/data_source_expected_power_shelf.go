@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,24 +26,23 @@ type ExpectedPowerShelfDataSource struct {
 }
 
 type ExpectedPowerShelfDataSourceModel struct {
-	Id types.String `tfsdk:"id"`
-	SiteId types.String `tfsdk:"site_id"`
-	BmcMacAddress types.String `tfsdk:"bmc_mac_address"`
+	Id                types.String `tfsdk:"id"`
+	SiteId            types.String `tfsdk:"site_id"`
+	BmcMacAddress     types.String `tfsdk:"bmc_mac_address"`
 	ShelfSerialNumber types.String `tfsdk:"shelf_serial_number"`
-	BmcIpAddress types.String `tfsdk:"bmc_ip_address"`
-	RackId types.String `tfsdk:"rack_id"`
-	Name types.String `tfsdk:"name"`
-	Manufacturer types.String `tfsdk:"manufacturer"`
-	Model types.String `tfsdk:"model"`
-	Description types.String `tfsdk:"description"`
-	SlotId types.Int64 `tfsdk:"slot_id"`
-	TrayIdx types.Int64 `tfsdk:"tray_idx"`
-	HostId types.Int64 `tfsdk:"host_id"`
-	Labels types.Map `tfsdk:"labels"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
+	BmcIpAddress      types.String `tfsdk:"bmc_ip_address"`
+	RackId            types.String `tfsdk:"rack_id"`
+	Name              types.String `tfsdk:"name"`
+	Manufacturer      types.String `tfsdk:"manufacturer"`
+	Model             types.String `tfsdk:"model"`
+	Description       types.String `tfsdk:"description"`
+	SlotId            types.Int64  `tfsdk:"slot_id"`
+	TrayIdx           types.Int64  `tfsdk:"tray_idx"`
+	HostId            types.Int64  `tfsdk:"host_id"`
+	Labels            types.Map    `tfsdk:"labels"`
+	Created           types.String `tfsdk:"created"`
+	Updated           types.String `tfsdk:"updated"`
 }
-
 
 func (d *ExpectedPowerShelfDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_expected_power_shelf"
@@ -217,26 +216,26 @@ func (d *ExpectedPowerShelfDataSource) Read(ctx context.Context, req datasource.
 			data.Id = StringFromAPI(result["id"])
 			diags := resp.Diagnostics
 			data.BmcMacAddress = StringFromAPI(result["bmcMacAddress"])
-		data.ShelfSerialNumber = StringFromAPI(result["shelfSerialNumber"])
-		data.BmcIpAddress = StringFromAPI(result["bmcIpAddress"])
-		data.RackId = StringFromAPI(result["rackId"])
-		data.Name = StringFromAPI(result["name"])
-		data.Manufacturer = StringFromAPI(result["manufacturer"])
-		data.Model = StringFromAPI(result["model"])
-		data.Description = StringFromAPI(result["description"])
-		data.SlotId = Int64FromAPI(result["slotId"])
-		data.TrayIdx = Int64FromAPI(result["trayIdx"])
-		data.HostId = Int64FromAPI(result["hostId"])
-		if rawMap_labels := StringMapFromAPI(result["labels"]); rawMap_labels != nil {
-			mv, d := types.MapValueFrom(ctx, types.StringType, rawMap_labels)
-			diags.Append(d...)
-			data.Labels = mv
-		} else {
-			data.Labels = types.MapNull(types.StringType)
-		}
-		data.Created = StringFromAPI(result["created"])
-		data.Updated = StringFromAPI(result["updated"])
-		_ = diags
+			data.ShelfSerialNumber = StringFromAPI(result["shelfSerialNumber"])
+			data.BmcIpAddress = StringFromAPI(result["bmcIpAddress"])
+			data.RackId = StringFromAPI(result["rackId"])
+			data.Name = StringFromAPI(result["name"])
+			data.Manufacturer = StringFromAPI(result["manufacturer"])
+			data.Model = StringFromAPI(result["model"])
+			data.Description = StringFromAPI(result["description"])
+			data.SlotId = Int64FromAPI(result["slotId"])
+			data.TrayIdx = Int64FromAPI(result["trayIdx"])
+			data.HostId = Int64FromAPI(result["hostId"])
+			if rawMap_labels := StringMapFromAPI(result["labels"]); rawMap_labels != nil {
+				mv, d := types.MapValueFrom(ctx, types.StringType, rawMap_labels)
+				diags.Append(d...)
+				data.Labels = mv
+			} else {
+				data.Labels = types.MapNull(types.StringType)
+			}
+			data.Created = StringFromAPI(result["created"])
+			data.Updated = StringFromAPI(result["updated"])
+			_ = diags
 		}
 	}
 

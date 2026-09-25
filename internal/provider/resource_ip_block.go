@@ -26,39 +26,38 @@ type IpBlockResource struct {
 }
 
 type IpBlockResourceModel struct {
-	Id types.String `tfsdk:"id"`
-	Name types.String `tfsdk:"name"`
-	Description types.String `tfsdk:"description"`
-	SiteId types.String `tfsdk:"site_id"`
-	RoutingType types.String `tfsdk:"routing_type"`
-	Prefix types.String `tfsdk:"prefix"`
-	PrefixLength types.Int64 `tfsdk:"prefix_length"`
-	ProtocolVersion types.String `tfsdk:"protocol_version"`
-	InfrastructureProviderId types.String `tfsdk:"infrastructure_provider_id"`
-	TenantId types.String `tfsdk:"tenant_id"`
-	UsageStats *IpBlockUsageStats `tfsdk:"usage_stats"`
-	Status types.String `tfsdk:"status"`
-	StatusHistory []IpBlockStatusHistoryItem `tfsdk:"status_history"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
-	IpBlockId types.String `tfsdk:"ip_block_id"`
+	Id                       types.String               `tfsdk:"id"`
+	Name                     types.String               `tfsdk:"name"`
+	Description              types.String               `tfsdk:"description"`
+	SiteId                   types.String               `tfsdk:"site_id"`
+	RoutingType              types.String               `tfsdk:"routing_type"`
+	Prefix                   types.String               `tfsdk:"prefix"`
+	PrefixLength             types.Int64                `tfsdk:"prefix_length"`
+	ProtocolVersion          types.String               `tfsdk:"protocol_version"`
+	InfrastructureProviderId types.String               `tfsdk:"infrastructure_provider_id"`
+	TenantId                 types.String               `tfsdk:"tenant_id"`
+	UsageStats               *IpBlockUsageStats         `tfsdk:"usage_stats"`
+	Status                   types.String               `tfsdk:"status"`
+	StatusHistory            []IpBlockStatusHistoryItem `tfsdk:"status_history"`
+	Created                  types.String               `tfsdk:"created"`
+	Updated                  types.String               `tfsdk:"updated"`
+	IpBlockId                types.String               `tfsdk:"ip_block_id"`
 }
 
 type IpBlockUsageStats struct {
-	AvailableIPs types.Int64 `tfsdk:"available_i_ps"`
-	AcquiredIPs types.Int64 `tfsdk:"acquired_i_ps"`
-	AvailablePrefixes types.List `tfsdk:"available_prefixes"`
+	AvailableIPs              types.Int64 `tfsdk:"available_i_ps"`
+	AcquiredIPs               types.Int64 `tfsdk:"acquired_i_ps"`
+	AvailablePrefixes         types.List  `tfsdk:"available_prefixes"`
 	AvailableSmallestPrefixes types.Int64 `tfsdk:"available_smallest_prefixes"`
-	AcquiredPrefixes types.Int64 `tfsdk:"acquired_prefixes"`
+	AcquiredPrefixes          types.Int64 `tfsdk:"acquired_prefixes"`
 }
 
 type IpBlockStatusHistoryItem struct {
-	Status types.String `tfsdk:"status"`
+	Status  types.String `tfsdk:"status"`
 	Message types.String `tfsdk:"message"`
 	Created types.String `tfsdk:"created"`
 	Updated types.String `tfsdk:"updated"`
 }
-
 
 func (r *IpBlockResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_ip_block"
@@ -134,7 +133,7 @@ func (r *IpBlockResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 						Required:    false,
 						Optional:    false,
 						Computed:    true,
-						Description: "Total number of IP addresses in the block (acquired and unused), capped at 2,147,483,647. An IP Block allocated to one child prefix of the same size reports zero. ",
+						Description: "Total number of IP addresses in the block (acquired and unused)",
 					},
 					"acquired_i_ps": schema.Int64Attribute{
 						Required:    false,
@@ -153,7 +152,7 @@ func (r *IpBlockResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 						Required:    false,
 						Optional:    false,
 						Computed:    true,
-						Description: "Number of complete `/30` IPv4 prefixes or `/126` IPv6 prefixes remaining after acquired child prefixes are excluded. Both prefix sizes contain four addresses. The count is capped at 2,147,483,647. The `acquiredIPs` count is not subtracted. ",
+						Description: "Total number of /30 prefixes that can still be acquired from this block (only reduced if prefixes are acquired, not reduced by acquired IPs) ",
 					},
 					"acquired_prefixes": schema.Int64Attribute{
 						Required:    false,
@@ -305,7 +304,9 @@ func (r *IpBlockResource) Create(ctx context.Context, req resource.CreateRequest
 		items_status_history := make([]IpBlockStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -368,7 +369,9 @@ func (r *IpBlockResource) Read(ctx context.Context, req resource.ReadRequest, re
 		items_status_history := make([]IpBlockStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -435,7 +438,9 @@ func (r *IpBlockResource) Update(ctx context.Context, req resource.UpdateRequest
 		items_status_history := make([]IpBlockStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -493,7 +498,9 @@ func (r *IpBlockResource) populateModel(ctx context.Context, data *IpBlockResour
 		items_status_history := make([]IpBlockStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])

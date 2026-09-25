@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,123 +26,115 @@ type ExpectedMachineDataSource struct {
 }
 
 type ExpectedMachineDataSourceModel struct {
-	Id types.String `tfsdk:"id"`
-	SiteId types.String `tfsdk:"site_id"`
-	BmcMacAddress types.String `tfsdk:"bmc_mac_address"`
-	ChassisSerialNumber types.String `tfsdk:"chassis_serial_number"`
-	FallbackDpuSerialNumbers types.List `tfsdk:"fallback_dpu_serial_numbers"`
-	SkuId types.String `tfsdk:"sku_id"`
-	Sku *ExpectedMachineDsSku `tfsdk:"sku"`
-	MachineId types.String `tfsdk:"machine_id"`
-	Machine *ExpectedMachineDsMachine `tfsdk:"machine"`
-	RackId types.String `tfsdk:"rack_id"`
-	BmcIpAddress types.String `tfsdk:"bmc_ip_address"`
-	Name types.String `tfsdk:"name"`
-	Manufacturer types.String `tfsdk:"manufacturer"`
-	Model types.String `tfsdk:"model"`
-	Description types.String `tfsdk:"description"`
-	SlotId types.Int64 `tfsdk:"slot_id"`
-	TrayIdx types.Int64 `tfsdk:"tray_idx"`
-	HostId types.Int64 `tfsdk:"host_id"`
-	IsDpfEnabled types.Bool `tfsdk:"is_dpf_enabled"`
-	Labels types.Map `tfsdk:"labels"`
-	HostLifecycleProfile *ExpectedMachineDsHostLifecycleProfile `tfsdk:"host_lifecycle_profile"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
+	Id                       types.String                           `tfsdk:"id"`
+	SiteId                   types.String                           `tfsdk:"site_id"`
+	BmcMacAddress            types.String                           `tfsdk:"bmc_mac_address"`
+	ChassisSerialNumber      types.String                           `tfsdk:"chassis_serial_number"`
+	FallbackDpuSerialNumbers types.List                             `tfsdk:"fallback_dpu_serial_numbers"`
+	SkuId                    types.String                           `tfsdk:"sku_id"`
+	Sku                      *ExpectedMachineDsSku                  `tfsdk:"sku"`
+	MachineId                types.String                           `tfsdk:"machine_id"`
+	Machine                  *ExpectedMachineDsMachine              `tfsdk:"machine"`
+	RackId                   types.String                           `tfsdk:"rack_id"`
+	BmcIpAddress             types.String                           `tfsdk:"bmc_ip_address"`
+	Name                     types.String                           `tfsdk:"name"`
+	Manufacturer             types.String                           `tfsdk:"manufacturer"`
+	Model                    types.String                           `tfsdk:"model"`
+	Description              types.String                           `tfsdk:"description"`
+	SlotId                   types.Int64                            `tfsdk:"slot_id"`
+	TrayIdx                  types.Int64                            `tfsdk:"tray_idx"`
+	HostId                   types.Int64                            `tfsdk:"host_id"`
+	IsDpfEnabled             types.Bool                             `tfsdk:"is_dpf_enabled"`
+	Labels                   types.Map                              `tfsdk:"labels"`
+	HostLifecycleProfile     *ExpectedMachineDsHostLifecycleProfile `tfsdk:"host_lifecycle_profile"`
+	Created                  types.String                           `tfsdk:"created"`
+	Updated                  types.String                           `tfsdk:"updated"`
 }
 
 type ExpectedMachineDsSku struct {
-	Id types.String `tfsdk:"id"`
-	SiteId types.String `tfsdk:"site_id"`
-	Description types.String `tfsdk:"description"`
-	SchemaVersion types.Int64 `tfsdk:"schema_version"`
-	DeviceType types.String `tfsdk:"device_type"`
-	AssociatedMachineIds types.List `tfsdk:"associated_machine_ids"`
-	Components *ExpectedMachineDsSkuComponents `tfsdk:"components"`
-	Created types.String `tfsdk:"created"`
+	Id                   types.String                    `tfsdk:"id"`
+	SiteId               types.String                    `tfsdk:"site_id"`
+	DeviceType           types.String                    `tfsdk:"device_type"`
+	AssociatedMachineIds types.List                      `tfsdk:"associated_machine_ids"`
+	Components           *ExpectedMachineDsSkuComponents `tfsdk:"components"`
+	Created              types.String                    `tfsdk:"created"`
+	Updated              types.String                    `tfsdk:"updated"`
 }
 
 type ExpectedMachineDsSkuComponents struct {
-	Cpus []ExpectedMachineDsSkuComponentsCpusItem `tfsdk:"cpus"`
-	Gpus []ExpectedMachineDsSkuComponentsGpusItem `tfsdk:"gpus"`
-	Memory []ExpectedMachineDsSkuComponentsMemoryItem `tfsdk:"memory"`
-	Storage []ExpectedMachineDsSkuComponentsStorageItem `tfsdk:"storage"`
-	Chassis *ExpectedMachineDsSkuComponentsChassis `tfsdk:"chassis"`
-	EthernetDevices []ExpectedMachineDsSkuComponentsEthernetDevicesItem `tfsdk:"ethernet_devices"`
+	Cpus              []ExpectedMachineDsSkuComponentsCpusItem              `tfsdk:"cpus"`
+	Gpus              []ExpectedMachineDsSkuComponentsGpusItem              `tfsdk:"gpus"`
+	Memory            []ExpectedMachineDsSkuComponentsMemoryItem            `tfsdk:"memory"`
+	Storage           []ExpectedMachineDsSkuComponentsStorageItem           `tfsdk:"storage"`
+	Chassis           *ExpectedMachineDsSkuComponentsChassis                `tfsdk:"chassis"`
+	EthernetDevices   []ExpectedMachineDsSkuComponentsEthernetDevicesItem   `tfsdk:"ethernet_devices"`
 	InfinibandDevices []ExpectedMachineDsSkuComponentsInfinibandDevicesItem `tfsdk:"infiniband_devices"`
-	Tpm []ExpectedMachineDsSkuComponentsTpmItem `tfsdk:"tpm"`
+	Tpm               []ExpectedMachineDsSkuComponentsTpmItem               `tfsdk:"tpm"`
 }
 
 type ExpectedMachineDsSkuComponentsCpusItem struct {
-	Vendor types.String `tfsdk:"vendor"`
-	Model types.String `tfsdk:"model"`
-	ThreadCount types.Int64 `tfsdk:"thread_count"`
-	CountValue types.Int64 `tfsdk:"count_value"`
+	Vendor      types.String `tfsdk:"vendor"`
+	Model       types.String `tfsdk:"model"`
+	ThreadCount types.Int64  `tfsdk:"thread_count"`
+	CountValue  types.Int64  `tfsdk:"count_value"`
 }
 
 type ExpectedMachineDsSkuComponentsGpusItem struct {
-	Vendor types.String `tfsdk:"vendor"`
-	Model types.String `tfsdk:"model"`
+	Vendor      types.String `tfsdk:"vendor"`
+	Model       types.String `tfsdk:"model"`
 	TotalMemory types.String `tfsdk:"total_memory"`
-	CountValue types.Int64 `tfsdk:"count_value"`
+	CountValue  types.Int64  `tfsdk:"count_value"`
 }
 
 type ExpectedMachineDsSkuComponentsMemoryItem struct {
-	CapacityMb types.Int64 `tfsdk:"capacity_mb"`
+	CapacityMb types.Int64  `tfsdk:"capacity_mb"`
 	MemoryType types.String `tfsdk:"memory_type"`
-	CountValue types.Int64 `tfsdk:"count_value"`
+	CountValue types.Int64  `tfsdk:"count_value"`
 }
 
 type ExpectedMachineDsSkuComponentsStorageItem struct {
-	Vendor types.String `tfsdk:"vendor"`
-	Model types.String `tfsdk:"model"`
-	CapacityMb types.Int64 `tfsdk:"capacity_mb"`
-	CountValue types.Int64 `tfsdk:"count_value"`
-	MinSizeMiB types.Int64 `tfsdk:"min_size_mi_b"`
-	MaxSizeMiB types.Int64 `tfsdk:"max_size_mi_b"`
-	PciPatterns types.List `tfsdk:"pci_patterns"`
+	Vendor     types.String `tfsdk:"vendor"`
+	Model      types.String `tfsdk:"model"`
+	CapacityMb types.Int64  `tfsdk:"capacity_mb"`
+	CountValue types.Int64  `tfsdk:"count_value"`
 }
 
 type ExpectedMachineDsSkuComponentsChassis struct {
 	Vendor types.String `tfsdk:"vendor"`
-	Model types.String `tfsdk:"model"`
-	Architecture types.String `tfsdk:"architecture"`
+	Model  types.String `tfsdk:"model"`
 }
 
 type ExpectedMachineDsSkuComponentsEthernetDevicesItem struct {
-	Vendor types.String `tfsdk:"vendor"`
-	Model types.String `tfsdk:"model"`
-	CountValue types.Int64 `tfsdk:"count_value"`
-	IsConnected types.Bool `tfsdk:"is_connected"`
+	Vendor     types.String `tfsdk:"vendor"`
+	Model      types.String `tfsdk:"model"`
+	CountValue types.Int64  `tfsdk:"count_value"`
 }
 
 type ExpectedMachineDsSkuComponentsInfinibandDevicesItem struct {
-	Vendor types.String `tfsdk:"vendor"`
-	Model types.String `tfsdk:"model"`
-	CountValue types.Int64 `tfsdk:"count_value"`
-	InactiveDevices types.List `tfsdk:"inactive_devices"`
+	Vendor     types.String `tfsdk:"vendor"`
+	Model      types.String `tfsdk:"model"`
+	CountValue types.Int64  `tfsdk:"count_value"`
 }
 
 type ExpectedMachineDsSkuComponentsTpmItem struct {
-	Vendor types.String `tfsdk:"vendor"`
+	Vendor  types.String `tfsdk:"vendor"`
 	Version types.String `tfsdk:"version"`
 }
 
 type ExpectedMachineDsMachine struct {
-	Id types.String `tfsdk:"id"`
-	ControllerMachineId types.String `tfsdk:"controller_machine_id"`
+	Id                    types.String `tfsdk:"id"`
+	ControllerMachineId   types.String `tfsdk:"controller_machine_id"`
 	ControllerMachineType types.String `tfsdk:"controller_machine_type"`
-	HwSkuDeviceType types.String `tfsdk:"hw_sku_device_type"`
-	Vendor types.String `tfsdk:"vendor"`
-	ProductName types.String `tfsdk:"product_name"`
-	MaintenanceMessage types.String `tfsdk:"maintenance_message"`
-	Status types.String `tfsdk:"status"`
+	HwSkuDeviceType       types.String `tfsdk:"hw_sku_device_type"`
+	Vendor                types.String `tfsdk:"vendor"`
+	ProductName           types.String `tfsdk:"product_name"`
+	MaintenanceMessage    types.String `tfsdk:"maintenance_message"`
+	Status                types.String `tfsdk:"status"`
 }
 
 type ExpectedMachineDsHostLifecycleProfile struct {
 	DisableLockdown types.Bool `tfsdk:"disable_lockdown"`
 }
-
 
 func (d *ExpectedMachineDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_expected_machine"
@@ -201,18 +193,6 @@ func (d *ExpectedMachineDataSource) Schema(_ context.Context, _ datasource.Schem
 						Optional:    false,
 						Computed:    true,
 						Description: "ID of the Site this SKU belongs to",
-					},
-					"description": schema.StringAttribute{
-						Required:    false,
-						Optional:    false,
-						Computed:    true,
-						Description: "Human-readable SKU description",
-					},
-					"schema_version": schema.Int64Attribute{
-						Required:    false,
-						Optional:    false,
-						Computed:    true,
-						Description: "Core SKU schema version when available",
 					},
 					"device_type": schema.StringAttribute{
 						Required:    false,
@@ -340,44 +320,25 @@ func (d *ExpectedMachineDataSource) Schema(_ context.Context, _ datasource.Schem
 											Required:    false,
 											Optional:    false,
 											Computed:    true,
-											Description: "Storage vendor used for schema version 4 matching. Read-only in REST mutation requests and preserved in responses for legacy SKUs. Schema version 5 does not use this field.",
+											Description: "Vendor of the storage device",
 										},
 										"model": schema.StringAttribute{
 											Required:    false,
 											Optional:    false,
 											Computed:    true,
-											Description: "Informational storage model. Starting with the 2.1 release, NICo does not use this field for storage matching or validation.",
+											Description: "Model of the storage device",
 										},
 										"capacity_mb": schema.Int64Attribute{
 											Required:    false,
 											Optional:    false,
 											Computed:    true,
-											Description: "Storage capacity in megabytes used for schema version 4 matching. Read-only in REST mutation requests and preserved in responses for legacy SKUs. Schema version 5 uses minSizeMiB and maxSizeMiB instead.",
+											Description: "Capacity in megabytes",
 										},
 										"count_value": schema.Int64Attribute{
 											Required:    false,
 											Optional:    false,
 											Computed:    true,
 											Description: "Number of storage devices present",
-										},
-										"min_size_mi_b": schema.Int64Attribute{
-											Required:    false,
-											Optional:    false,
-											Computed:    true,
-											Description: "Inclusive minimum size in MiB for each storage device. Null or omission means no lower bound. Used for SKU schema version 5 and later.",
-										},
-										"max_size_mi_b": schema.Int64Attribute{
-											Required:    false,
-											Optional:    false,
-											Computed:    true,
-											Description: "Inclusive maximum size in MiB for each storage device. Null or omission means no upper bound. Used for SKU schema version 5 and later.",
-										},
-										"pci_patterns": schema.ListAttribute{
-											ElementType: types.StringType,
-											Required:    false,
-											Optional:    false,
-											Computed:    true,
-											Description: "Regular expressions matched against each drive's sysfs PCI path. An empty or omitted list disables PCI location matching. Used for SKU schema version 5 and later.  The matched path is the NVMe controller's sysfs DEVPATH with its trailing kernel-assigned `nvmeN` node removed, for example `/devices/pci0000:00/0000:64:00.0/0000:65:00.0/nvme`, because that node changes with probe order. Patterns that anchor on the node (such as `nvme0$`) never match; end them at `/nvme` instead.",
 										},
 									},
 								},
@@ -400,19 +361,13 @@ func (d *ExpectedMachineDataSource) Schema(_ context.Context, _ datasource.Schem
 										Computed:    true,
 										Description: "Model of the chassis",
 									},
-									"architecture": schema.StringAttribute{
-										Required:    false,
-										Optional:    false,
-										Computed:    true,
-										Description: "Architecture of the chassis",
-									},
 								},
 							},
 							"ethernet_devices": schema.ListNestedAttribute{
 								Required:    false,
 								Optional:    false,
 								Computed:    true,
-								Description: "Read-only Ethernet device components reported by Core. Omit this property from REST mutation requests; null and an empty array are accepted for compatibility, while a non-empty array is rejected with HTTP 400.",
+								Description: "Ethernet device components",
 								NestedObject: schema.NestedAttributeObject{
 									Attributes: map[string]schema.Attribute{
 										"vendor": schema.StringAttribute{
@@ -432,12 +387,6 @@ func (d *ExpectedMachineDataSource) Schema(_ context.Context, _ datasource.Schem
 											Optional:    false,
 											Computed:    true,
 											Description: "Number of ethernet devices present",
-										},
-										"is_connected": schema.BoolAttribute{
-											Required:    false,
-											Optional:    false,
-											Computed:    true,
-											Description: "Whether the ethernet device is connected",
 										},
 									},
 								},
@@ -466,13 +415,6 @@ func (d *ExpectedMachineDataSource) Schema(_ context.Context, _ datasource.Schem
 											Optional:    false,
 											Computed:    true,
 											Description: "Number of infiniband devices present",
-										},
-										"inactive_devices": schema.ListAttribute{
-											ElementType: types.Int64Type,
-											Required:    false,
-											Optional:    false,
-											Computed:    true,
-											Description: "Zero-based indexes of inactive devices",
 										},
 									},
 								},
@@ -505,7 +447,13 @@ func (d *ExpectedMachineDataSource) Schema(_ context.Context, _ datasource.Schem
 						Required:    false,
 						Optional:    false,
 						Computed:    true,
-						Description: "ISO 8601 datetime when the SKU was created, using the Site-reported timestamp when available",
+						Description: "ISO 8601 datetime when the SKU was created",
+					},
+					"updated": schema.StringAttribute{
+						Required:    false,
+						Optional:    false,
+						Computed:    true,
+						Description: "ISO 8601 datetime when the SKU was last updated",
 					},
 				},
 			},
@@ -629,7 +577,7 @@ func (d *ExpectedMachineDataSource) Schema(_ context.Context, _ datasource.Schem
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
-				Description: "When true, this host is eligible for DPF-based provisioning. Returns the effective setting: true when no value is configured. An explicitly configured false value is returned as false.",
+				Description: "When true, this host is eligible for DPF-based provisioning.",
 			},
 			"labels": schema.MapAttribute{
 				ElementType: types.StringType,
@@ -717,12 +665,11 @@ func (d *ExpectedMachineDataSource) Read(ctx context.Context, req datasource.Rea
 			obj_sku := &ExpectedMachineDsSku{}
 			obj_sku.Id = StringFromAPI(rawObj_sku["id"])
 			obj_sku.SiteId = StringFromAPI(rawObj_sku["siteId"])
-			obj_sku.Description = StringFromAPI(rawObj_sku["description"])
-			obj_sku.SchemaVersion = Int64FromAPI(rawObj_sku["schemaVersion"])
 			obj_sku.DeviceType = StringFromAPI(rawObj_sku["deviceType"])
 			// associatedMachineIds: nested field — expand manually if needed
 			// components: nested field — expand manually if needed
 			obj_sku.Created = StringFromAPI(rawObj_sku["created"])
+			obj_sku.Updated = StringFromAPI(rawObj_sku["updated"])
 			_ = rawObj_sku
 			data.Sku = obj_sku
 		} else {
@@ -784,74 +731,73 @@ func (d *ExpectedMachineDataSource) Read(ctx context.Context, req datasource.Rea
 			data.Id = StringFromAPI(result["id"])
 			diags := resp.Diagnostics
 			data.BmcMacAddress = StringFromAPI(result["bmcMacAddress"])
-		data.ChassisSerialNumber = StringFromAPI(result["chassisSerialNumber"])
-		if rawSlice_fallback_dpu_serial_numbers := StringSliceFromAPI(result["fallbackDPUSerialNumbers"]); rawSlice_fallback_dpu_serial_numbers != nil {
-			lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_fallback_dpu_serial_numbers)
-			diags.Append(d...)
-			data.FallbackDpuSerialNumbers = lv
-		} else {
-			data.FallbackDpuSerialNumbers = types.ListNull(types.StringType)
-		}
-		data.SkuId = StringFromAPI(result["skuId"])
-		if rawObj_sku, ok := result["sku"].(map[string]interface{}); ok {
-			obj_sku := &ExpectedMachineDsSku{}
-			obj_sku.Id = StringFromAPI(rawObj_sku["id"])
-			obj_sku.SiteId = StringFromAPI(rawObj_sku["siteId"])
-			obj_sku.Description = StringFromAPI(rawObj_sku["description"])
-			obj_sku.SchemaVersion = Int64FromAPI(rawObj_sku["schemaVersion"])
-			obj_sku.DeviceType = StringFromAPI(rawObj_sku["deviceType"])
-			// associatedMachineIds: nested field — expand manually if needed
-			// components: nested field — expand manually if needed
-			obj_sku.Created = StringFromAPI(rawObj_sku["created"])
-			_ = rawObj_sku
-			data.Sku = obj_sku
-		} else {
-			data.Sku = nil
-		}
-		data.MachineId = StringFromAPI(result["machineId"])
-		if rawObj_machine, ok := result["machine"].(map[string]interface{}); ok {
-			obj_machine := &ExpectedMachineDsMachine{}
-			obj_machine.Id = StringFromAPI(rawObj_machine["id"])
-			obj_machine.ControllerMachineId = StringFromAPI(rawObj_machine["controllerMachineId"])
-			obj_machine.ControllerMachineType = StringFromAPI(rawObj_machine["controllerMachineType"])
-			obj_machine.HwSkuDeviceType = StringFromAPI(rawObj_machine["hwSkuDeviceType"])
-			obj_machine.Vendor = StringFromAPI(rawObj_machine["vendor"])
-			obj_machine.ProductName = StringFromAPI(rawObj_machine["productName"])
-			obj_machine.MaintenanceMessage = StringFromAPI(rawObj_machine["maintenanceMessage"])
-			obj_machine.Status = StringFromAPI(rawObj_machine["status"])
-			_ = rawObj_machine
-			data.Machine = obj_machine
-		} else {
-			data.Machine = nil
-		}
-		data.RackId = StringFromAPI(result["rackId"])
-		data.BmcIpAddress = StringFromAPI(result["bmcIpAddress"])
-		data.Name = StringFromAPI(result["name"])
-		data.Manufacturer = StringFromAPI(result["manufacturer"])
-		data.Model = StringFromAPI(result["model"])
-		data.Description = StringFromAPI(result["description"])
-		data.SlotId = Int64FromAPI(result["slotId"])
-		data.TrayIdx = Int64FromAPI(result["trayIdx"])
-		data.HostId = Int64FromAPI(result["hostId"])
-		data.IsDpfEnabled = BoolFromAPI(result["isDpfEnabled"])
-		if rawMap_labels := StringMapFromAPI(result["labels"]); rawMap_labels != nil {
-			mv, d := types.MapValueFrom(ctx, types.StringType, rawMap_labels)
-			diags.Append(d...)
-			data.Labels = mv
-		} else {
-			data.Labels = types.MapNull(types.StringType)
-		}
-		if rawObj_host_lifecycle_profile, ok := result["hostLifecycleProfile"].(map[string]interface{}); ok {
-			obj_host_lifecycle_profile := &ExpectedMachineDsHostLifecycleProfile{}
-			obj_host_lifecycle_profile.DisableLockdown = BoolFromAPI(rawObj_host_lifecycle_profile["disableLockdown"])
-			_ = rawObj_host_lifecycle_profile
-			data.HostLifecycleProfile = obj_host_lifecycle_profile
-		} else {
-			data.HostLifecycleProfile = nil
-		}
-		data.Created = StringFromAPI(result["created"])
-		data.Updated = StringFromAPI(result["updated"])
-		_ = diags
+			data.ChassisSerialNumber = StringFromAPI(result["chassisSerialNumber"])
+			if rawSlice_fallback_dpu_serial_numbers := StringSliceFromAPI(result["fallbackDPUSerialNumbers"]); rawSlice_fallback_dpu_serial_numbers != nil {
+				lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_fallback_dpu_serial_numbers)
+				diags.Append(d...)
+				data.FallbackDpuSerialNumbers = lv
+			} else {
+				data.FallbackDpuSerialNumbers = types.ListNull(types.StringType)
+			}
+			data.SkuId = StringFromAPI(result["skuId"])
+			if rawObj_sku, ok := result["sku"].(map[string]interface{}); ok {
+				obj_sku := &ExpectedMachineDsSku{}
+				obj_sku.Id = StringFromAPI(rawObj_sku["id"])
+				obj_sku.SiteId = StringFromAPI(rawObj_sku["siteId"])
+				obj_sku.DeviceType = StringFromAPI(rawObj_sku["deviceType"])
+				// associatedMachineIds: nested field — expand manually if needed
+				// components: nested field — expand manually if needed
+				obj_sku.Created = StringFromAPI(rawObj_sku["created"])
+				obj_sku.Updated = StringFromAPI(rawObj_sku["updated"])
+				_ = rawObj_sku
+				data.Sku = obj_sku
+			} else {
+				data.Sku = nil
+			}
+			data.MachineId = StringFromAPI(result["machineId"])
+			if rawObj_machine, ok := result["machine"].(map[string]interface{}); ok {
+				obj_machine := &ExpectedMachineDsMachine{}
+				obj_machine.Id = StringFromAPI(rawObj_machine["id"])
+				obj_machine.ControllerMachineId = StringFromAPI(rawObj_machine["controllerMachineId"])
+				obj_machine.ControllerMachineType = StringFromAPI(rawObj_machine["controllerMachineType"])
+				obj_machine.HwSkuDeviceType = StringFromAPI(rawObj_machine["hwSkuDeviceType"])
+				obj_machine.Vendor = StringFromAPI(rawObj_machine["vendor"])
+				obj_machine.ProductName = StringFromAPI(rawObj_machine["productName"])
+				obj_machine.MaintenanceMessage = StringFromAPI(rawObj_machine["maintenanceMessage"])
+				obj_machine.Status = StringFromAPI(rawObj_machine["status"])
+				_ = rawObj_machine
+				data.Machine = obj_machine
+			} else {
+				data.Machine = nil
+			}
+			data.RackId = StringFromAPI(result["rackId"])
+			data.BmcIpAddress = StringFromAPI(result["bmcIpAddress"])
+			data.Name = StringFromAPI(result["name"])
+			data.Manufacturer = StringFromAPI(result["manufacturer"])
+			data.Model = StringFromAPI(result["model"])
+			data.Description = StringFromAPI(result["description"])
+			data.SlotId = Int64FromAPI(result["slotId"])
+			data.TrayIdx = Int64FromAPI(result["trayIdx"])
+			data.HostId = Int64FromAPI(result["hostId"])
+			data.IsDpfEnabled = BoolFromAPI(result["isDpfEnabled"])
+			if rawMap_labels := StringMapFromAPI(result["labels"]); rawMap_labels != nil {
+				mv, d := types.MapValueFrom(ctx, types.StringType, rawMap_labels)
+				diags.Append(d...)
+				data.Labels = mv
+			} else {
+				data.Labels = types.MapNull(types.StringType)
+			}
+			if rawObj_host_lifecycle_profile, ok := result["hostLifecycleProfile"].(map[string]interface{}); ok {
+				obj_host_lifecycle_profile := &ExpectedMachineDsHostLifecycleProfile{}
+				obj_host_lifecycle_profile.DisableLockdown = BoolFromAPI(rawObj_host_lifecycle_profile["disableLockdown"])
+				_ = rawObj_host_lifecycle_profile
+				data.HostLifecycleProfile = obj_host_lifecycle_profile
+			} else {
+				data.HostLifecycleProfile = nil
+			}
+			data.Created = StringFromAPI(result["created"])
+			data.Updated = StringFromAPI(result["updated"])
+			_ = diags
 		}
 	}
 
@@ -873,12 +819,11 @@ func (d *ExpectedMachineDataSource) populateModel(ctx context.Context, data *Exp
 		obj_sku := &ExpectedMachineDsSku{}
 		obj_sku.Id = StringFromAPI(rawObj_sku["id"])
 		obj_sku.SiteId = StringFromAPI(rawObj_sku["siteId"])
-		obj_sku.Description = StringFromAPI(rawObj_sku["description"])
-		obj_sku.SchemaVersion = Int64FromAPI(rawObj_sku["schemaVersion"])
 		obj_sku.DeviceType = StringFromAPI(rawObj_sku["deviceType"])
 		// associatedMachineIds: nested field — expand manually if needed
 		// components: nested field — expand manually if needed
 		obj_sku.Created = StringFromAPI(rawObj_sku["created"])
+		obj_sku.Updated = StringFromAPI(rawObj_sku["updated"])
 		_ = rawObj_sku
 		data.Sku = obj_sku
 	} else {

@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,33 +26,32 @@ type AuditDataSource struct {
 }
 
 type AuditDataSourceModel struct {
-	Id types.String `tfsdk:"id"`
-	FailedOnly types.String `tfsdk:"failed_only"`
-	Endpoint types.String `tfsdk:"endpoint"`
-	QueryParams types.Map `tfsdk:"query_params"`
-	Method types.String `tfsdk:"method"`
-	Body types.Map `tfsdk:"body"`
-	StatusCode types.Int64 `tfsdk:"status_code"`
+	Id            types.String `tfsdk:"id"`
+	FailedOnly    types.String `tfsdk:"failed_only"`
+	Endpoint      types.String `tfsdk:"endpoint"`
+	QueryParams   types.String `tfsdk:"query_params"`
+	Method        types.String `tfsdk:"method"`
+	Body          types.String `tfsdk:"body"`
+	StatusCode    types.Int64  `tfsdk:"status_code"`
 	StatusMessage types.String `tfsdk:"status_message"`
-	ClientIp types.String `tfsdk:"client_ip"`
-	UserId types.String `tfsdk:"user_id"`
-	User *AuditDsUser `tfsdk:"user"`
-	OrgName types.String `tfsdk:"org_name"`
-	ExtraData types.String `tfsdk:"extra_data"`
-	Timestamp types.String `tfsdk:"timestamp"`
-	DurationMs types.Int64 `tfsdk:"duration_ms"`
-	ApiVersion types.String `tfsdk:"api_version"`
+	ClientIp      types.String `tfsdk:"client_ip"`
+	UserId        types.String `tfsdk:"user_id"`
+	User          *AuditDsUser `tfsdk:"user"`
+	OrgName       types.String `tfsdk:"org_name"`
+	ExtraData     types.String `tfsdk:"extra_data"`
+	Timestamp     types.String `tfsdk:"timestamp"`
+	DurationMs    types.Int64  `tfsdk:"duration_ms"`
+	ApiVersion    types.String `tfsdk:"api_version"`
 }
 
 type AuditDsUser struct {
-	Id types.String `tfsdk:"id"`
-	Email types.String `tfsdk:"email"`
+	Id        types.String `tfsdk:"id"`
+	Email     types.String `tfsdk:"email"`
 	FirstName types.String `tfsdk:"first_name"`
-	LastName types.String `tfsdk:"last_name"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
+	LastName  types.String `tfsdk:"last_name"`
+	Created   types.String `tfsdk:"created"`
+	Updated   types.String `tfsdk:"updated"`
 }
-
 
 func (d *AuditDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_audit"
@@ -75,12 +74,11 @@ func (d *AuditDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, 
 				Computed:    true,
 				Description: "API endpoint",
 			},
-			"query_params": schema.MapAttribute{
-				ElementType: types.StringType,
+			"query_params": schema.StringAttribute{
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
-				Description: "Query parameters from the request URL, keyed by parameter name. Each value contains all values supplied for that parameter.",
+				Description: "Query parameters",
 			},
 			"method": schema.StringAttribute{
 				Required:    false,
@@ -88,12 +86,11 @@ func (d *AuditDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, 
 				Computed:    true,
 				Description: "HTTP method",
 			},
-			"body": schema.MapAttribute{
-				ElementType: types.StringType,
+			"body": schema.StringAttribute{
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
-				Description: "Audited request body. JSON object bodies retain their properties directly after sensitive fields are recursively obfuscated. Valid non-object JSON is stored in `value`. Malformed JSON is represented by `jsonParseFailed: true` without retaining the raw request content.",
+				Description: "HTTP body in JSON format",
 			},
 			"status_code": schema.Int64Attribute{
 				Required:    false,
@@ -233,21 +230,9 @@ func (d *AuditDataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 		data.Id = StringFromAPI(result["id"])
 		diags := resp.Diagnostics
 		data.Endpoint = StringFromAPI(result["endpoint"])
-		if rawMap_query_params := StringMapFromAPI(result["queryParams"]); rawMap_query_params != nil {
-			mv, d := types.MapValueFrom(ctx, types.StringType, rawMap_query_params)
-			diags.Append(d...)
-			data.QueryParams = mv
-		} else {
-			data.QueryParams = types.MapNull(types.StringType)
-		}
+		data.QueryParams = StringFromAPI(result["queryParams"])
 		data.Method = StringFromAPI(result["method"])
-		if rawMap_body := StringMapFromAPI(result["body"]); rawMap_body != nil {
-			mv, d := types.MapValueFrom(ctx, types.StringType, rawMap_body)
-			diags.Append(d...)
-			data.Body = mv
-		} else {
-			data.Body = types.MapNull(types.StringType)
-		}
+		data.Body = StringFromAPI(result["body"])
 		data.StatusCode = Int64FromAPI(result["statusCode"])
 		data.StatusMessage = StringFromAPI(result["statusMessage"])
 		data.ClientIp = StringFromAPI(result["clientIP"])
@@ -283,44 +268,32 @@ func (d *AuditDataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 			data.Id = StringFromAPI(result["id"])
 			diags := resp.Diagnostics
 			data.Endpoint = StringFromAPI(result["endpoint"])
-		if rawMap_query_params := StringMapFromAPI(result["queryParams"]); rawMap_query_params != nil {
-			mv, d := types.MapValueFrom(ctx, types.StringType, rawMap_query_params)
-			diags.Append(d...)
-			data.QueryParams = mv
-		} else {
-			data.QueryParams = types.MapNull(types.StringType)
-		}
-		data.Method = StringFromAPI(result["method"])
-		if rawMap_body := StringMapFromAPI(result["body"]); rawMap_body != nil {
-			mv, d := types.MapValueFrom(ctx, types.StringType, rawMap_body)
-			diags.Append(d...)
-			data.Body = mv
-		} else {
-			data.Body = types.MapNull(types.StringType)
-		}
-		data.StatusCode = Int64FromAPI(result["statusCode"])
-		data.StatusMessage = StringFromAPI(result["statusMessage"])
-		data.ClientIp = StringFromAPI(result["clientIP"])
-		data.UserId = StringFromAPI(result["userID"])
-		if rawObj_user, ok := result["user"].(map[string]interface{}); ok {
-			obj_user := &AuditDsUser{}
-			obj_user.Id = StringFromAPI(rawObj_user["id"])
-			obj_user.Email = StringFromAPI(rawObj_user["email"])
-			obj_user.FirstName = StringFromAPI(rawObj_user["firstName"])
-			obj_user.LastName = StringFromAPI(rawObj_user["lastName"])
-			obj_user.Created = StringFromAPI(rawObj_user["created"])
-			obj_user.Updated = StringFromAPI(rawObj_user["updated"])
-			_ = rawObj_user
-			data.User = obj_user
-		} else {
-			data.User = nil
-		}
-		data.OrgName = StringFromAPI(result["orgName"])
-		data.ExtraData = StringFromAPI(result["extraData"])
-		data.Timestamp = StringFromAPI(result["timestamp"])
-		data.DurationMs = Int64FromAPI(result["durationMs"])
-		data.ApiVersion = StringFromAPI(result["apiVersion"])
-		_ = diags
+			data.QueryParams = StringFromAPI(result["queryParams"])
+			data.Method = StringFromAPI(result["method"])
+			data.Body = StringFromAPI(result["body"])
+			data.StatusCode = Int64FromAPI(result["statusCode"])
+			data.StatusMessage = StringFromAPI(result["statusMessage"])
+			data.ClientIp = StringFromAPI(result["clientIP"])
+			data.UserId = StringFromAPI(result["userID"])
+			if rawObj_user, ok := result["user"].(map[string]interface{}); ok {
+				obj_user := &AuditDsUser{}
+				obj_user.Id = StringFromAPI(rawObj_user["id"])
+				obj_user.Email = StringFromAPI(rawObj_user["email"])
+				obj_user.FirstName = StringFromAPI(rawObj_user["firstName"])
+				obj_user.LastName = StringFromAPI(rawObj_user["lastName"])
+				obj_user.Created = StringFromAPI(rawObj_user["created"])
+				obj_user.Updated = StringFromAPI(rawObj_user["updated"])
+				_ = rawObj_user
+				data.User = obj_user
+			} else {
+				data.User = nil
+			}
+			data.OrgName = StringFromAPI(result["orgName"])
+			data.ExtraData = StringFromAPI(result["extraData"])
+			data.Timestamp = StringFromAPI(result["timestamp"])
+			data.DurationMs = Int64FromAPI(result["durationMs"])
+			data.ApiVersion = StringFromAPI(result["apiVersion"])
+			_ = diags
 		}
 	}
 
@@ -329,21 +302,9 @@ func (d *AuditDataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 
 func (d *AuditDataSource) populateModel(ctx context.Context, data *AuditDataSourceModel, result map[string]interface{}, diags diag.Diagnostics) {
 	data.Endpoint = StringFromAPI(result["endpoint"])
-	if rawMap_query_params := StringMapFromAPI(result["queryParams"]); rawMap_query_params != nil {
-		mv, d := types.MapValueFrom(ctx, types.StringType, rawMap_query_params)
-		diags.Append(d...)
-		data.QueryParams = mv
-	} else {
-		data.QueryParams = types.MapNull(types.StringType)
-	}
+	data.QueryParams = StringFromAPI(result["queryParams"])
 	data.Method = StringFromAPI(result["method"])
-	if rawMap_body := StringMapFromAPI(result["body"]); rawMap_body != nil {
-		mv, d := types.MapValueFrom(ctx, types.StringType, rawMap_body)
-		diags.Append(d...)
-		data.Body = mv
-	} else {
-		data.Body = types.MapNull(types.StringType)
-	}
+	data.Body = StringFromAPI(result["body"])
 	data.StatusCode = Int64FromAPI(result["statusCode"])
 	data.StatusMessage = StringFromAPI(result["statusMessage"])
 	data.ClientIp = StringFromAPI(result["clientIP"])

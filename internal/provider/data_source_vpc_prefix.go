@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,37 +26,36 @@ type VpcPrefixDataSource struct {
 }
 
 type VpcPrefixDataSourceModel struct {
-	Id types.String `tfsdk:"id"`
-	SiteId types.String `tfsdk:"site_id"`
-	VpcId types.String `tfsdk:"vpc_id"`
-	Status types.String `tfsdk:"status"`
-	Query types.String `tfsdk:"query"`
-	IncludeUsageStats types.String `tfsdk:"include_usage_stats"`
-	Name types.String `tfsdk:"name"`
-	IpBlockId types.String `tfsdk:"ip_block_id"`
-	Prefix types.String `tfsdk:"prefix"`
-	PrefixLength types.Int64 `tfsdk:"prefix_length"`
-	UsageStats *VpcPrefixDsUsageStats `tfsdk:"usage_stats"`
-	StatusHistory []VpcPrefixDsStatusHistoryItem `tfsdk:"status_history"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
+	Id                types.String                   `tfsdk:"id"`
+	SiteId            types.String                   `tfsdk:"site_id"`
+	VpcId             types.String                   `tfsdk:"vpc_id"`
+	Status            types.String                   `tfsdk:"status"`
+	Query             types.String                   `tfsdk:"query"`
+	IncludeUsageStats types.String                   `tfsdk:"include_usage_stats"`
+	Name              types.String                   `tfsdk:"name"`
+	IpBlockId         types.String                   `tfsdk:"ip_block_id"`
+	Prefix            types.String                   `tfsdk:"prefix"`
+	PrefixLength      types.Int64                    `tfsdk:"prefix_length"`
+	UsageStats        *VpcPrefixDsUsageStats         `tfsdk:"usage_stats"`
+	StatusHistory     []VpcPrefixDsStatusHistoryItem `tfsdk:"status_history"`
+	Created           types.String                   `tfsdk:"created"`
+	Updated           types.String                   `tfsdk:"updated"`
 }
 
 type VpcPrefixDsUsageStats struct {
-	AvailableIPs types.Int64 `tfsdk:"available_i_ps"`
-	AcquiredIPs types.Int64 `tfsdk:"acquired_i_ps"`
-	AvailablePrefixes types.List `tfsdk:"available_prefixes"`
+	AvailableIPs              types.Int64 `tfsdk:"available_i_ps"`
+	AcquiredIPs               types.Int64 `tfsdk:"acquired_i_ps"`
+	AvailablePrefixes         types.List  `tfsdk:"available_prefixes"`
 	AvailableSmallestPrefixes types.Int64 `tfsdk:"available_smallest_prefixes"`
-	AcquiredPrefixes types.Int64 `tfsdk:"acquired_prefixes"`
+	AcquiredPrefixes          types.Int64 `tfsdk:"acquired_prefixes"`
 }
 
 type VpcPrefixDsStatusHistoryItem struct {
-	Status types.String `tfsdk:"status"`
+	Status  types.String `tfsdk:"status"`
 	Message types.String `tfsdk:"message"`
 	Created types.String `tfsdk:"created"`
 	Updated types.String `tfsdk:"updated"`
 }
-
 
 func (d *VpcPrefixDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_vpc_prefix"
@@ -95,7 +94,7 @@ func (d *VpcPrefixDataSource) Schema(_ context.Context, _ datasource.SchemaReque
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "When true, each VPC Prefix with IPv4 includes IPv4 usage statistics using the same structure as IP Block usage. Usage is derived from associated Ethernet interfaces and their IPv4 addresses. IP usage counts two addresses per interface, while prefix usage counts each distinct `/31` containing an assigned IPv4 address.",
+				Description: "When true, each VPC Prefix object includes usage statistics using the same structure as IP Block usage. Prefix and IP usage data is derived by evaluating associated Ethernet interfaces. Each Interface associated with a VPC Prefix consumes a `/31` prefix.",
 			},
 			"name": schema.StringAttribute{
 				Required:    false,
@@ -119,19 +118,19 @@ func (d *VpcPrefixDataSource) Schema(_ context.Context, _ datasource.SchemaReque
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
-				Description: "Length of the returned prefix. A VPC Prefix reported by a Site may fall outside the bounds for REST create requests.",
+				Description: "Length of the prefix. Valid range is 8 to 31, and max usable value depends on prefix length of parent IP Block.",
 			},
 			"usage_stats": schema.SingleNestedAttribute{
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
-				Description: "Present when query parameter `includeUsageStats=true` and the VPC Prefix has IPv4. This statistic reports IPv4 usage only. IP usage counts two addresses per associated Ethernet interface, while prefix usage counts each distinct `/31` containing an assigned IPv4 address.",
+				Description: "Present when query parameter `includeUsageStats=true`. Prefix and IP usage data is derived by evaluating associated Ethernet interfaces. Each Interface associated with a VPC Prefix consumes a `/31` prefix.",
 				Attributes: map[string]schema.Attribute{
 					"available_i_ps": schema.Int64Attribute{
 						Required:    false,
 						Optional:    false,
 						Computed:    true,
-						Description: "Total number of IP addresses in the block (acquired and unused), capped at 2,147,483,647. An IP Block allocated to one child prefix of the same size reports zero. ",
+						Description: "Total number of IP addresses in the block (acquired and unused)",
 					},
 					"acquired_i_ps": schema.Int64Attribute{
 						Required:    false,
@@ -150,7 +149,7 @@ func (d *VpcPrefixDataSource) Schema(_ context.Context, _ datasource.SchemaReque
 						Required:    false,
 						Optional:    false,
 						Computed:    true,
-						Description: "Number of complete `/30` IPv4 prefixes or `/126` IPv6 prefixes remaining after acquired child prefixes are excluded. Both prefix sizes contain four addresses. The count is capped at 2,147,483,647. The `acquiredIPs` count is not subtracted. ",
+						Description: "Total number of /30 prefixes that can still be acquired from this block (only reduced if prefixes are acquired, not reduced by acquired IPs) ",
 					},
 					"acquired_prefixes": schema.Int64Attribute{
 						Required:    false,
@@ -265,7 +264,9 @@ func (d *VpcPrefixDataSource) Read(ctx context.Context, req datasource.ReadReque
 			items_status_history := make([]VpcPrefixDsStatusHistoryItem, len(rawItems_status_history))
 			for i_status_history, raw_status_history := range rawItems_status_history {
 				m_status_history, _ := raw_status_history.(map[string]interface{})
-				if m_status_history == nil { m_status_history = map[string]interface{}{} }
+				if m_status_history == nil {
+					m_status_history = map[string]interface{}{}
+				}
 				items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 				items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 				items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -290,38 +291,40 @@ func (d *VpcPrefixDataSource) Read(ctx context.Context, req datasource.ReadReque
 			data.Id = StringFromAPI(result["id"])
 			diags := resp.Diagnostics
 			data.Name = StringFromAPI(result["name"])
-		data.IpBlockId = StringFromAPI(result["ipBlockId"])
-		data.Prefix = StringFromAPI(result["prefix"])
-		data.PrefixLength = Int64FromAPI(result["prefixLength"])
-		if rawObj_usage_stats, ok := result["usageStats"].(map[string]interface{}); ok {
-			obj_usage_stats := &VpcPrefixDsUsageStats{}
-			obj_usage_stats.AvailableIPs = Int64FromAPI(rawObj_usage_stats["availableIPs"])
-			obj_usage_stats.AcquiredIPs = Int64FromAPI(rawObj_usage_stats["acquiredIPs"])
-			// availablePrefixes: nested field — expand manually if needed
-			obj_usage_stats.AvailableSmallestPrefixes = Int64FromAPI(rawObj_usage_stats["availableSmallestPrefixes"])
-			obj_usage_stats.AcquiredPrefixes = Int64FromAPI(rawObj_usage_stats["acquiredPrefixes"])
-			_ = rawObj_usage_stats
-			data.UsageStats = obj_usage_stats
-		} else {
-			data.UsageStats = nil
-		}
-		if rawItems_status_history, ok := result["statusHistory"].([]interface{}); ok && rawItems_status_history != nil {
-			items_status_history := make([]VpcPrefixDsStatusHistoryItem, len(rawItems_status_history))
-			for i_status_history, raw_status_history := range rawItems_status_history {
-				m_status_history, _ := raw_status_history.(map[string]interface{})
-				if m_status_history == nil { m_status_history = map[string]interface{}{} }
-				items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
-				items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
-				items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
-				items_status_history[i_status_history].Updated = StringFromAPI(m_status_history["updated"])
+			data.IpBlockId = StringFromAPI(result["ipBlockId"])
+			data.Prefix = StringFromAPI(result["prefix"])
+			data.PrefixLength = Int64FromAPI(result["prefixLength"])
+			if rawObj_usage_stats, ok := result["usageStats"].(map[string]interface{}); ok {
+				obj_usage_stats := &VpcPrefixDsUsageStats{}
+				obj_usage_stats.AvailableIPs = Int64FromAPI(rawObj_usage_stats["availableIPs"])
+				obj_usage_stats.AcquiredIPs = Int64FromAPI(rawObj_usage_stats["acquiredIPs"])
+				// availablePrefixes: nested field — expand manually if needed
+				obj_usage_stats.AvailableSmallestPrefixes = Int64FromAPI(rawObj_usage_stats["availableSmallestPrefixes"])
+				obj_usage_stats.AcquiredPrefixes = Int64FromAPI(rawObj_usage_stats["acquiredPrefixes"])
+				_ = rawObj_usage_stats
+				data.UsageStats = obj_usage_stats
+			} else {
+				data.UsageStats = nil
 			}
-			data.StatusHistory = items_status_history
-		} else {
-			data.StatusHistory = nil
-		}
-		data.Created = StringFromAPI(result["created"])
-		data.Updated = StringFromAPI(result["updated"])
-		_ = diags
+			if rawItems_status_history, ok := result["statusHistory"].([]interface{}); ok && rawItems_status_history != nil {
+				items_status_history := make([]VpcPrefixDsStatusHistoryItem, len(rawItems_status_history))
+				for i_status_history, raw_status_history := range rawItems_status_history {
+					m_status_history, _ := raw_status_history.(map[string]interface{})
+					if m_status_history == nil {
+						m_status_history = map[string]interface{}{}
+					}
+					items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
+					items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
+					items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
+					items_status_history[i_status_history].Updated = StringFromAPI(m_status_history["updated"])
+				}
+				data.StatusHistory = items_status_history
+			} else {
+				data.StatusHistory = nil
+			}
+			data.Created = StringFromAPI(result["created"])
+			data.Updated = StringFromAPI(result["updated"])
+			_ = diags
 		}
 	}
 
@@ -349,7 +352,9 @@ func (d *VpcPrefixDataSource) populateModel(ctx context.Context, data *VpcPrefix
 		items_status_history := make([]VpcPrefixDsStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])

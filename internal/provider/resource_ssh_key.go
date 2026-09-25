@@ -26,18 +26,17 @@ type SshKeyResource struct {
 }
 
 type SshKeyResourceModel struct {
-	Id types.String `tfsdk:"id"`
-	Name types.String `tfsdk:"name"`
-	PublicKey types.String `tfsdk:"public_key"`
+	Id            types.String `tfsdk:"id"`
+	Name          types.String `tfsdk:"name"`
+	PublicKey     types.String `tfsdk:"public_key"`
 	SshKeyGroupId types.String `tfsdk:"ssh_key_group_id"`
-	Org types.String `tfsdk:"org"`
-	TenantId types.String `tfsdk:"tenant_id"`
-	Fingerprint types.String `tfsdk:"fingerprint"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
-	SshKeyId types.String `tfsdk:"ssh_key_id"`
+	Org           types.String `tfsdk:"org"`
+	TenantId      types.String `tfsdk:"tenant_id"`
+	Fingerprint   types.String `tfsdk:"fingerprint"`
+	Created       types.String `tfsdk:"created"`
+	Updated       types.String `tfsdk:"updated"`
+	SshKeyId      types.String `tfsdk:"ssh_key_id"`
 }
-
 
 func (r *SshKeyResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_ssh_key"

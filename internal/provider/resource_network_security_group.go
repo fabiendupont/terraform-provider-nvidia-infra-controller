@@ -26,49 +26,48 @@ type NetworkSecurityGroupResource struct {
 }
 
 type NetworkSecurityGroupResourceModel struct {
-	Id types.String `tfsdk:"id"`
-	Name types.String `tfsdk:"name"`
-	Description types.String `tfsdk:"description"`
-	SiteId types.String `tfsdk:"site_id"`
-	StatefulEgress types.Bool `tfsdk:"stateful_egress"`
-	Rules []NetworkSecurityGroupRulesItem `tfsdk:"rules"`
-	Labels types.Map `tfsdk:"labels"`
-	TenantId types.String `tfsdk:"tenant_id"`
-	Status types.String `tfsdk:"status"`
-	StatusHistory []NetworkSecurityGroupStatusHistoryItem `tfsdk:"status_history"`
-	RuleCount types.Int64 `tfsdk:"rule_count"`
-	AttachmentStats *NetworkSecurityGroupAttachmentStats `tfsdk:"attachment_stats"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
-	NetworkSecurityGroupId types.String `tfsdk:"network_security_group_id"`
+	Id                     types.String                            `tfsdk:"id"`
+	Name                   types.String                            `tfsdk:"name"`
+	Description            types.String                            `tfsdk:"description"`
+	SiteId                 types.String                            `tfsdk:"site_id"`
+	StatefulEgress         types.Bool                              `tfsdk:"stateful_egress"`
+	Rules                  []NetworkSecurityGroupRulesItem         `tfsdk:"rules"`
+	Labels                 types.Map                               `tfsdk:"labels"`
+	TenantId               types.String                            `tfsdk:"tenant_id"`
+	Status                 types.String                            `tfsdk:"status"`
+	StatusHistory          []NetworkSecurityGroupStatusHistoryItem `tfsdk:"status_history"`
+	RuleCount              types.Int64                             `tfsdk:"rule_count"`
+	AttachmentStats        *NetworkSecurityGroupAttachmentStats    `tfsdk:"attachment_stats"`
+	Created                types.String                            `tfsdk:"created"`
+	Updated                types.String                            `tfsdk:"updated"`
+	NetworkSecurityGroupId types.String                            `tfsdk:"network_security_group_id"`
 }
 
 type NetworkSecurityGroupRulesItem struct {
-	Name types.String `tfsdk:"name"`
-	Direction types.String `tfsdk:"direction"`
-	SourcePortRange types.String `tfsdk:"source_port_range"`
+	Name                 types.String `tfsdk:"name"`
+	Direction            types.String `tfsdk:"direction"`
+	SourcePortRange      types.String `tfsdk:"source_port_range"`
 	DestinationPortRange types.String `tfsdk:"destination_port_range"`
-	Protocol types.String `tfsdk:"protocol"`
-	Action types.String `tfsdk:"action"`
-	Priority types.Int64 `tfsdk:"priority"`
-	SourcePrefix types.String `tfsdk:"source_prefix"`
-	DestinationPrefix types.String `tfsdk:"destination_prefix"`
+	Protocol             types.String `tfsdk:"protocol"`
+	Action               types.String `tfsdk:"action"`
+	Priority             types.Int64  `tfsdk:"priority"`
+	SourcePrefix         types.String `tfsdk:"source_prefix"`
+	DestinationPrefix    types.String `tfsdk:"destination_prefix"`
 }
 
 type NetworkSecurityGroupStatusHistoryItem struct {
-	Status types.String `tfsdk:"status"`
+	Status  types.String `tfsdk:"status"`
 	Message types.String `tfsdk:"message"`
 	Created types.String `tfsdk:"created"`
 	Updated types.String `tfsdk:"updated"`
 }
 
 type NetworkSecurityGroupAttachmentStats struct {
-	InUse types.Bool `tfsdk:"in_use"`
-	DirectVpcAttachmentCount types.Int64 `tfsdk:"direct_vpc_attachment_count"`
+	InUse                         types.Bool  `tfsdk:"in_use"`
+	DirectVpcAttachmentCount      types.Int64 `tfsdk:"direct_vpc_attachment_count"`
 	DirectInstanceAttachmentCount types.Int64 `tfsdk:"direct_instance_attachment_count"`
-	TotalDirectAttachmentCount types.Int64 `tfsdk:"total_direct_attachment_count"`
+	TotalDirectAttachmentCount    types.Int64 `tfsdk:"total_direct_attachment_count"`
 }
-
 
 func (r *NetworkSecurityGroupResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_network_security_group"
@@ -323,15 +322,33 @@ func (r *NetworkSecurityGroupResource) Create(ctx context.Context, req resource.
 		items_rules := make([]map[string]interface{}, len(data.Rules))
 		for i_rules, item_rules := range data.Rules {
 			m_rules := map[string]interface{}{}
-			if !item_rules.Name.IsNull() { m_rules["name"] = item_rules.Name.ValueString() }
-			if !item_rules.Direction.IsNull() { m_rules["direction"] = item_rules.Direction.ValueString() }
-			if !item_rules.SourcePortRange.IsNull() { m_rules["sourcePortRange"] = item_rules.SourcePortRange.ValueString() }
-			if !item_rules.DestinationPortRange.IsNull() { m_rules["destinationPortRange"] = item_rules.DestinationPortRange.ValueString() }
-			if !item_rules.Protocol.IsNull() { m_rules["protocol"] = item_rules.Protocol.ValueString() }
-			if !item_rules.Action.IsNull() { m_rules["action"] = item_rules.Action.ValueString() }
-			if !item_rules.Priority.IsNull() { m_rules["priority"] = item_rules.Priority.ValueInt64() }
-			if !item_rules.SourcePrefix.IsNull() { m_rules["sourcePrefix"] = item_rules.SourcePrefix.ValueString() }
-			if !item_rules.DestinationPrefix.IsNull() { m_rules["destinationPrefix"] = item_rules.DestinationPrefix.ValueString() }
+			if !item_rules.Name.IsNull() {
+				m_rules["name"] = item_rules.Name.ValueString()
+			}
+			if !item_rules.Direction.IsNull() {
+				m_rules["direction"] = item_rules.Direction.ValueString()
+			}
+			if !item_rules.SourcePortRange.IsNull() {
+				m_rules["sourcePortRange"] = item_rules.SourcePortRange.ValueString()
+			}
+			if !item_rules.DestinationPortRange.IsNull() {
+				m_rules["destinationPortRange"] = item_rules.DestinationPortRange.ValueString()
+			}
+			if !item_rules.Protocol.IsNull() {
+				m_rules["protocol"] = item_rules.Protocol.ValueString()
+			}
+			if !item_rules.Action.IsNull() {
+				m_rules["action"] = item_rules.Action.ValueString()
+			}
+			if !item_rules.Priority.IsNull() {
+				m_rules["priority"] = item_rules.Priority.ValueInt64()
+			}
+			if !item_rules.SourcePrefix.IsNull() {
+				m_rules["sourcePrefix"] = item_rules.SourcePrefix.ValueString()
+			}
+			if !item_rules.DestinationPrefix.IsNull() {
+				m_rules["destinationPrefix"] = item_rules.DestinationPrefix.ValueString()
+			}
 			items_rules[i_rules] = m_rules
 		}
 		body["rules"] = items_rules
@@ -359,7 +376,9 @@ func (r *NetworkSecurityGroupResource) Create(ctx context.Context, req resource.
 		items_rules := make([]NetworkSecurityGroupRulesItem, len(rawItems_rules))
 		for i_rules, raw_rules := range rawItems_rules {
 			m_rules, _ := raw_rules.(map[string]interface{})
-			if m_rules == nil { m_rules = map[string]interface{}{} }
+			if m_rules == nil {
+				m_rules = map[string]interface{}{}
+			}
 			items_rules[i_rules].Name = StringFromAPI(m_rules["name"])
 			items_rules[i_rules].Direction = StringFromAPI(m_rules["direction"])
 			items_rules[i_rules].SourcePortRange = StringFromAPI(m_rules["sourcePortRange"])
@@ -387,7 +406,9 @@ func (r *NetworkSecurityGroupResource) Create(ctx context.Context, req resource.
 		items_status_history := make([]NetworkSecurityGroupStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -444,7 +465,9 @@ func (r *NetworkSecurityGroupResource) Read(ctx context.Context, req resource.Re
 		items_rules := make([]NetworkSecurityGroupRulesItem, len(rawItems_rules))
 		for i_rules, raw_rules := range rawItems_rules {
 			m_rules, _ := raw_rules.(map[string]interface{})
-			if m_rules == nil { m_rules = map[string]interface{}{} }
+			if m_rules == nil {
+				m_rules = map[string]interface{}{}
+			}
 			items_rules[i_rules].Name = StringFromAPI(m_rules["name"])
 			items_rules[i_rules].Direction = StringFromAPI(m_rules["direction"])
 			items_rules[i_rules].SourcePortRange = StringFromAPI(m_rules["sourcePortRange"])
@@ -472,7 +495,9 @@ func (r *NetworkSecurityGroupResource) Read(ctx context.Context, req resource.Re
 		items_status_history := make([]NetworkSecurityGroupStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -522,15 +547,33 @@ func (r *NetworkSecurityGroupResource) Update(ctx context.Context, req resource.
 		items_rules := make([]map[string]interface{}, len(data.Rules))
 		for i_rules, item_rules := range data.Rules {
 			m_rules := map[string]interface{}{}
-			if !item_rules.Name.IsNull() { m_rules["name"] = item_rules.Name.ValueString() }
-			if !item_rules.Direction.IsNull() { m_rules["direction"] = item_rules.Direction.ValueString() }
-			if !item_rules.SourcePortRange.IsNull() { m_rules["sourcePortRange"] = item_rules.SourcePortRange.ValueString() }
-			if !item_rules.DestinationPortRange.IsNull() { m_rules["destinationPortRange"] = item_rules.DestinationPortRange.ValueString() }
-			if !item_rules.Protocol.IsNull() { m_rules["protocol"] = item_rules.Protocol.ValueString() }
-			if !item_rules.Action.IsNull() { m_rules["action"] = item_rules.Action.ValueString() }
-			if !item_rules.Priority.IsNull() { m_rules["priority"] = item_rules.Priority.ValueInt64() }
-			if !item_rules.SourcePrefix.IsNull() { m_rules["sourcePrefix"] = item_rules.SourcePrefix.ValueString() }
-			if !item_rules.DestinationPrefix.IsNull() { m_rules["destinationPrefix"] = item_rules.DestinationPrefix.ValueString() }
+			if !item_rules.Name.IsNull() {
+				m_rules["name"] = item_rules.Name.ValueString()
+			}
+			if !item_rules.Direction.IsNull() {
+				m_rules["direction"] = item_rules.Direction.ValueString()
+			}
+			if !item_rules.SourcePortRange.IsNull() {
+				m_rules["sourcePortRange"] = item_rules.SourcePortRange.ValueString()
+			}
+			if !item_rules.DestinationPortRange.IsNull() {
+				m_rules["destinationPortRange"] = item_rules.DestinationPortRange.ValueString()
+			}
+			if !item_rules.Protocol.IsNull() {
+				m_rules["protocol"] = item_rules.Protocol.ValueString()
+			}
+			if !item_rules.Action.IsNull() {
+				m_rules["action"] = item_rules.Action.ValueString()
+			}
+			if !item_rules.Priority.IsNull() {
+				m_rules["priority"] = item_rules.Priority.ValueInt64()
+			}
+			if !item_rules.SourcePrefix.IsNull() {
+				m_rules["sourcePrefix"] = item_rules.SourcePrefix.ValueString()
+			}
+			if !item_rules.DestinationPrefix.IsNull() {
+				m_rules["destinationPrefix"] = item_rules.DestinationPrefix.ValueString()
+			}
 			items_rules[i_rules] = m_rules
 		}
 		body["rules"] = items_rules
@@ -558,7 +601,9 @@ func (r *NetworkSecurityGroupResource) Update(ctx context.Context, req resource.
 		items_rules := make([]NetworkSecurityGroupRulesItem, len(rawItems_rules))
 		for i_rules, raw_rules := range rawItems_rules {
 			m_rules, _ := raw_rules.(map[string]interface{})
-			if m_rules == nil { m_rules = map[string]interface{}{} }
+			if m_rules == nil {
+				m_rules = map[string]interface{}{}
+			}
 			items_rules[i_rules].Name = StringFromAPI(m_rules["name"])
 			items_rules[i_rules].Direction = StringFromAPI(m_rules["direction"])
 			items_rules[i_rules].SourcePortRange = StringFromAPI(m_rules["sourcePortRange"])
@@ -586,7 +631,9 @@ func (r *NetworkSecurityGroupResource) Update(ctx context.Context, req resource.
 		items_status_history := make([]NetworkSecurityGroupStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -638,7 +685,9 @@ func (r *NetworkSecurityGroupResource) populateModel(ctx context.Context, data *
 		items_rules := make([]NetworkSecurityGroupRulesItem, len(rawItems_rules))
 		for i_rules, raw_rules := range rawItems_rules {
 			m_rules, _ := raw_rules.(map[string]interface{})
-			if m_rules == nil { m_rules = map[string]interface{}{} }
+			if m_rules == nil {
+				m_rules = map[string]interface{}{}
+			}
 			items_rules[i_rules].Name = StringFromAPI(m_rules["name"])
 			items_rules[i_rules].Direction = StringFromAPI(m_rules["direction"])
 			items_rules[i_rules].SourcePortRange = StringFromAPI(m_rules["sourcePortRange"])
@@ -666,7 +715,9 @@ func (r *NetworkSecurityGroupResource) populateModel(ctx context.Context, data *
 		items_status_history := make([]NetworkSecurityGroupStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])

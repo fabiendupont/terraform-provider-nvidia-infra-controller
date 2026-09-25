@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,10 +26,9 @@ type MetadataDataSource struct {
 }
 
 type MetadataDataSourceModel struct {
-	Version types.String `tfsdk:"version"`
+	Version   types.String `tfsdk:"version"`
 	BuildTime types.String `tfsdk:"build_time"`
 }
-
 
 func (d *MetadataDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_metadata"

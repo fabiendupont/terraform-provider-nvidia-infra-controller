@@ -38,7 +38,6 @@ output "tenant_account_name" {
 - `created` (String) Date/time when the Tenant Account was created
 - `deprecations` (Attributes List) Deprecations active for this resource. Returned only if there are active deprecations. (see [below for nested schema](#nestedatt--deprecations))
 - `infrastructure_provider_org` (String) Organization name of the Infrastructure Provider
-- `site_capabilities` (Attributes List) Provider-scoped TargetedInstanceCreation settings for this Tenant Account. Replaces the deprecated tenant-level capabilities.targetedInstanceCreation attribute.  When present on a Tenant Account response, the array always includes one entry with omitted `siteIds` derived from TenantAccount.config, followed by zero or more entries with `siteIds` for per-site overrides that differ from the account default. (see [below for nested schema](#nestedatt--site_capabilities))
 - `status` (String) Status of the Tenant Account
 - `status_history` (Attributes List) Chronological status history for the Tenant Account (see [below for nested schema](#nestedatt--status_history))
 - `tenant_contact` (Attributes) Contact user for the Tenant (see [below for nested schema](#nestedatt--tenant_contact))
@@ -56,15 +55,6 @@ Read-Only:
 - `query_param` (String) Query parameter that is deprecated. Omitted if attribute or endpoint is being deprecated.
 - `replaced_by` (String) Name of the attribute, query parameter, or endpoint that replaces the deprecated item. Omitted if no replacement is available.
 - `take_action_by` (String) Date/time by which clients should migrate away from the deprecated API surface
-
-
-<a id="nestedatt--site_capabilities"></a>
-### Nested Schema for `site_capabilities`
-
-Read-Only:
-
-- `site_ids` (List of String) Sites to configure. An omitted or empty array identifies the Tenant Account default entry. Each value must be a valid Site UUID, may appear only once across all siteCapabilities entries in the same request, must be associated with the Tenant, and must be owned by the Tenant Account's Infrastructure Provider; otherwise the server rejects the request with 400.
-- `targeted_instance_creation` (Boolean) Whether TargetedInstanceCreation is enabled for the Tenant Account default or listed Sites. When true, Tenant Admins with a Ready Tenant Account on the Site's Infrastructure Provider may create Instances by Machine ID and perform related privileged actions on that Site.
 
 
 <a id="nestedatt--status_history"></a>

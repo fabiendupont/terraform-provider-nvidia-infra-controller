@@ -75,13 +75,11 @@ Read-Only:
 
 Read-Only:
 
-- `dps_power_management` (Boolean) Whether this Site accepts non-empty power resource groups and power profiles for DPS power management. When false, omission and explicit clearing remain allowed.
 - `flow` (Boolean) Whether the Site supports Flow-based operations
 - `image_based_operating_system` (Boolean) Whether the Site supports image-based operating system provisioning
 - `native_networking` (Boolean) Whether the Site supports native networking
 - `network_security_group` (Boolean) Whether the Site supports Network Security Groups
 - `nv_link_partition` (Boolean) Whether the Site supports NVLink partitioning
-- `vpc_slaac` (Boolean) Whether the latest successfully stored Site configuration inventory reports that Core supports VPCs with SLAAC enabled. False also represents a missing Site configuration or an inventory report that omits the capability. This value is managed by Site configuration inventory and cannot be updated through the Site API.
 
 
 

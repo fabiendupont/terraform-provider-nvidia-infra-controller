@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,73 +26,72 @@ type AllocationDataSource struct {
 }
 
 type AllocationDataSourceModel struct {
-	Id types.String `tfsdk:"id"`
-	InfrastructureProviderId types.String `tfsdk:"infrastructure_provider_id"`
-	TenantId types.String `tfsdk:"tenant_id"`
-	SiteId types.String `tfsdk:"site_id"`
-	ResourceType types.String `tfsdk:"resource_type"`
-	Status types.String `tfsdk:"status"`
-	ResourceTypeId types.String `tfsdk:"resource_type_id"`
-	ConstraintType types.String `tfsdk:"constraint_type"`
-	ConstraintValue types.String `tfsdk:"constraint_value"`
-	Query types.String `tfsdk:"query"`
-	AllocationId types.String `tfsdk:"allocation_id"`
-	Name types.String `tfsdk:"name"`
-	Description types.String `tfsdk:"description"`
-	StatusHistory []AllocationDsStatusHistoryItem `tfsdk:"status_history"`
-	AllocationConstraints []AllocationDsAllocationConstraintsItem `tfsdk:"allocation_constraints"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
+	Id                       types.String                            `tfsdk:"id"`
+	InfrastructureProviderId types.String                            `tfsdk:"infrastructure_provider_id"`
+	TenantId                 types.String                            `tfsdk:"tenant_id"`
+	SiteId                   types.String                            `tfsdk:"site_id"`
+	ResourceType             types.String                            `tfsdk:"resource_type"`
+	Status                   types.String                            `tfsdk:"status"`
+	ResourceTypeId           types.String                            `tfsdk:"resource_type_id"`
+	ConstraintType           types.String                            `tfsdk:"constraint_type"`
+	ConstraintValue          types.String                            `tfsdk:"constraint_value"`
+	Query                    types.String                            `tfsdk:"query"`
+	AllocationId             types.String                            `tfsdk:"allocation_id"`
+	Name                     types.String                            `tfsdk:"name"`
+	Description              types.String                            `tfsdk:"description"`
+	StatusHistory            []AllocationDsStatusHistoryItem         `tfsdk:"status_history"`
+	AllocationConstraints    []AllocationDsAllocationConstraintsItem `tfsdk:"allocation_constraints"`
+	Created                  types.String                            `tfsdk:"created"`
+	Updated                  types.String                            `tfsdk:"updated"`
 }
 
 type AllocationDsStatusHistoryItem struct {
-	Status types.String `tfsdk:"status"`
+	Status  types.String `tfsdk:"status"`
 	Message types.String `tfsdk:"message"`
 	Created types.String `tfsdk:"created"`
 	Updated types.String `tfsdk:"updated"`
 }
 
 type AllocationDsAllocationConstraintsItem struct {
-	Id types.String `tfsdk:"id"`
-	AllocationId types.String `tfsdk:"allocation_id"`
-	ResourceType types.String `tfsdk:"resource_type"`
-	ResourceTypeId types.String `tfsdk:"resource_type_id"`
-	ConstraintType types.String `tfsdk:"constraint_type"`
-	ConstraintValue types.Int64 `tfsdk:"constraint_value"`
-	DerivedResourceId types.String `tfsdk:"derived_resource_id"`
-	InstanceType *AllocationDsAllocationConstraintsItemInstanceType `tfsdk:"instance_type"`
-	IpBlock *AllocationDsAllocationConstraintsItemIpBlock `tfsdk:"ip_block"`
-	Deprecations []AllocationDsAllocationConstraintsItemDeprecationsItem `tfsdk:"deprecations"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
+	Id                types.String                                            `tfsdk:"id"`
+	AllocationId      types.String                                            `tfsdk:"allocation_id"`
+	ResourceType      types.String                                            `tfsdk:"resource_type"`
+	ResourceTypeId    types.String                                            `tfsdk:"resource_type_id"`
+	ConstraintType    types.String                                            `tfsdk:"constraint_type"`
+	ConstraintValue   types.Int64                                             `tfsdk:"constraint_value"`
+	DerivedResourceId types.String                                            `tfsdk:"derived_resource_id"`
+	InstanceType      *AllocationDsAllocationConstraintsItemInstanceType      `tfsdk:"instance_type"`
+	IpBlock           *AllocationDsAllocationConstraintsItemIpBlock           `tfsdk:"ip_block"`
+	Deprecations      []AllocationDsAllocationConstraintsItemDeprecationsItem `tfsdk:"deprecations"`
+	Created           types.String                                            `tfsdk:"created"`
+	Updated           types.String                                            `tfsdk:"updated"`
 }
 
 type AllocationDsAllocationConstraintsItemInstanceType struct {
-	Id types.String `tfsdk:"id"`
-	Name types.String `tfsdk:"name"`
+	Id                       types.String `tfsdk:"id"`
+	Name                     types.String `tfsdk:"name"`
 	InfrastructureProviderId types.String `tfsdk:"infrastructure_provider_id"`
-	SiteId types.String `tfsdk:"site_id"`
-	Status types.String `tfsdk:"status"`
+	SiteId                   types.String `tfsdk:"site_id"`
+	Status                   types.String `tfsdk:"status"`
 }
 
 type AllocationDsAllocationConstraintsItemIpBlock struct {
-	Id types.String `tfsdk:"id"`
-	Name types.String `tfsdk:"name"`
-	RoutingType types.String `tfsdk:"routing_type"`
-	Prefix types.String `tfsdk:"prefix"`
-	PrefixLength types.Int64 `tfsdk:"prefix_length"`
-	Status types.String `tfsdk:"status"`
+	Id           types.String `tfsdk:"id"`
+	Name         types.String `tfsdk:"name"`
+	RoutingType  types.String `tfsdk:"routing_type"`
+	Prefix       types.String `tfsdk:"prefix"`
+	PrefixLength types.Int64  `tfsdk:"prefix_length"`
+	Status       types.String `tfsdk:"status"`
 }
 
 type AllocationDsAllocationConstraintsItemDeprecationsItem struct {
-	Attribute types.String `tfsdk:"attribute"`
-	QueryParam types.String `tfsdk:"query_param"`
-	Endpoint types.String `tfsdk:"endpoint"`
-	ReplacedBy types.String `tfsdk:"replaced_by"`
+	Attribute    types.String `tfsdk:"attribute"`
+	QueryParam   types.String `tfsdk:"query_param"`
+	Endpoint     types.String `tfsdk:"endpoint"`
+	ReplacedBy   types.String `tfsdk:"replaced_by"`
 	TakeActionBy types.String `tfsdk:"take_action_by"`
-	Notice types.String `tfsdk:"notice"`
+	Notice       types.String `tfsdk:"notice"`
 }
-
 
 func (d *AllocationDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_allocation"
@@ -458,7 +457,9 @@ func (d *AllocationDataSource) Read(ctx context.Context, req datasource.ReadRequ
 			items_status_history := make([]AllocationDsStatusHistoryItem, len(rawItems_status_history))
 			for i_status_history, raw_status_history := range rawItems_status_history {
 				m_status_history, _ := raw_status_history.(map[string]interface{})
-				if m_status_history == nil { m_status_history = map[string]interface{}{} }
+				if m_status_history == nil {
+					m_status_history = map[string]interface{}{}
+				}
 				items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 				items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 				items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -472,7 +473,9 @@ func (d *AllocationDataSource) Read(ctx context.Context, req datasource.ReadRequ
 			items_allocation_constraints := make([]AllocationDsAllocationConstraintsItem, len(rawItems_allocation_constraints))
 			for i_allocation_constraints, raw_allocation_constraints := range rawItems_allocation_constraints {
 				m_allocation_constraints, _ := raw_allocation_constraints.(map[string]interface{})
-				if m_allocation_constraints == nil { m_allocation_constraints = map[string]interface{}{} }
+				if m_allocation_constraints == nil {
+					m_allocation_constraints = map[string]interface{}{}
+				}
 				items_allocation_constraints[i_allocation_constraints].Id = StringFromAPI(m_allocation_constraints["id"])
 				items_allocation_constraints[i_allocation_constraints].AllocationId = StringFromAPI(m_allocation_constraints["allocationId"])
 				items_allocation_constraints[i_allocation_constraints].ResourceType = StringFromAPI(m_allocation_constraints["resourceType"])
@@ -505,46 +508,50 @@ func (d *AllocationDataSource) Read(ctx context.Context, req datasource.ReadRequ
 			data.Id = StringFromAPI(result["id"])
 			diags := resp.Diagnostics
 			data.Name = StringFromAPI(result["name"])
-		data.Description = StringFromAPI(result["description"])
-		if rawItems_status_history, ok := result["statusHistory"].([]interface{}); ok && rawItems_status_history != nil {
-			items_status_history := make([]AllocationDsStatusHistoryItem, len(rawItems_status_history))
-			for i_status_history, raw_status_history := range rawItems_status_history {
-				m_status_history, _ := raw_status_history.(map[string]interface{})
-				if m_status_history == nil { m_status_history = map[string]interface{}{} }
-				items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
-				items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
-				items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
-				items_status_history[i_status_history].Updated = StringFromAPI(m_status_history["updated"])
+			data.Description = StringFromAPI(result["description"])
+			if rawItems_status_history, ok := result["statusHistory"].([]interface{}); ok && rawItems_status_history != nil {
+				items_status_history := make([]AllocationDsStatusHistoryItem, len(rawItems_status_history))
+				for i_status_history, raw_status_history := range rawItems_status_history {
+					m_status_history, _ := raw_status_history.(map[string]interface{})
+					if m_status_history == nil {
+						m_status_history = map[string]interface{}{}
+					}
+					items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
+					items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
+					items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
+					items_status_history[i_status_history].Updated = StringFromAPI(m_status_history["updated"])
+				}
+				data.StatusHistory = items_status_history
+			} else {
+				data.StatusHistory = nil
 			}
-			data.StatusHistory = items_status_history
-		} else {
-			data.StatusHistory = nil
-		}
-		if rawItems_allocation_constraints, ok := result["allocationConstraints"].([]interface{}); ok && rawItems_allocation_constraints != nil {
-			items_allocation_constraints := make([]AllocationDsAllocationConstraintsItem, len(rawItems_allocation_constraints))
-			for i_allocation_constraints, raw_allocation_constraints := range rawItems_allocation_constraints {
-				m_allocation_constraints, _ := raw_allocation_constraints.(map[string]interface{})
-				if m_allocation_constraints == nil { m_allocation_constraints = map[string]interface{}{} }
-				items_allocation_constraints[i_allocation_constraints].Id = StringFromAPI(m_allocation_constraints["id"])
-				items_allocation_constraints[i_allocation_constraints].AllocationId = StringFromAPI(m_allocation_constraints["allocationId"])
-				items_allocation_constraints[i_allocation_constraints].ResourceType = StringFromAPI(m_allocation_constraints["resourceType"])
-				items_allocation_constraints[i_allocation_constraints].ResourceTypeId = StringFromAPI(m_allocation_constraints["resourceTypeId"])
-				items_allocation_constraints[i_allocation_constraints].ConstraintType = StringFromAPI(m_allocation_constraints["constraintType"])
-				items_allocation_constraints[i_allocation_constraints].ConstraintValue = Int64FromAPI(m_allocation_constraints["constraintValue"])
-				items_allocation_constraints[i_allocation_constraints].DerivedResourceId = StringFromAPI(m_allocation_constraints["derivedResourceId"])
-				// instanceType: nested field — expand manually if needed
-				// ipBlock: nested field — expand manually if needed
-				// deprecations: nested field — expand manually if needed
-				items_allocation_constraints[i_allocation_constraints].Created = StringFromAPI(m_allocation_constraints["created"])
-				items_allocation_constraints[i_allocation_constraints].Updated = StringFromAPI(m_allocation_constraints["updated"])
+			if rawItems_allocation_constraints, ok := result["allocationConstraints"].([]interface{}); ok && rawItems_allocation_constraints != nil {
+				items_allocation_constraints := make([]AllocationDsAllocationConstraintsItem, len(rawItems_allocation_constraints))
+				for i_allocation_constraints, raw_allocation_constraints := range rawItems_allocation_constraints {
+					m_allocation_constraints, _ := raw_allocation_constraints.(map[string]interface{})
+					if m_allocation_constraints == nil {
+						m_allocation_constraints = map[string]interface{}{}
+					}
+					items_allocation_constraints[i_allocation_constraints].Id = StringFromAPI(m_allocation_constraints["id"])
+					items_allocation_constraints[i_allocation_constraints].AllocationId = StringFromAPI(m_allocation_constraints["allocationId"])
+					items_allocation_constraints[i_allocation_constraints].ResourceType = StringFromAPI(m_allocation_constraints["resourceType"])
+					items_allocation_constraints[i_allocation_constraints].ResourceTypeId = StringFromAPI(m_allocation_constraints["resourceTypeId"])
+					items_allocation_constraints[i_allocation_constraints].ConstraintType = StringFromAPI(m_allocation_constraints["constraintType"])
+					items_allocation_constraints[i_allocation_constraints].ConstraintValue = Int64FromAPI(m_allocation_constraints["constraintValue"])
+					items_allocation_constraints[i_allocation_constraints].DerivedResourceId = StringFromAPI(m_allocation_constraints["derivedResourceId"])
+					// instanceType: nested field — expand manually if needed
+					// ipBlock: nested field — expand manually if needed
+					// deprecations: nested field — expand manually if needed
+					items_allocation_constraints[i_allocation_constraints].Created = StringFromAPI(m_allocation_constraints["created"])
+					items_allocation_constraints[i_allocation_constraints].Updated = StringFromAPI(m_allocation_constraints["updated"])
+				}
+				data.AllocationConstraints = items_allocation_constraints
+			} else {
+				data.AllocationConstraints = nil
 			}
-			data.AllocationConstraints = items_allocation_constraints
-		} else {
-			data.AllocationConstraints = nil
-		}
-		data.Created = StringFromAPI(result["created"])
-		data.Updated = StringFromAPI(result["updated"])
-		_ = diags
+			data.Created = StringFromAPI(result["created"])
+			data.Updated = StringFromAPI(result["updated"])
+			_ = diags
 		}
 	}
 
@@ -558,7 +565,9 @@ func (d *AllocationDataSource) populateModel(ctx context.Context, data *Allocati
 		items_status_history := make([]AllocationDsStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -572,7 +581,9 @@ func (d *AllocationDataSource) populateModel(ctx context.Context, data *Allocati
 		items_allocation_constraints := make([]AllocationDsAllocationConstraintsItem, len(rawItems_allocation_constraints))
 		for i_allocation_constraints, raw_allocation_constraints := range rawItems_allocation_constraints {
 			m_allocation_constraints, _ := raw_allocation_constraints.(map[string]interface{})
-			if m_allocation_constraints == nil { m_allocation_constraints = map[string]interface{}{} }
+			if m_allocation_constraints == nil {
+				m_allocation_constraints = map[string]interface{}{}
+			}
 			items_allocation_constraints[i_allocation_constraints].Id = StringFromAPI(m_allocation_constraints["id"])
 			items_allocation_constraints[i_allocation_constraints].AllocationId = StringFromAPI(m_allocation_constraints["allocationId"])
 			items_allocation_constraints[i_allocation_constraints].ResourceType = StringFromAPI(m_allocation_constraints["resourceType"])

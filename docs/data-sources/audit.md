@@ -33,14 +33,14 @@ output "audit_name" {
 ### Read-Only
 
 - `api_version` (String) API version
-- `body` (Map of String) Audited request body. JSON object bodies retain their properties directly after sensitive fields are recursively obfuscated. Valid non-object JSON is stored in `value`. Malformed JSON is represented by `jsonParseFailed: true` without retaining the raw request content.
+- `body` (String) HTTP body in JSON format
 - `client_ip` (String) Client IP address
 - `duration_ms` (Number) API execution duration in milliseconds
 - `endpoint` (String) API endpoint
 - `extra_data` (String) Extra data in JSON format
 - `method` (String) HTTP method
 - `org_name` (String) Organization name
-- `query_params` (Map of String) Query parameters from the request URL, keyed by parameter name. Each value contains all values supplied for that parameter.
+- `query_params` (String) Query parameters
 - `status_code` (Number) HTTP response status code
 - `status_message` (String) HTTP response status message
 - `timestamp` (String) API execution time

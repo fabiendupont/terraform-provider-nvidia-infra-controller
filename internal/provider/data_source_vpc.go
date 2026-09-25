@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,80 +26,53 @@ type VpcDataSource struct {
 }
 
 type VpcDataSourceModel struct {
-	Id types.String `tfsdk:"id"`
-	SiteId types.String `tfsdk:"site_id"`
-	Status types.String `tfsdk:"status"`
-	NetworkSecurityGroupId types.String `tfsdk:"network_security_group_id"`
-	NvLinkLogicalPartitionId types.String `tfsdk:"nv_link_logical_partition_id"`
-	Query types.String `tfsdk:"query"`
-	Name types.String `tfsdk:"name"`
-	Description types.String `tfsdk:"description"`
-	Org types.String `tfsdk:"org"`
-	TenantId types.String `tfsdk:"tenant_id"`
-	ControllerVpcId types.String `tfsdk:"controller_vpc_id"`
-	NetworkVirtualizationType types.String `tfsdk:"network_virtualization_type"`
-	SlaacEnabled types.Bool `tfsdk:"slaac_enabled"`
-	RoutingProfile types.String `tfsdk:"routing_profile"`
-	PowerResourceGroup types.String `tfsdk:"power_resource_group"`
-	RoutingProfileOverrides types.String `tfsdk:"routing_profile_overrides"`
-	EffectiveRoutingProfile *VpcDsEffectiveRoutingProfile `tfsdk:"effective_routing_profile"`
-	RequestedVni types.Int64 `tfsdk:"requested_vni"`
-	Vni types.Int64 `tfsdk:"vni"`
+	Id                                     types.String                                 `tfsdk:"id"`
+	SiteId                                 types.String                                 `tfsdk:"site_id"`
+	Status                                 types.String                                 `tfsdk:"status"`
+	NetworkSecurityGroupId                 types.String                                 `tfsdk:"network_security_group_id"`
+	NvLinkLogicalPartitionId               types.String                                 `tfsdk:"nv_link_logical_partition_id"`
+	Query                                  types.String                                 `tfsdk:"query"`
+	Name                                   types.String                                 `tfsdk:"name"`
+	Description                            types.String                                 `tfsdk:"description"`
+	Org                                    types.String                                 `tfsdk:"org"`
+	TenantId                               types.String                                 `tfsdk:"tenant_id"`
+	ControllerVpcId                        types.String                                 `tfsdk:"controller_vpc_id"`
+	NetworkVirtualizationType              types.String                                 `tfsdk:"network_virtualization_type"`
+	RoutingProfile                         types.String                                 `tfsdk:"routing_profile"`
+	RequestedVni                           types.Int64                                  `tfsdk:"requested_vni"`
+	Vni                                    types.Int64                                  `tfsdk:"vni"`
 	NetworkSecurityGroupPropagationDetails *VpcDsNetworkSecurityGroupPropagationDetails `tfsdk:"network_security_group_propagation_details"`
-	Labels types.Map `tfsdk:"labels"`
-	StatusHistory []VpcDsStatusHistoryItem `tfsdk:"status_history"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
-}
-
-type VpcDsEffectiveRoutingProfile struct {
-	RouteTargetImports []VpcDsEffectiveRoutingProfileRouteTargetImportsItem `tfsdk:"route_target_imports"`
-	RouteTargetsOnExports []VpcDsEffectiveRoutingProfileRouteTargetsOnExportsItem `tfsdk:"route_targets_on_exports"`
-	LeakDefaultRouteFromUnderlay types.Bool `tfsdk:"leak_default_route_from_underlay"`
-	LeakTenantHostRoutesToUnderlay types.Bool `tfsdk:"leak_tenant_host_routes_to_underlay"`
-	TenantLeakCommunitiesAccepted types.Bool `tfsdk:"tenant_leak_communities_accepted"`
-	AcceptedLeaksFromUnderlay types.List `tfsdk:"accepted_leaks_from_underlay"`
-	AllowedAnycastPrefixes types.List `tfsdk:"allowed_anycast_prefixes"`
-	Internal types.Bool `tfsdk:"internal"`
-	AccessTier types.Int64 `tfsdk:"access_tier"`
-}
-
-type VpcDsEffectiveRoutingProfileRouteTargetImportsItem struct {
-	Asn types.Int64 `tfsdk:"asn"`
-	Vni types.Int64 `tfsdk:"vni"`
-}
-
-type VpcDsEffectiveRoutingProfileRouteTargetsOnExportsItem struct {
-	Asn types.Int64 `tfsdk:"asn"`
-	Vni types.Int64 `tfsdk:"vni"`
+	Labels                                 types.Map                                    `tfsdk:"labels"`
+	StatusHistory                          []VpcDsStatusHistoryItem                     `tfsdk:"status_history"`
+	Created                                types.String                                 `tfsdk:"created"`
+	Updated                                types.String                                 `tfsdk:"updated"`
 }
 
 type VpcDsNetworkSecurityGroupPropagationDetails struct {
-	ObjectId types.String `tfsdk:"object_id"`
-	DetailedStatus types.String `tfsdk:"detailed_status"`
-	Status types.String `tfsdk:"status"`
-	Details types.String `tfsdk:"details"`
-	UnpropagatedInstanceIds types.List `tfsdk:"unpropagated_instance_ids"`
-	RelatedInstanceIds types.List `tfsdk:"related_instance_ids"`
-	Deprecations []VpcDsNetworkSecurityGroupPropagationDetailsDeprecationsItem `tfsdk:"deprecations"`
+	ObjectId                types.String                                                  `tfsdk:"object_id"`
+	DetailedStatus          types.String                                                  `tfsdk:"detailed_status"`
+	Status                  types.String                                                  `tfsdk:"status"`
+	Details                 types.String                                                  `tfsdk:"details"`
+	UnpropagatedInstanceIds types.List                                                    `tfsdk:"unpropagated_instance_ids"`
+	RelatedInstanceIds      types.List                                                    `tfsdk:"related_instance_ids"`
+	Deprecations            []VpcDsNetworkSecurityGroupPropagationDetailsDeprecationsItem `tfsdk:"deprecations"`
 }
 
 type VpcDsNetworkSecurityGroupPropagationDetailsDeprecationsItem struct {
-	Attribute types.String `tfsdk:"attribute"`
-	QueryParam types.String `tfsdk:"query_param"`
-	Endpoint types.String `tfsdk:"endpoint"`
-	ReplacedBy types.String `tfsdk:"replaced_by"`
+	Attribute    types.String `tfsdk:"attribute"`
+	QueryParam   types.String `tfsdk:"query_param"`
+	Endpoint     types.String `tfsdk:"endpoint"`
+	ReplacedBy   types.String `tfsdk:"replaced_by"`
 	TakeActionBy types.String `tfsdk:"take_action_by"`
-	Notice types.String `tfsdk:"notice"`
+	Notice       types.String `tfsdk:"notice"`
 }
 
 type VpcDsStatusHistoryItem struct {
-	Status types.String `tfsdk:"status"`
+	Status  types.String `tfsdk:"status"`
 	Message types.String `tfsdk:"message"`
 	Created types.String `tfsdk:"created"`
 	Updated types.String `tfsdk:"updated"`
 }
-
 
 func (d *VpcDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_vpc"
@@ -176,125 +149,11 @@ func (d *VpcDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, re
 				Computed:    true,
 				Description: "Network virtualization type of the VPC. Flat VPCs hold instances on zero-DPU hosts (or hosts with their DPU in NIC mode); their interfaces are bound to underlay (HostInband) network segments and NICo does not drive their data plane.",
 			},
-			"slaac_enabled": schema.BoolAttribute{
-				Required:    false,
-				Optional:    false,
-				Computed:    true,
-				Description: "Whether this VPC uses SLAAC allocation mode for instance IPv6 interfaces. When true, Core allocates a `/64` to each interface that includes IPv6 and retains the prefix without assigning a concrete IPv6 host address. This value is fixed when the VPC is created. NICo does not yet configure router advertisements (RAs); that support is tracked by https://github.com/NVIDIA/infra-controller/issues/2398.",
-			},
 			"routing_profile": schema.StringAttribute{
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
 				Description: "Routing profile type for the VPC. Populated when Site has Native Networking enabled and network virtualization type is `FNN`.",
-			},
-			"power_resource_group": schema.StringAttribute{
-				Required:    false,
-				Optional:    false,
-				Computed:    true,
-				Description: "External power provisioning resource group associated with the VPC.",
-			},
-			"routing_profile_overrides": schema.StringAttribute{
-				Required:    false,
-				Optional:    false,
-				Computed:    true,
-				Description: "Routing-profile properties set directly on the VPC. Unset properties inherit from the named routing profile.",
-			},
-			"effective_routing_profile": schema.SingleNestedAttribute{
-				Required:    false,
-				Optional:    false,
-				Computed:    true,
-				Description: "Fully resolved routing profile last reported by Core for the VPC. This property is included only when the requesting Tenant has effective TargetedInstanceCreation permission for the VPC's Site.",
-				Attributes: map[string]schema.Attribute{
-					"route_target_imports": schema.ListNestedAttribute{
-						Required:    false,
-						Optional:    false,
-						Computed:    true,
-						Description: "route_target_imports attribute.",
-						NestedObject: schema.NestedAttributeObject{
-							Attributes: map[string]schema.Attribute{
-								"asn": schema.Int64Attribute{
-									Required:    false,
-									Optional:    false,
-									Computed:    true,
-									Description: "Autonomous system number.",
-								},
-								"vni": schema.Int64Attribute{
-									Required:    false,
-									Optional:    false,
-									Computed:    true,
-									Description: "Route-target VNI.",
-								},
-							},
-						},
-					},
-					"route_targets_on_exports": schema.ListNestedAttribute{
-						Required:    false,
-						Optional:    false,
-						Computed:    true,
-						Description: "route_targets_on_exports attribute.",
-						NestedObject: schema.NestedAttributeObject{
-							Attributes: map[string]schema.Attribute{
-								"asn": schema.Int64Attribute{
-									Required:    false,
-									Optional:    false,
-									Computed:    true,
-									Description: "Autonomous system number.",
-								},
-								"vni": schema.Int64Attribute{
-									Required:    false,
-									Optional:    false,
-									Computed:    true,
-									Description: "Route-target VNI.",
-								},
-							},
-						},
-					},
-					"leak_default_route_from_underlay": schema.BoolAttribute{
-						Required:    false,
-						Optional:    false,
-						Computed:    true,
-						Description: "leak_default_route_from_underlay attribute.",
-					},
-					"leak_tenant_host_routes_to_underlay": schema.BoolAttribute{
-						Required:    false,
-						Optional:    false,
-						Computed:    true,
-						Description: "leak_tenant_host_routes_to_underlay attribute.",
-					},
-					"tenant_leak_communities_accepted": schema.BoolAttribute{
-						Required:    false,
-						Optional:    false,
-						Computed:    true,
-						Description: "tenant_leak_communities_accepted attribute.",
-					},
-					"accepted_leaks_from_underlay": schema.ListAttribute{
-						ElementType: types.StringType,
-						Required:    false,
-						Optional:    false,
-						Computed:    true,
-						Description: "accepted_leaks_from_underlay attribute.",
-					},
-					"allowed_anycast_prefixes": schema.ListAttribute{
-						ElementType: types.StringType,
-						Required:    false,
-						Optional:    false,
-						Computed:    true,
-						Description: "allowed_anycast_prefixes attribute.",
-					},
-					"internal": schema.BoolAttribute{
-						Required:    false,
-						Optional:    false,
-						Computed:    true,
-						Description: "Operator-controlled internal-routing classification inherited from the named profile.",
-					},
-					"access_tier": schema.Int64Attribute{
-						Required:    false,
-						Optional:    false,
-						Computed:    true,
-						Description: "Operator-controlled access tier inherited from the named profile.",
-					},
-				},
 			},
 			"requested_vni": schema.Int64Attribute{
 				Required:    false,
@@ -498,26 +357,7 @@ func (d *VpcDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 		data.TenantId = StringFromAPI(result["tenantId"])
 		data.ControllerVpcId = StringFromAPI(result["controllerVpcId"])
 		data.NetworkVirtualizationType = StringFromAPI(result["networkVirtualizationType"])
-		data.SlaacEnabled = BoolFromAPI(result["slaacEnabled"])
 		data.RoutingProfile = StringFromAPI(result["routingProfile"])
-		data.PowerResourceGroup = StringFromAPI(result["powerResourceGroup"])
-		data.RoutingProfileOverrides = StringFromAPI(result["routingProfileOverrides"])
-		if rawObj_effective_routing_profile, ok := result["effectiveRoutingProfile"].(map[string]interface{}); ok {
-			obj_effective_routing_profile := &VpcDsEffectiveRoutingProfile{}
-			// routeTargetImports: nested field — expand manually if needed
-			// routeTargetsOnExports: nested field — expand manually if needed
-			obj_effective_routing_profile.LeakDefaultRouteFromUnderlay = BoolFromAPI(rawObj_effective_routing_profile["leakDefaultRouteFromUnderlay"])
-			obj_effective_routing_profile.LeakTenantHostRoutesToUnderlay = BoolFromAPI(rawObj_effective_routing_profile["leakTenantHostRoutesToUnderlay"])
-			obj_effective_routing_profile.TenantLeakCommunitiesAccepted = BoolFromAPI(rawObj_effective_routing_profile["tenantLeakCommunitiesAccepted"])
-			// acceptedLeaksFromUnderlay: nested field — expand manually if needed
-			// allowedAnycastPrefixes: nested field — expand manually if needed
-			obj_effective_routing_profile.Internal = BoolFromAPI(rawObj_effective_routing_profile["internal"])
-			obj_effective_routing_profile.AccessTier = Int64FromAPI(rawObj_effective_routing_profile["accessTier"])
-			_ = rawObj_effective_routing_profile
-			data.EffectiveRoutingProfile = obj_effective_routing_profile
-		} else {
-			data.EffectiveRoutingProfile = nil
-		}
 		data.RequestedVni = Int64FromAPI(result["requestedVni"])
 		data.Vni = Int64FromAPI(result["vni"])
 		if rawObj_network_security_group_propagation_details, ok := result["networkSecurityGroupPropagationDetails"].(map[string]interface{}); ok {
@@ -545,7 +385,9 @@ func (d *VpcDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 			items_status_history := make([]VpcDsStatusHistoryItem, len(rawItems_status_history))
 			for i_status_history, raw_status_history := range rawItems_status_history {
 				m_status_history, _ := raw_status_history.(map[string]interface{})
-				if m_status_history == nil { m_status_history = map[string]interface{}{} }
+				if m_status_history == nil {
+					m_status_history = map[string]interface{}{}
+				}
 				items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 				items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 				items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -570,71 +412,54 @@ func (d *VpcDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 			data.Id = StringFromAPI(result["id"])
 			diags := resp.Diagnostics
 			data.Name = StringFromAPI(result["name"])
-		data.Description = StringFromAPI(result["description"])
-		data.Org = StringFromAPI(result["org"])
-		data.TenantId = StringFromAPI(result["tenantId"])
-		data.ControllerVpcId = StringFromAPI(result["controllerVpcId"])
-		data.NetworkVirtualizationType = StringFromAPI(result["networkVirtualizationType"])
-		data.SlaacEnabled = BoolFromAPI(result["slaacEnabled"])
-		data.RoutingProfile = StringFromAPI(result["routingProfile"])
-		data.PowerResourceGroup = StringFromAPI(result["powerResourceGroup"])
-		data.RoutingProfileOverrides = StringFromAPI(result["routingProfileOverrides"])
-		if rawObj_effective_routing_profile, ok := result["effectiveRoutingProfile"].(map[string]interface{}); ok {
-			obj_effective_routing_profile := &VpcDsEffectiveRoutingProfile{}
-			// routeTargetImports: nested field — expand manually if needed
-			// routeTargetsOnExports: nested field — expand manually if needed
-			obj_effective_routing_profile.LeakDefaultRouteFromUnderlay = BoolFromAPI(rawObj_effective_routing_profile["leakDefaultRouteFromUnderlay"])
-			obj_effective_routing_profile.LeakTenantHostRoutesToUnderlay = BoolFromAPI(rawObj_effective_routing_profile["leakTenantHostRoutesToUnderlay"])
-			obj_effective_routing_profile.TenantLeakCommunitiesAccepted = BoolFromAPI(rawObj_effective_routing_profile["tenantLeakCommunitiesAccepted"])
-			// acceptedLeaksFromUnderlay: nested field — expand manually if needed
-			// allowedAnycastPrefixes: nested field — expand manually if needed
-			obj_effective_routing_profile.Internal = BoolFromAPI(rawObj_effective_routing_profile["internal"])
-			obj_effective_routing_profile.AccessTier = Int64FromAPI(rawObj_effective_routing_profile["accessTier"])
-			_ = rawObj_effective_routing_profile
-			data.EffectiveRoutingProfile = obj_effective_routing_profile
-		} else {
-			data.EffectiveRoutingProfile = nil
-		}
-		data.RequestedVni = Int64FromAPI(result["requestedVni"])
-		data.Vni = Int64FromAPI(result["vni"])
-		if rawObj_network_security_group_propagation_details, ok := result["networkSecurityGroupPropagationDetails"].(map[string]interface{}); ok {
-			obj_network_security_group_propagation_details := &VpcDsNetworkSecurityGroupPropagationDetails{}
-			obj_network_security_group_propagation_details.ObjectId = StringFromAPI(rawObj_network_security_group_propagation_details["objectId"])
-			obj_network_security_group_propagation_details.DetailedStatus = StringFromAPI(rawObj_network_security_group_propagation_details["detailedStatus"])
-			obj_network_security_group_propagation_details.Status = StringFromAPI(rawObj_network_security_group_propagation_details["status"])
-			obj_network_security_group_propagation_details.Details = StringFromAPI(rawObj_network_security_group_propagation_details["details"])
-			// unpropagatedInstanceIds: nested field — expand manually if needed
-			// relatedInstanceIds: nested field — expand manually if needed
-			// deprecations: nested field — expand manually if needed
-			_ = rawObj_network_security_group_propagation_details
-			data.NetworkSecurityGroupPropagationDetails = obj_network_security_group_propagation_details
-		} else {
-			data.NetworkSecurityGroupPropagationDetails = nil
-		}
-		if rawMap_labels := StringMapFromAPI(result["labels"]); rawMap_labels != nil {
-			mv, d := types.MapValueFrom(ctx, types.StringType, rawMap_labels)
-			diags.Append(d...)
-			data.Labels = mv
-		} else {
-			data.Labels = types.MapNull(types.StringType)
-		}
-		if rawItems_status_history, ok := result["statusHistory"].([]interface{}); ok && rawItems_status_history != nil {
-			items_status_history := make([]VpcDsStatusHistoryItem, len(rawItems_status_history))
-			for i_status_history, raw_status_history := range rawItems_status_history {
-				m_status_history, _ := raw_status_history.(map[string]interface{})
-				if m_status_history == nil { m_status_history = map[string]interface{}{} }
-				items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
-				items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
-				items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
-				items_status_history[i_status_history].Updated = StringFromAPI(m_status_history["updated"])
+			data.Description = StringFromAPI(result["description"])
+			data.Org = StringFromAPI(result["org"])
+			data.TenantId = StringFromAPI(result["tenantId"])
+			data.ControllerVpcId = StringFromAPI(result["controllerVpcId"])
+			data.NetworkVirtualizationType = StringFromAPI(result["networkVirtualizationType"])
+			data.RoutingProfile = StringFromAPI(result["routingProfile"])
+			data.RequestedVni = Int64FromAPI(result["requestedVni"])
+			data.Vni = Int64FromAPI(result["vni"])
+			if rawObj_network_security_group_propagation_details, ok := result["networkSecurityGroupPropagationDetails"].(map[string]interface{}); ok {
+				obj_network_security_group_propagation_details := &VpcDsNetworkSecurityGroupPropagationDetails{}
+				obj_network_security_group_propagation_details.ObjectId = StringFromAPI(rawObj_network_security_group_propagation_details["objectId"])
+				obj_network_security_group_propagation_details.DetailedStatus = StringFromAPI(rawObj_network_security_group_propagation_details["detailedStatus"])
+				obj_network_security_group_propagation_details.Status = StringFromAPI(rawObj_network_security_group_propagation_details["status"])
+				obj_network_security_group_propagation_details.Details = StringFromAPI(rawObj_network_security_group_propagation_details["details"])
+				// unpropagatedInstanceIds: nested field — expand manually if needed
+				// relatedInstanceIds: nested field — expand manually if needed
+				// deprecations: nested field — expand manually if needed
+				_ = rawObj_network_security_group_propagation_details
+				data.NetworkSecurityGroupPropagationDetails = obj_network_security_group_propagation_details
+			} else {
+				data.NetworkSecurityGroupPropagationDetails = nil
 			}
-			data.StatusHistory = items_status_history
-		} else {
-			data.StatusHistory = nil
-		}
-		data.Created = StringFromAPI(result["created"])
-		data.Updated = StringFromAPI(result["updated"])
-		_ = diags
+			if rawMap_labels := StringMapFromAPI(result["labels"]); rawMap_labels != nil {
+				mv, d := types.MapValueFrom(ctx, types.StringType, rawMap_labels)
+				diags.Append(d...)
+				data.Labels = mv
+			} else {
+				data.Labels = types.MapNull(types.StringType)
+			}
+			if rawItems_status_history, ok := result["statusHistory"].([]interface{}); ok && rawItems_status_history != nil {
+				items_status_history := make([]VpcDsStatusHistoryItem, len(rawItems_status_history))
+				for i_status_history, raw_status_history := range rawItems_status_history {
+					m_status_history, _ := raw_status_history.(map[string]interface{})
+					if m_status_history == nil {
+						m_status_history = map[string]interface{}{}
+					}
+					items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
+					items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
+					items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
+					items_status_history[i_status_history].Updated = StringFromAPI(m_status_history["updated"])
+				}
+				data.StatusHistory = items_status_history
+			} else {
+				data.StatusHistory = nil
+			}
+			data.Created = StringFromAPI(result["created"])
+			data.Updated = StringFromAPI(result["updated"])
+			_ = diags
 		}
 	}
 
@@ -648,26 +473,7 @@ func (d *VpcDataSource) populateModel(ctx context.Context, data *VpcDataSourceMo
 	data.TenantId = StringFromAPI(result["tenantId"])
 	data.ControllerVpcId = StringFromAPI(result["controllerVpcId"])
 	data.NetworkVirtualizationType = StringFromAPI(result["networkVirtualizationType"])
-	data.SlaacEnabled = BoolFromAPI(result["slaacEnabled"])
 	data.RoutingProfile = StringFromAPI(result["routingProfile"])
-	data.PowerResourceGroup = StringFromAPI(result["powerResourceGroup"])
-	data.RoutingProfileOverrides = StringFromAPI(result["routingProfileOverrides"])
-	if rawObj_effective_routing_profile, ok := result["effectiveRoutingProfile"].(map[string]interface{}); ok {
-		obj_effective_routing_profile := &VpcDsEffectiveRoutingProfile{}
-		// routeTargetImports: nested field — expand manually if needed
-		// routeTargetsOnExports: nested field — expand manually if needed
-		obj_effective_routing_profile.LeakDefaultRouteFromUnderlay = BoolFromAPI(rawObj_effective_routing_profile["leakDefaultRouteFromUnderlay"])
-		obj_effective_routing_profile.LeakTenantHostRoutesToUnderlay = BoolFromAPI(rawObj_effective_routing_profile["leakTenantHostRoutesToUnderlay"])
-		obj_effective_routing_profile.TenantLeakCommunitiesAccepted = BoolFromAPI(rawObj_effective_routing_profile["tenantLeakCommunitiesAccepted"])
-		// acceptedLeaksFromUnderlay: nested field — expand manually if needed
-		// allowedAnycastPrefixes: nested field — expand manually if needed
-		obj_effective_routing_profile.Internal = BoolFromAPI(rawObj_effective_routing_profile["internal"])
-		obj_effective_routing_profile.AccessTier = Int64FromAPI(rawObj_effective_routing_profile["accessTier"])
-		_ = rawObj_effective_routing_profile
-		data.EffectiveRoutingProfile = obj_effective_routing_profile
-	} else {
-		data.EffectiveRoutingProfile = nil
-	}
 	data.RequestedVni = Int64FromAPI(result["requestedVni"])
 	data.Vni = Int64FromAPI(result["vni"])
 	if rawObj_network_security_group_propagation_details, ok := result["networkSecurityGroupPropagationDetails"].(map[string]interface{}); ok {
@@ -695,7 +501,9 @@ func (d *VpcDataSource) populateModel(ctx context.Context, data *VpcDataSourceMo
 		items_status_history := make([]VpcDsStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])

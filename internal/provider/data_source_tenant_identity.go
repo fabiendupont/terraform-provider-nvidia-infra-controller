@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,26 +26,25 @@ type TenantIdentityDataSource struct {
 }
 
 type TenantIdentityDataSourceModel struct {
-	SiteId types.String `tfsdk:"site_id"`
-	Org types.String `tfsdk:"org"`
-	Enabled types.Bool `tfsdk:"enabled"`
-	Issuer types.String `tfsdk:"issuer"`
-	DefaultAudience types.String `tfsdk:"default_audience"`
-	AllowedAudiences types.List `tfsdk:"allowed_audiences"`
-	TokenTtlSeconds types.Int64 `tfsdk:"token_ttl_seconds"`
-	SubjectPrefix types.String `tfsdk:"subject_prefix"`
-	SigningKeys []TenantIdentityDsSigningKeysItem `tfsdk:"signing_keys"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
+	SiteId           types.String                      `tfsdk:"site_id"`
+	Org              types.String                      `tfsdk:"org"`
+	Enabled          types.Bool                        `tfsdk:"enabled"`
+	Issuer           types.String                      `tfsdk:"issuer"`
+	DefaultAudience  types.String                      `tfsdk:"default_audience"`
+	AllowedAudiences types.List                        `tfsdk:"allowed_audiences"`
+	TokenTtlSeconds  types.Int64                       `tfsdk:"token_ttl_seconds"`
+	SubjectPrefix    types.String                      `tfsdk:"subject_prefix"`
+	SigningKeys      []TenantIdentityDsSigningKeysItem `tfsdk:"signing_keys"`
+	Created          types.String                      `tfsdk:"created"`
+	Updated          types.String                      `tfsdk:"updated"`
 }
 
 type TenantIdentityDsSigningKeysItem struct {
-	Kid types.String `tfsdk:"kid"`
-	Alg types.String `tfsdk:"alg"`
-	CurrentSigner types.Bool `tfsdk:"current_signer"`
-	ExpireAt types.String `tfsdk:"expire_at"`
+	Kid           types.String `tfsdk:"kid"`
+	Alg           types.String `tfsdk:"alg"`
+	CurrentSigner types.Bool   `tfsdk:"current_signer"`
+	ExpireAt      types.String `tfsdk:"expire_at"`
 }
-
 
 func (d *TenantIdentityDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_tenant_identity"
@@ -208,7 +207,9 @@ func (d *TenantIdentityDataSource) populateModel(ctx context.Context, data *Tena
 		items_signing_keys := make([]TenantIdentityDsSigningKeysItem, len(rawItems_signing_keys))
 		for i_signing_keys, raw_signing_keys := range rawItems_signing_keys {
 			m_signing_keys, _ := raw_signing_keys.(map[string]interface{})
-			if m_signing_keys == nil { m_signing_keys = map[string]interface{}{} }
+			if m_signing_keys == nil {
+				m_signing_keys = map[string]interface{}{}
+			}
 			items_signing_keys[i_signing_keys].Kid = StringFromAPI(m_signing_keys["kid"])
 			items_signing_keys[i_signing_keys].Alg = StringFromAPI(m_signing_keys["alg"])
 			items_signing_keys[i_signing_keys].CurrentSigner = BoolFromAPI(m_signing_keys["currentSigner"])

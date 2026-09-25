@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,47 +26,47 @@ type SpectrumxPartitionDataSource struct {
 }
 
 type SpectrumxPartitionDataSourceModel struct {
-	Id types.String `tfsdk:"id"`
-	SiteId types.String `tfsdk:"site_id"`
-	Status types.String `tfsdk:"status"`
-	Query types.String `tfsdk:"query"`
-	Name types.String `tfsdk:"name"`
-	Description types.String `tfsdk:"description"`
-	Site *SpectrumxPartitionDsSite `tfsdk:"site"`
-	TenantId types.String `tfsdk:"tenant_id"`
-	Tenant *SpectrumxPartitionDsTenant `tfsdk:"tenant"`
-	Vni types.Int64 `tfsdk:"vni"`
-	Labels types.Map `tfsdk:"labels"`
+	Id            types.String                            `tfsdk:"id"`
+	SiteId        types.String                            `tfsdk:"site_id"`
+	Status        types.String                            `tfsdk:"status"`
+	Query         types.String                            `tfsdk:"query"`
+	Name          types.String                            `tfsdk:"name"`
+	Description   types.String                            `tfsdk:"description"`
+	Site          *SpectrumxPartitionDsSite               `tfsdk:"site"`
+	TenantId      types.String                            `tfsdk:"tenant_id"`
+	Tenant        *SpectrumxPartitionDsTenant             `tfsdk:"tenant"`
+	Vni           types.Int64                             `tfsdk:"vni"`
+	Labels        types.Map                               `tfsdk:"labels"`
 	StatusHistory []SpectrumxPartitionDsStatusHistoryItem `tfsdk:"status_history"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
+	Created       types.String                            `tfsdk:"created"`
+	Updated       types.String                            `tfsdk:"updated"`
 }
 
 type SpectrumxPartitionDsSite struct {
-	Id types.String `tfsdk:"id"`
-	Name types.String `tfsdk:"name"`
-	InfrastructureProviderId types.String `tfsdk:"infrastructure_provider_id"`
-	IsSerialConsoleEnabled types.Bool `tfsdk:"is_serial_console_enabled"`
-	IsOnline types.Bool `tfsdk:"is_online"`
-	Capabilities *SpectrumxPartitionDsSiteCapabilities `tfsdk:"capabilities"`
-	Status types.String `tfsdk:"status"`
+	Id                       types.String                          `tfsdk:"id"`
+	Name                     types.String                          `tfsdk:"name"`
+	InfrastructureProviderId types.String                          `tfsdk:"infrastructure_provider_id"`
+	IsSerialConsoleEnabled   types.Bool                            `tfsdk:"is_serial_console_enabled"`
+	IsOnline                 types.Bool                            `tfsdk:"is_online"`
+	Capabilities             *SpectrumxPartitionDsSiteCapabilities `tfsdk:"capabilities"`
+	Status                   types.String                          `tfsdk:"status"`
 }
 
 type SpectrumxPartitionDsSiteCapabilities struct {
-	NativeNetworking types.Bool `tfsdk:"native_networking"`
-	NetworkSecurityGroup types.Bool `tfsdk:"network_security_group"`
-	NvLinkPartition types.Bool `tfsdk:"nv_link_partition"`
-	Flow types.Bool `tfsdk:"flow"`
+	NativeNetworking          types.Bool `tfsdk:"native_networking"`
+	NetworkSecurityGroup      types.Bool `tfsdk:"network_security_group"`
+	NvLinkPartition           types.Bool `tfsdk:"nv_link_partition"`
+	Flow                      types.Bool `tfsdk:"flow"`
 	ImageBasedOperatingSystem types.Bool `tfsdk:"image_based_operating_system"`
-	VpcSlaac types.Bool `tfsdk:"vpc_slaac"`
-	DpsPowerManagement types.Bool `tfsdk:"dps_power_management"`
+	VpcSlaac                  types.Bool `tfsdk:"vpc_slaac"`
+	DpsPowerManagement        types.Bool `tfsdk:"dps_power_management"`
 }
 
 type SpectrumxPartitionDsTenant struct {
-	Org types.String `tfsdk:"org"`
-	OrgDisplayName types.String `tfsdk:"org_display_name"`
-	Capabilities *SpectrumxPartitionDsTenantCapabilities `tfsdk:"capabilities"`
-	Deprecations []SpectrumxPartitionDsTenantDeprecationsItem `tfsdk:"deprecations"`
+	Org            types.String                                 `tfsdk:"org"`
+	OrgDisplayName types.String                                 `tfsdk:"org_display_name"`
+	Capabilities   *SpectrumxPartitionDsTenantCapabilities      `tfsdk:"capabilities"`
+	Deprecations   []SpectrumxPartitionDsTenantDeprecationsItem `tfsdk:"deprecations"`
 }
 
 type SpectrumxPartitionDsTenantCapabilities struct {
@@ -74,21 +74,20 @@ type SpectrumxPartitionDsTenantCapabilities struct {
 }
 
 type SpectrumxPartitionDsTenantDeprecationsItem struct {
-	Attribute types.String `tfsdk:"attribute"`
-	QueryParam types.String `tfsdk:"query_param"`
-	Endpoint types.String `tfsdk:"endpoint"`
-	ReplacedBy types.String `tfsdk:"replaced_by"`
+	Attribute    types.String `tfsdk:"attribute"`
+	QueryParam   types.String `tfsdk:"query_param"`
+	Endpoint     types.String `tfsdk:"endpoint"`
+	ReplacedBy   types.String `tfsdk:"replaced_by"`
 	TakeActionBy types.String `tfsdk:"take_action_by"`
-	Notice types.String `tfsdk:"notice"`
+	Notice       types.String `tfsdk:"notice"`
 }
 
 type SpectrumxPartitionDsStatusHistoryItem struct {
-	Status types.String `tfsdk:"status"`
+	Status  types.String `tfsdk:"status"`
 	Message types.String `tfsdk:"message"`
 	Created types.String `tfsdk:"created"`
 	Updated types.String `tfsdk:"updated"`
 }
-
 
 func (d *SpectrumxPartitionDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_spectrumx_partition"
@@ -447,7 +446,9 @@ func (d *SpectrumxPartitionDataSource) Read(ctx context.Context, req datasource.
 			items_status_history := make([]SpectrumxPartitionDsStatusHistoryItem, len(rawItems_status_history))
 			for i_status_history, raw_status_history := range rawItems_status_history {
 				m_status_history, _ := raw_status_history.(map[string]interface{})
-				if m_status_history == nil { m_status_history = map[string]interface{}{} }
+				if m_status_history == nil {
+					m_status_history = map[string]interface{}{}
+				}
 				items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 				items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 				items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -472,58 +473,60 @@ func (d *SpectrumxPartitionDataSource) Read(ctx context.Context, req datasource.
 			data.Id = StringFromAPI(result["id"])
 			diags := resp.Diagnostics
 			data.Name = StringFromAPI(result["name"])
-		data.Description = StringFromAPI(result["description"])
-		if rawObj_site, ok := result["site"].(map[string]interface{}); ok {
-			obj_site := &SpectrumxPartitionDsSite{}
-			obj_site.Id = StringFromAPI(rawObj_site["id"])
-			obj_site.Name = StringFromAPI(rawObj_site["name"])
-			obj_site.InfrastructureProviderId = StringFromAPI(rawObj_site["infrastructureProviderId"])
-			obj_site.IsSerialConsoleEnabled = BoolFromAPI(rawObj_site["isSerialConsoleEnabled"])
-			obj_site.IsOnline = BoolFromAPI(rawObj_site["isOnline"])
-			// capabilities: nested field — expand manually if needed
-			obj_site.Status = StringFromAPI(rawObj_site["status"])
-			_ = rawObj_site
-			data.Site = obj_site
-		} else {
-			data.Site = nil
-		}
-		data.TenantId = StringFromAPI(result["tenantId"])
-		if rawObj_tenant, ok := result["tenant"].(map[string]interface{}); ok {
-			obj_tenant := &SpectrumxPartitionDsTenant{}
-			obj_tenant.Org = StringFromAPI(rawObj_tenant["org"])
-			obj_tenant.OrgDisplayName = StringFromAPI(rawObj_tenant["orgDisplayName"])
-			// capabilities: nested field — expand manually if needed
-			// deprecations: nested field — expand manually if needed
-			_ = rawObj_tenant
-			data.Tenant = obj_tenant
-		} else {
-			data.Tenant = nil
-		}
-		data.Vni = Int64FromAPI(result["vni"])
-		if rawMap_labels := StringMapFromAPI(result["labels"]); rawMap_labels != nil {
-			mv, d := types.MapValueFrom(ctx, types.StringType, rawMap_labels)
-			diags.Append(d...)
-			data.Labels = mv
-		} else {
-			data.Labels = types.MapNull(types.StringType)
-		}
-		if rawItems_status_history, ok := result["statusHistory"].([]interface{}); ok && rawItems_status_history != nil {
-			items_status_history := make([]SpectrumxPartitionDsStatusHistoryItem, len(rawItems_status_history))
-			for i_status_history, raw_status_history := range rawItems_status_history {
-				m_status_history, _ := raw_status_history.(map[string]interface{})
-				if m_status_history == nil { m_status_history = map[string]interface{}{} }
-				items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
-				items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
-				items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
-				items_status_history[i_status_history].Updated = StringFromAPI(m_status_history["updated"])
+			data.Description = StringFromAPI(result["description"])
+			if rawObj_site, ok := result["site"].(map[string]interface{}); ok {
+				obj_site := &SpectrumxPartitionDsSite{}
+				obj_site.Id = StringFromAPI(rawObj_site["id"])
+				obj_site.Name = StringFromAPI(rawObj_site["name"])
+				obj_site.InfrastructureProviderId = StringFromAPI(rawObj_site["infrastructureProviderId"])
+				obj_site.IsSerialConsoleEnabled = BoolFromAPI(rawObj_site["isSerialConsoleEnabled"])
+				obj_site.IsOnline = BoolFromAPI(rawObj_site["isOnline"])
+				// capabilities: nested field — expand manually if needed
+				obj_site.Status = StringFromAPI(rawObj_site["status"])
+				_ = rawObj_site
+				data.Site = obj_site
+			} else {
+				data.Site = nil
 			}
-			data.StatusHistory = items_status_history
-		} else {
-			data.StatusHistory = nil
-		}
-		data.Created = StringFromAPI(result["created"])
-		data.Updated = StringFromAPI(result["updated"])
-		_ = diags
+			data.TenantId = StringFromAPI(result["tenantId"])
+			if rawObj_tenant, ok := result["tenant"].(map[string]interface{}); ok {
+				obj_tenant := &SpectrumxPartitionDsTenant{}
+				obj_tenant.Org = StringFromAPI(rawObj_tenant["org"])
+				obj_tenant.OrgDisplayName = StringFromAPI(rawObj_tenant["orgDisplayName"])
+				// capabilities: nested field — expand manually if needed
+				// deprecations: nested field — expand manually if needed
+				_ = rawObj_tenant
+				data.Tenant = obj_tenant
+			} else {
+				data.Tenant = nil
+			}
+			data.Vni = Int64FromAPI(result["vni"])
+			if rawMap_labels := StringMapFromAPI(result["labels"]); rawMap_labels != nil {
+				mv, d := types.MapValueFrom(ctx, types.StringType, rawMap_labels)
+				diags.Append(d...)
+				data.Labels = mv
+			} else {
+				data.Labels = types.MapNull(types.StringType)
+			}
+			if rawItems_status_history, ok := result["statusHistory"].([]interface{}); ok && rawItems_status_history != nil {
+				items_status_history := make([]SpectrumxPartitionDsStatusHistoryItem, len(rawItems_status_history))
+				for i_status_history, raw_status_history := range rawItems_status_history {
+					m_status_history, _ := raw_status_history.(map[string]interface{})
+					if m_status_history == nil {
+						m_status_history = map[string]interface{}{}
+					}
+					items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
+					items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
+					items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
+					items_status_history[i_status_history].Updated = StringFromAPI(m_status_history["updated"])
+				}
+				data.StatusHistory = items_status_history
+			} else {
+				data.StatusHistory = nil
+			}
+			data.Created = StringFromAPI(result["created"])
+			data.Updated = StringFromAPI(result["updated"])
+			_ = diags
 		}
 	}
 
@@ -571,7 +574,9 @@ func (d *SpectrumxPartitionDataSource) populateModel(ctx context.Context, data *
 		items_status_history := make([]SpectrumxPartitionDsStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])

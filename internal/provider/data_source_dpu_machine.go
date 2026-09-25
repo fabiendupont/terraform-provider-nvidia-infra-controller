@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,43 +26,42 @@ type DpuMachineDataSource struct {
 }
 
 type DpuMachineDataSourceModel struct {
-	Id types.String `tfsdk:"id"`
-	SiteId types.String `tfsdk:"site_id"`
-	InfrastructureProviderId types.String `tfsdk:"infrastructure_provider_id"`
-	HostMachineId types.String `tfsdk:"host_machine_id"`
-	DpuAgentVersion types.String `tfsdk:"dpu_agent_version"`
-	BmcInfo types.String `tfsdk:"bmc_info"`
-	DmiData types.String `tfsdk:"dmi_data"`
-	Interfaces []DpuMachineDsInterfacesItem `tfsdk:"interfaces"`
-	SoftwareComponents []DpuMachineDsSoftwareComponentsItem `tfsdk:"software_components"`
-	Health types.String `tfsdk:"health"`
-	Labels types.Map `tfsdk:"labels"`
-	State types.String `tfsdk:"state"`
-	DpuNetworkConfig types.String `tfsdk:"dpu_network_config"`
-	LastRebooted types.String `tfsdk:"last_rebooted"`
-	PlacementInRack types.String `tfsdk:"placement_in_rack"`
+	Id                       types.String                         `tfsdk:"id"`
+	SiteId                   types.String                         `tfsdk:"site_id"`
+	InfrastructureProviderId types.String                         `tfsdk:"infrastructure_provider_id"`
+	HostMachineId            types.String                         `tfsdk:"host_machine_id"`
+	DpuAgentVersion          types.String                         `tfsdk:"dpu_agent_version"`
+	BmcInfo                  types.String                         `tfsdk:"bmc_info"`
+	DmiData                  types.String                         `tfsdk:"dmi_data"`
+	Interfaces               []DpuMachineDsInterfacesItem         `tfsdk:"interfaces"`
+	SoftwareComponents       []DpuMachineDsSoftwareComponentsItem `tfsdk:"software_components"`
+	Health                   types.String                         `tfsdk:"health"`
+	Labels                   types.Map                            `tfsdk:"labels"`
+	State                    types.String                         `tfsdk:"state"`
+	DpuNetworkConfig         types.String                         `tfsdk:"dpu_network_config"`
+	LastRebooted             types.String                         `tfsdk:"last_rebooted"`
+	PlacementInRack          types.String                         `tfsdk:"placement_in_rack"`
 }
 
 type DpuMachineDsInterfacesItem struct {
-	Id types.String `tfsdk:"id"`
-	MachineId types.String `tfsdk:"machine_id"`
-	SegmentId types.String `tfsdk:"segment_id"`
-	Hostname types.String `tfsdk:"hostname"`
-	PrimaryInterface types.Bool `tfsdk:"primary_interface"`
-	MacAddress types.String `tfsdk:"mac_address"`
-	Address types.List `tfsdk:"address"`
-	Vendor types.String `tfsdk:"vendor"`
-	Created types.String `tfsdk:"created"`
-	LastDhcp types.String `tfsdk:"last_dhcp"`
-	IsBmc types.Bool `tfsdk:"is_bmc"`
+	Id               types.String `tfsdk:"id"`
+	MachineId        types.String `tfsdk:"machine_id"`
+	SegmentId        types.String `tfsdk:"segment_id"`
+	Hostname         types.String `tfsdk:"hostname"`
+	PrimaryInterface types.Bool   `tfsdk:"primary_interface"`
+	MacAddress       types.String `tfsdk:"mac_address"`
+	Address          types.List   `tfsdk:"address"`
+	Vendor           types.String `tfsdk:"vendor"`
+	Created          types.String `tfsdk:"created"`
+	LastDhcp         types.String `tfsdk:"last_dhcp"`
+	IsBmc            types.Bool   `tfsdk:"is_bmc"`
 }
 
 type DpuMachineDsSoftwareComponentsItem struct {
-	Name types.String `tfsdk:"name"`
+	Name    types.String `tfsdk:"name"`
 	Version types.String `tfsdk:"version"`
-	Url types.String `tfsdk:"url"`
+	Url     types.String `tfsdk:"url"`
 }
-
 
 func (d *DpuMachineDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_dpu_machine"
@@ -299,7 +298,9 @@ func (d *DpuMachineDataSource) Read(ctx context.Context, req datasource.ReadRequ
 			items_interfaces := make([]DpuMachineDsInterfacesItem, len(rawItems_interfaces))
 			for i_interfaces, raw_interfaces := range rawItems_interfaces {
 				m_interfaces, _ := raw_interfaces.(map[string]interface{})
-				if m_interfaces == nil { m_interfaces = map[string]interface{}{} }
+				if m_interfaces == nil {
+					m_interfaces = map[string]interface{}{}
+				}
 				items_interfaces[i_interfaces].Id = StringFromAPI(m_interfaces["id"])
 				items_interfaces[i_interfaces].MachineId = StringFromAPI(m_interfaces["machineId"])
 				items_interfaces[i_interfaces].SegmentId = StringFromAPI(m_interfaces["segmentId"])
@@ -320,7 +321,9 @@ func (d *DpuMachineDataSource) Read(ctx context.Context, req datasource.ReadRequ
 			items_software_components := make([]DpuMachineDsSoftwareComponentsItem, len(rawItems_software_components))
 			for i_software_components, raw_software_components := range rawItems_software_components {
 				m_software_components, _ := raw_software_components.(map[string]interface{})
-				if m_software_components == nil { m_software_components = map[string]interface{}{} }
+				if m_software_components == nil {
+					m_software_components = map[string]interface{}{}
+				}
 				items_software_components[i_software_components].Name = StringFromAPI(m_software_components["name"])
 				items_software_components[i_software_components].Version = StringFromAPI(m_software_components["version"])
 				items_software_components[i_software_components].Url = StringFromAPI(m_software_components["url"])
@@ -354,57 +357,61 @@ func (d *DpuMachineDataSource) Read(ctx context.Context, req datasource.ReadRequ
 			data.Id = StringFromAPI(result["id"])
 			diags := resp.Diagnostics
 			data.InfrastructureProviderId = StringFromAPI(result["infrastructureProviderId"])
-		data.HostMachineId = StringFromAPI(result["hostMachineId"])
-		data.DpuAgentVersion = StringFromAPI(result["dpuAgentVersion"])
-		data.BmcInfo = StringFromAPI(result["bmcInfo"])
-		data.DmiData = StringFromAPI(result["dmiData"])
-		if rawItems_interfaces, ok := result["interfaces"].([]interface{}); ok && rawItems_interfaces != nil {
-			items_interfaces := make([]DpuMachineDsInterfacesItem, len(rawItems_interfaces))
-			for i_interfaces, raw_interfaces := range rawItems_interfaces {
-				m_interfaces, _ := raw_interfaces.(map[string]interface{})
-				if m_interfaces == nil { m_interfaces = map[string]interface{}{} }
-				items_interfaces[i_interfaces].Id = StringFromAPI(m_interfaces["id"])
-				items_interfaces[i_interfaces].MachineId = StringFromAPI(m_interfaces["machineId"])
-				items_interfaces[i_interfaces].SegmentId = StringFromAPI(m_interfaces["segmentId"])
-				items_interfaces[i_interfaces].Hostname = StringFromAPI(m_interfaces["hostname"])
-				items_interfaces[i_interfaces].PrimaryInterface = BoolFromAPI(m_interfaces["primaryInterface"])
-				items_interfaces[i_interfaces].MacAddress = StringFromAPI(m_interfaces["macAddress"])
-				// address: nested field — expand manually if needed
-				items_interfaces[i_interfaces].Vendor = StringFromAPI(m_interfaces["vendor"])
-				items_interfaces[i_interfaces].Created = StringFromAPI(m_interfaces["created"])
-				items_interfaces[i_interfaces].LastDhcp = StringFromAPI(m_interfaces["lastDhcp"])
-				items_interfaces[i_interfaces].IsBmc = BoolFromAPI(m_interfaces["isBmc"])
+			data.HostMachineId = StringFromAPI(result["hostMachineId"])
+			data.DpuAgentVersion = StringFromAPI(result["dpuAgentVersion"])
+			data.BmcInfo = StringFromAPI(result["bmcInfo"])
+			data.DmiData = StringFromAPI(result["dmiData"])
+			if rawItems_interfaces, ok := result["interfaces"].([]interface{}); ok && rawItems_interfaces != nil {
+				items_interfaces := make([]DpuMachineDsInterfacesItem, len(rawItems_interfaces))
+				for i_interfaces, raw_interfaces := range rawItems_interfaces {
+					m_interfaces, _ := raw_interfaces.(map[string]interface{})
+					if m_interfaces == nil {
+						m_interfaces = map[string]interface{}{}
+					}
+					items_interfaces[i_interfaces].Id = StringFromAPI(m_interfaces["id"])
+					items_interfaces[i_interfaces].MachineId = StringFromAPI(m_interfaces["machineId"])
+					items_interfaces[i_interfaces].SegmentId = StringFromAPI(m_interfaces["segmentId"])
+					items_interfaces[i_interfaces].Hostname = StringFromAPI(m_interfaces["hostname"])
+					items_interfaces[i_interfaces].PrimaryInterface = BoolFromAPI(m_interfaces["primaryInterface"])
+					items_interfaces[i_interfaces].MacAddress = StringFromAPI(m_interfaces["macAddress"])
+					// address: nested field — expand manually if needed
+					items_interfaces[i_interfaces].Vendor = StringFromAPI(m_interfaces["vendor"])
+					items_interfaces[i_interfaces].Created = StringFromAPI(m_interfaces["created"])
+					items_interfaces[i_interfaces].LastDhcp = StringFromAPI(m_interfaces["lastDhcp"])
+					items_interfaces[i_interfaces].IsBmc = BoolFromAPI(m_interfaces["isBmc"])
+				}
+				data.Interfaces = items_interfaces
+			} else {
+				data.Interfaces = nil
 			}
-			data.Interfaces = items_interfaces
-		} else {
-			data.Interfaces = nil
-		}
-		if rawItems_software_components, ok := result["softwareComponents"].([]interface{}); ok && rawItems_software_components != nil {
-			items_software_components := make([]DpuMachineDsSoftwareComponentsItem, len(rawItems_software_components))
-			for i_software_components, raw_software_components := range rawItems_software_components {
-				m_software_components, _ := raw_software_components.(map[string]interface{})
-				if m_software_components == nil { m_software_components = map[string]interface{}{} }
-				items_software_components[i_software_components].Name = StringFromAPI(m_software_components["name"])
-				items_software_components[i_software_components].Version = StringFromAPI(m_software_components["version"])
-				items_software_components[i_software_components].Url = StringFromAPI(m_software_components["url"])
+			if rawItems_software_components, ok := result["softwareComponents"].([]interface{}); ok && rawItems_software_components != nil {
+				items_software_components := make([]DpuMachineDsSoftwareComponentsItem, len(rawItems_software_components))
+				for i_software_components, raw_software_components := range rawItems_software_components {
+					m_software_components, _ := raw_software_components.(map[string]interface{})
+					if m_software_components == nil {
+						m_software_components = map[string]interface{}{}
+					}
+					items_software_components[i_software_components].Name = StringFromAPI(m_software_components["name"])
+					items_software_components[i_software_components].Version = StringFromAPI(m_software_components["version"])
+					items_software_components[i_software_components].Url = StringFromAPI(m_software_components["url"])
+				}
+				data.SoftwareComponents = items_software_components
+			} else {
+				data.SoftwareComponents = nil
 			}
-			data.SoftwareComponents = items_software_components
-		} else {
-			data.SoftwareComponents = nil
-		}
-		data.Health = StringFromAPI(result["health"])
-		if rawMap_labels := StringMapFromAPI(result["labels"]); rawMap_labels != nil {
-			mv, d := types.MapValueFrom(ctx, types.StringType, rawMap_labels)
-			diags.Append(d...)
-			data.Labels = mv
-		} else {
-			data.Labels = types.MapNull(types.StringType)
-		}
-		data.State = StringFromAPI(result["state"])
-		data.DpuNetworkConfig = StringFromAPI(result["dpuNetworkConfig"])
-		data.LastRebooted = StringFromAPI(result["lastRebooted"])
-		data.PlacementInRack = StringFromAPI(result["placementInRack"])
-		_ = diags
+			data.Health = StringFromAPI(result["health"])
+			if rawMap_labels := StringMapFromAPI(result["labels"]); rawMap_labels != nil {
+				mv, d := types.MapValueFrom(ctx, types.StringType, rawMap_labels)
+				diags.Append(d...)
+				data.Labels = mv
+			} else {
+				data.Labels = types.MapNull(types.StringType)
+			}
+			data.State = StringFromAPI(result["state"])
+			data.DpuNetworkConfig = StringFromAPI(result["dpuNetworkConfig"])
+			data.LastRebooted = StringFromAPI(result["lastRebooted"])
+			data.PlacementInRack = StringFromAPI(result["placementInRack"])
+			_ = diags
 		}
 	}
 
@@ -421,7 +428,9 @@ func (d *DpuMachineDataSource) populateModel(ctx context.Context, data *DpuMachi
 		items_interfaces := make([]DpuMachineDsInterfacesItem, len(rawItems_interfaces))
 		for i_interfaces, raw_interfaces := range rawItems_interfaces {
 			m_interfaces, _ := raw_interfaces.(map[string]interface{})
-			if m_interfaces == nil { m_interfaces = map[string]interface{}{} }
+			if m_interfaces == nil {
+				m_interfaces = map[string]interface{}{}
+			}
 			items_interfaces[i_interfaces].Id = StringFromAPI(m_interfaces["id"])
 			items_interfaces[i_interfaces].MachineId = StringFromAPI(m_interfaces["machineId"])
 			items_interfaces[i_interfaces].SegmentId = StringFromAPI(m_interfaces["segmentId"])
@@ -442,7 +451,9 @@ func (d *DpuMachineDataSource) populateModel(ctx context.Context, data *DpuMachi
 		items_software_components := make([]DpuMachineDsSoftwareComponentsItem, len(rawItems_software_components))
 		for i_software_components, raw_software_components := range rawItems_software_components {
 			m_software_components, _ := raw_software_components.(map[string]interface{})
-			if m_software_components == nil { m_software_components = map[string]interface{}{} }
+			if m_software_components == nil {
+				m_software_components = map[string]interface{}{}
+			}
 			items_software_components[i_software_components].Name = StringFromAPI(m_software_components["name"])
 			items_software_components[i_software_components].Version = StringFromAPI(m_software_components["version"])
 			items_software_components[i_software_components].Url = StringFromAPI(m_software_components["url"])

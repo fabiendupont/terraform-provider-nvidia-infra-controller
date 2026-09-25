@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,60 +26,60 @@ type SiteExplorerDataSource struct {
 }
 
 type SiteExplorerDataSourceModel struct {
-	SiteId types.String `tfsdk:"site_id"`
-	MachineId types.String `tfsdk:"machine_id"`
-	Address types.String `tfsdk:"address"`
-	Report *SiteExplorerDsReport `tfsdk:"report"`
-	ReportVersion types.String `tfsdk:"report_version"`
-	ExplorationRequested types.Bool `tfsdk:"exploration_requested"`
-	PreingestionState types.String `tfsdk:"preingestion_state"`
-	LastRedfishBmcReset types.String `tfsdk:"last_redfish_bmc_reset"`
-	LastIpmitoolBmcReset types.String `tfsdk:"last_ipmitool_bmc_reset"`
-	LastRedfishReboot types.String `tfsdk:"last_redfish_reboot"`
-	LastRedfishPowercycle types.String `tfsdk:"last_redfish_powercycle"`
-	PauseRemediation types.Bool `tfsdk:"pause_remediation"`
+	SiteId                types.String          `tfsdk:"site_id"`
+	MachineId             types.String          `tfsdk:"machine_id"`
+	Address               types.String          `tfsdk:"address"`
+	Report                *SiteExplorerDsReport `tfsdk:"report"`
+	ReportVersion         types.String          `tfsdk:"report_version"`
+	ExplorationRequested  types.Bool            `tfsdk:"exploration_requested"`
+	PreingestionState     types.String          `tfsdk:"preingestion_state"`
+	LastRedfishBmcReset   types.String          `tfsdk:"last_redfish_bmc_reset"`
+	LastIpmitoolBmcReset  types.String          `tfsdk:"last_ipmitool_bmc_reset"`
+	LastRedfishReboot     types.String          `tfsdk:"last_redfish_reboot"`
+	LastRedfishPowercycle types.String          `tfsdk:"last_redfish_powercycle"`
+	PauseRemediation      types.Bool            `tfsdk:"pause_remediation"`
 }
 
 type SiteExplorerDsReport struct {
-	EndpointType types.String `tfsdk:"endpoint_type"`
-	LastExplorationError types.String `tfsdk:"last_exploration_error"`
-	MachineId types.String `tfsdk:"machine_id"`
-	LastExplorationLatency types.String `tfsdk:"last_exploration_latency"`
-	Vendor types.String `tfsdk:"vendor"`
-	Managers []SiteExplorerDsReportManagersItem `tfsdk:"managers"`
-	Systems []SiteExplorerDsReportSystemsItem `tfsdk:"systems"`
-	Chassis []SiteExplorerDsReportChassisItem `tfsdk:"chassis"`
-	Service []SiteExplorerDsReportServiceItem `tfsdk:"service"`
-	MachineSetupStatus *SiteExplorerDsReportMachineSetupStatus `tfsdk:"machine_setup_status"`
-	SecureBootStatus *SiteExplorerDsReportSecureBootStatus `tfsdk:"secure_boot_status"`
-	LockdownStatus *SiteExplorerDsReportLockdownStatus `tfsdk:"lockdown_status"`
-	FirmwareVersions types.Map `tfsdk:"firmware_versions"`
+	EndpointType               types.String                                    `tfsdk:"endpoint_type"`
+	LastExplorationError       types.String                                    `tfsdk:"last_exploration_error"`
+	MachineId                  types.String                                    `tfsdk:"machine_id"`
+	LastExplorationLatency     types.String                                    `tfsdk:"last_exploration_latency"`
+	Vendor                     types.String                                    `tfsdk:"vendor"`
+	Managers                   []SiteExplorerDsReportManagersItem              `tfsdk:"managers"`
+	Systems                    []SiteExplorerDsReportSystemsItem               `tfsdk:"systems"`
+	Chassis                    []SiteExplorerDsReportChassisItem               `tfsdk:"chassis"`
+	Service                    []SiteExplorerDsReportServiceItem               `tfsdk:"service"`
+	MachineSetupStatus         *SiteExplorerDsReportMachineSetupStatus         `tfsdk:"machine_setup_status"`
+	SecureBootStatus           *SiteExplorerDsReportSecureBootStatus           `tfsdk:"secure_boot_status"`
+	LockdownStatus             *SiteExplorerDsReportLockdownStatus             `tfsdk:"lockdown_status"`
+	FirmwareVersions           types.Map                                       `tfsdk:"firmware_versions"`
 	LastExplorationErrorSchema *SiteExplorerDsReportLastExplorationErrorSchema `tfsdk:"last_exploration_error_schema"`
 }
 
 type SiteExplorerDsReportManagersItem struct {
-	Id types.String `tfsdk:"id"`
+	Id                 types.String                                             `tfsdk:"id"`
 	EthernetInterfaces []SiteExplorerDsReportManagersItemEthernetInterfacesItem `tfsdk:"ethernet_interfaces"`
 }
 
 type SiteExplorerDsReportManagersItemEthernetInterfacesItem struct {
-	Id types.String `tfsdk:"id"`
-	Description types.String `tfsdk:"description"`
-	InterfaceEnabled types.Bool `tfsdk:"interface_enabled"`
-	MacAddress types.String `tfsdk:"mac_address"`
-	LinkStatus types.String `tfsdk:"link_status"`
+	Id               types.String `tfsdk:"id"`
+	Description      types.String `tfsdk:"description"`
+	InterfaceEnabled types.Bool   `tfsdk:"interface_enabled"`
+	MacAddress       types.String `tfsdk:"mac_address"`
+	LinkStatus       types.String `tfsdk:"link_status"`
 }
 
 type SiteExplorerDsReportSystemsItem struct {
-	Id types.String `tfsdk:"id"`
-	Manufacturer types.String `tfsdk:"manufacturer"`
-	Model types.String `tfsdk:"model"`
-	SerialNumber types.String `tfsdk:"serial_number"`
-	Attributes *SiteExplorerDsReportSystemsItemAttributes `tfsdk:"attributes"`
+	Id                 types.String                                            `tfsdk:"id"`
+	Manufacturer       types.String                                            `tfsdk:"manufacturer"`
+	Model              types.String                                            `tfsdk:"model"`
+	SerialNumber       types.String                                            `tfsdk:"serial_number"`
+	Attributes         *SiteExplorerDsReportSystemsItemAttributes              `tfsdk:"attributes"`
 	EthernetInterfaces []SiteExplorerDsReportSystemsItemEthernetInterfacesItem `tfsdk:"ethernet_interfaces"`
-	PcieDevices []SiteExplorerDsReportSystemsItemPcieDevicesItem `tfsdk:"pcie_devices"`
-	PowerState types.String `tfsdk:"power_state"`
-	BootOrder *SiteExplorerDsReportSystemsItemBootOrder `tfsdk:"boot_order"`
+	PcieDevices        []SiteExplorerDsReportSystemsItemPcieDevicesItem        `tfsdk:"pcie_devices"`
+	PowerState         types.String                                            `tfsdk:"power_state"`
+	BootOrder          *SiteExplorerDsReportSystemsItemBootOrder               `tfsdk:"boot_order"`
 }
 
 type SiteExplorerDsReportSystemsItemAttributes struct {
@@ -87,29 +87,29 @@ type SiteExplorerDsReportSystemsItemAttributes struct {
 }
 
 type SiteExplorerDsReportSystemsItemEthernetInterfacesItem struct {
-	Id types.String `tfsdk:"id"`
-	Description types.String `tfsdk:"description"`
-	InterfaceEnabled types.Bool `tfsdk:"interface_enabled"`
-	MacAddress types.String `tfsdk:"mac_address"`
-	LinkStatus types.String `tfsdk:"link_status"`
+	Id               types.String `tfsdk:"id"`
+	Description      types.String `tfsdk:"description"`
+	InterfaceEnabled types.Bool   `tfsdk:"interface_enabled"`
+	MacAddress       types.String `tfsdk:"mac_address"`
+	LinkStatus       types.String `tfsdk:"link_status"`
 }
 
 type SiteExplorerDsReportSystemsItemPcieDevicesItem struct {
-	Description types.String `tfsdk:"description"`
-	FirmwareVersion types.String `tfsdk:"firmware_version"`
-	GpuVendor types.String `tfsdk:"gpu_vendor"`
-	Id types.String `tfsdk:"id"`
-	Manufacturer types.String `tfsdk:"manufacturer"`
-	Name types.String `tfsdk:"name"`
-	PartNumber types.String `tfsdk:"part_number"`
-	SerialNumber types.String `tfsdk:"serial_number"`
-	Status *SiteExplorerDsReportSystemsItemPcieDevicesItemStatus `tfsdk:"status"`
+	Description     types.String                                          `tfsdk:"description"`
+	FirmwareVersion types.String                                          `tfsdk:"firmware_version"`
+	GpuVendor       types.String                                          `tfsdk:"gpu_vendor"`
+	Id              types.String                                          `tfsdk:"id"`
+	Manufacturer    types.String                                          `tfsdk:"manufacturer"`
+	Name            types.String                                          `tfsdk:"name"`
+	PartNumber      types.String                                          `tfsdk:"part_number"`
+	SerialNumber    types.String                                          `tfsdk:"serial_number"`
+	Status          *SiteExplorerDsReportSystemsItemPcieDevicesItemStatus `tfsdk:"status"`
 }
 
 type SiteExplorerDsReportSystemsItemPcieDevicesItemStatus struct {
-	Health types.String `tfsdk:"health"`
+	Health       types.String `tfsdk:"health"`
 	HealthRollup types.String `tfsdk:"health_rollup"`
-	State types.String `tfsdk:"state"`
+	State        types.String `tfsdk:"state"`
 }
 
 type SiteExplorerDsReportSystemsItemBootOrder struct {
@@ -117,60 +117,60 @@ type SiteExplorerDsReportSystemsItemBootOrder struct {
 }
 
 type SiteExplorerDsReportSystemsItemBootOrderBootOrderItem struct {
-	DisplayName types.String `tfsdk:"display_name"`
-	Id types.String `tfsdk:"id"`
-	BootOptionEnabled types.Bool `tfsdk:"boot_option_enabled"`
-	UefiDevicePath types.String `tfsdk:"uefi_device_path"`
+	DisplayName       types.String `tfsdk:"display_name"`
+	Id                types.String `tfsdk:"id"`
+	BootOptionEnabled types.Bool   `tfsdk:"boot_option_enabled"`
+	UefiDevicePath    types.String `tfsdk:"uefi_device_path"`
 }
 
 type SiteExplorerDsReportChassisItem struct {
-	Id types.String `tfsdk:"id"`
+	Id              types.String                                         `tfsdk:"id"`
 	NetworkAdapters []SiteExplorerDsReportChassisItemNetworkAdaptersItem `tfsdk:"network_adapters"`
-	Manufacturer types.String `tfsdk:"manufacturer"`
-	Model types.String `tfsdk:"model"`
-	PartNumber types.String `tfsdk:"part_number"`
-	SerialNumber types.String `tfsdk:"serial_number"`
+	Manufacturer    types.String                                         `tfsdk:"manufacturer"`
+	Model           types.String                                         `tfsdk:"model"`
+	PartNumber      types.String                                         `tfsdk:"part_number"`
+	SerialNumber    types.String                                         `tfsdk:"serial_number"`
 }
 
 type SiteExplorerDsReportChassisItemNetworkAdaptersItem struct {
-	Id types.String `tfsdk:"id"`
+	Id           types.String `tfsdk:"id"`
 	Manufacturer types.String `tfsdk:"manufacturer"`
-	Model types.String `tfsdk:"model"`
-	PartNumber types.String `tfsdk:"part_number"`
+	Model        types.String `tfsdk:"model"`
+	PartNumber   types.String `tfsdk:"part_number"`
 	SerialNumber types.String `tfsdk:"serial_number"`
 }
 
 type SiteExplorerDsReportServiceItem struct {
-	Id types.String `tfsdk:"id"`
+	Id          types.String                                     `tfsdk:"id"`
 	Inventories []SiteExplorerDsReportServiceItemInventoriesItem `tfsdk:"inventories"`
 }
 
 type SiteExplorerDsReportServiceItemInventoriesItem struct {
-	Id types.String `tfsdk:"id"`
+	Id          types.String `tfsdk:"id"`
 	Description types.String `tfsdk:"description"`
-	Version types.String `tfsdk:"version"`
+	Version     types.String `tfsdk:"version"`
 	ReleaseDate types.String `tfsdk:"release_date"`
 }
 
 type SiteExplorerDsReportMachineSetupStatus struct {
-	IsDone types.Bool `tfsdk:"is_done"`
-	Diffs []SiteExplorerDsReportMachineSetupStatusDiffsItem `tfsdk:"diffs"`
+	IsDone                 types.Bool                                                    `tfsdk:"is_done"`
+	Diffs                  []SiteExplorerDsReportMachineSetupStatusDiffsItem             `tfsdk:"diffs"`
 	EvaluatedBootInterface *SiteExplorerDsReportMachineSetupStatusEvaluatedBootInterface `tfsdk:"evaluated_boot_interface"`
 }
 
 type SiteExplorerDsReportMachineSetupStatusDiffsItem struct {
-	Key types.String `tfsdk:"key"`
+	Key      types.String `tfsdk:"key"`
 	Expected types.String `tfsdk:"expected"`
-	Actual types.String `tfsdk:"actual"`
+	Actual   types.String `tfsdk:"actual"`
 }
 
 type SiteExplorerDsReportMachineSetupStatusEvaluatedBootInterface struct {
-	Pair *SiteExplorerDsReportMachineSetupStatusEvaluatedBootInterfacePair `tfsdk:"pair"`
-	MacOnly types.String `tfsdk:"mac_only"`
+	Pair    *SiteExplorerDsReportMachineSetupStatusEvaluatedBootInterfacePair `tfsdk:"pair"`
+	MacOnly types.String                                                      `tfsdk:"mac_only"`
 }
 
 type SiteExplorerDsReportMachineSetupStatusEvaluatedBootInterfacePair struct {
-	MacAddress types.String `tfsdk:"mac_address"`
+	MacAddress  types.String `tfsdk:"mac_address"`
 	InterfaceId types.String `tfsdk:"interface_id"`
 }
 
@@ -179,16 +179,15 @@ type SiteExplorerDsReportSecureBootStatus struct {
 }
 
 type SiteExplorerDsReportLockdownStatus struct {
-	Status types.String `tfsdk:"status"`
+	Status  types.String `tfsdk:"status"`
 	Message types.String `tfsdk:"message"`
 }
 
 type SiteExplorerDsReportLastExplorationErrorSchema struct {
-	ErrorCode types.String `tfsdk:"error_code"`
+	ErrorCode  types.String `tfsdk:"error_code"`
 	Mitigation types.String `tfsdk:"mitigation"`
-	Text types.String `tfsdk:"text"`
+	Text       types.String `tfsdk:"text"`
 }
-
 
 func (d *SiteExplorerDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_site_explorer"

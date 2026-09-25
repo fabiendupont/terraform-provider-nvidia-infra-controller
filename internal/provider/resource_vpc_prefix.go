@@ -26,36 +26,35 @@ type VpcPrefixResource struct {
 }
 
 type VpcPrefixResourceModel struct {
-	Id types.String `tfsdk:"id"`
-	Name types.String `tfsdk:"name"`
-	VpcId types.String `tfsdk:"vpc_id"`
-	IpBlockId types.String `tfsdk:"ip_block_id"`
-	PrefixLength types.Int64 `tfsdk:"prefix_length"`
-	SiteId types.String `tfsdk:"site_id"`
-	Prefix types.String `tfsdk:"prefix"`
-	Status types.String `tfsdk:"status"`
-	UsageStats *VpcPrefixUsageStats `tfsdk:"usage_stats"`
+	Id            types.String                 `tfsdk:"id"`
+	Name          types.String                 `tfsdk:"name"`
+	VpcId         types.String                 `tfsdk:"vpc_id"`
+	IpBlockId     types.String                 `tfsdk:"ip_block_id"`
+	PrefixLength  types.Int64                  `tfsdk:"prefix_length"`
+	SiteId        types.String                 `tfsdk:"site_id"`
+	Prefix        types.String                 `tfsdk:"prefix"`
+	Status        types.String                 `tfsdk:"status"`
+	UsageStats    *VpcPrefixUsageStats         `tfsdk:"usage_stats"`
 	StatusHistory []VpcPrefixStatusHistoryItem `tfsdk:"status_history"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
-	VpcPrefixId types.String `tfsdk:"vpc_prefix_id"`
+	Created       types.String                 `tfsdk:"created"`
+	Updated       types.String                 `tfsdk:"updated"`
+	VpcPrefixId   types.String                 `tfsdk:"vpc_prefix_id"`
 }
 
 type VpcPrefixUsageStats struct {
-	AvailableIPs types.Int64 `tfsdk:"available_i_ps"`
-	AcquiredIPs types.Int64 `tfsdk:"acquired_i_ps"`
-	AvailablePrefixes types.List `tfsdk:"available_prefixes"`
+	AvailableIPs              types.Int64 `tfsdk:"available_i_ps"`
+	AcquiredIPs               types.Int64 `tfsdk:"acquired_i_ps"`
+	AvailablePrefixes         types.List  `tfsdk:"available_prefixes"`
 	AvailableSmallestPrefixes types.Int64 `tfsdk:"available_smallest_prefixes"`
-	AcquiredPrefixes types.Int64 `tfsdk:"acquired_prefixes"`
+	AcquiredPrefixes          types.Int64 `tfsdk:"acquired_prefixes"`
 }
 
 type VpcPrefixStatusHistoryItem struct {
-	Status types.String `tfsdk:"status"`
+	Status  types.String `tfsdk:"status"`
 	Message types.String `tfsdk:"message"`
 	Created types.String `tfsdk:"created"`
 	Updated types.String `tfsdk:"updated"`
 }
-
 
 func (r *VpcPrefixResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_vpc_prefix"
@@ -83,13 +82,13 @@ func (r *VpcPrefixResource) Schema(_ context.Context, _ resource.SchemaRequest, 
 				Required:    true,
 				Optional:    false,
 				Computed:    false,
-				Description: "ID of the Ready tenant IPv4 or IPv6 IP Block to allocate the VPC Prefix from. The block must be at the FNN VPC's Site.",
+				Description: "ID of the IP Block to allocate the VPC Prefix from",
 			},
 			"prefix_length": schema.Int64Attribute{
 				Required:    true,
 				Optional:    false,
 				Computed:    false,
-				Description: "Prefix length for the VPC Prefix. IPv4 accepts 8 through 31. IPv6 accepts 8 through 63 when the FNN VPC has `slaacEnabled=true`, or 8 through 126 otherwise. The selected IP Block must contain a prefix of the requested length.",
+				Description: "Prefix length for the VPC Prefix. Valid range is 8 to 31, and max usable value depends on prefix length of parent IP Block.",
 			},
 			"site_id": schema.StringAttribute{
 				Required:    false,
@@ -113,13 +112,13 @@ func (r *VpcPrefixResource) Schema(_ context.Context, _ resource.SchemaRequest, 
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
-				Description: "Present when query parameter `includeUsageStats=true` and the VPC Prefix has IPv4. This statistic reports IPv4 usage only. IP usage counts two addresses per associated Ethernet interface, while prefix usage counts each distinct `/31` containing an assigned IPv4 address.",
+				Description: "Present when query parameter `includeUsageStats=true`. Prefix and IP usage data is derived by evaluating associated Ethernet interfaces. Each Interface associated with a VPC Prefix consumes a `/31` prefix.",
 				Attributes: map[string]schema.Attribute{
 					"available_i_ps": schema.Int64Attribute{
 						Required:    false,
 						Optional:    false,
 						Computed:    true,
-						Description: "Total number of IP addresses in the block (acquired and unused), capped at 2,147,483,647. An IP Block allocated to one child prefix of the same size reports zero. ",
+						Description: "Total number of IP addresses in the block (acquired and unused)",
 					},
 					"acquired_i_ps": schema.Int64Attribute{
 						Required:    false,
@@ -138,7 +137,7 @@ func (r *VpcPrefixResource) Schema(_ context.Context, _ resource.SchemaRequest, 
 						Required:    false,
 						Optional:    false,
 						Computed:    true,
-						Description: "Number of complete `/30` IPv4 prefixes or `/126` IPv6 prefixes remaining after acquired child prefixes are excluded. Both prefix sizes contain four addresses. The count is capped at 2,147,483,647. The `acquiredIPs` count is not subtracted. ",
+						Description: "Total number of /30 prefixes that can still be acquired from this block (only reduced if prefixes are acquired, not reduced by acquired IPs) ",
 					},
 					"acquired_prefixes": schema.Int64Attribute{
 						Required:    false,
@@ -272,7 +271,9 @@ func (r *VpcPrefixResource) Create(ctx context.Context, req resource.CreateReque
 		items_status_history := make([]VpcPrefixStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -332,7 +333,9 @@ func (r *VpcPrefixResource) Read(ctx context.Context, req resource.ReadRequest, 
 		items_status_history := make([]VpcPrefixStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -393,7 +396,9 @@ func (r *VpcPrefixResource) Update(ctx context.Context, req resource.UpdateReque
 		items_status_history := make([]VpcPrefixStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -448,7 +453,9 @@ func (r *VpcPrefixResource) populateModel(ctx context.Context, data *VpcPrefixRe
 		items_status_history := make([]VpcPrefixStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])

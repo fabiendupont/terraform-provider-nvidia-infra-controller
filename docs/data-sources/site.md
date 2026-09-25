@@ -28,16 +28,15 @@ output "site_name" {
 ### Optional
 
 - `id` (String) ID of the resource to retrieve. When set, returns a single resource.
-- `include_gpu_stats` (String) Include a per-Site breakdown of GPU counts grouped by GPU type. Requires Provider Admin role.
 - `include_machine_stats` (String) Include a breakdown of Machine counts by lifecycle status and health. Requires Provider Admin role.
-- `infrastructure_provider_id` (String) Filter Sites by Infrastructure Provider ID. Deprecated: Infrastructure Provider is now inferred from the org's membership.
+- `infrastructure_provider_id` (String) Filter Sites by Infrastructure Provider ID
 - `is_flow_enabled` (String) Filter Sites by NICo Flow enabled flag. Requires Provider Admin role.
 - `is_native_networking_enabled` (String) Filter Sites by native networking enabled flag. Requires Provider Admin role.
 - `is_network_security_group_enabled` (String) Filter Sites by network security group enabled flag. Requires Provider Admin role.
 - `is_nv_link_partition_enabled` (String) Filter Sites by NVLink partitioning enabled flag. Requires Provider Admin role.
 - `query` (String) Search for matches across all Sites. Input will be matched against name, description, location, contact, and status fields
 - `status` (String) Filter Sites by Status. Can be specified multiple times to filter on more than one status
-- `tenant_id` (String) Filter Sites by Tenant ID. Deprecated: Tenant is now inferred from the org's membership.
+- `tenant_id` (String) Filter Sites by Tenant ID
 
 ### Read-Only
 
@@ -45,7 +44,6 @@ output "site_name" {
 - `contact` (Attributes) Site contact information (see [below for nested schema](#nestedatt--contact))
 - `created` (String) Date/time when the Site was created
 - `description` (String) Optional description for the Site
-- `gpu_stats` (Attributes List) GPU counts grouped by GPU type for the Site. Populated when includeGpuStats is set (see [below for nested schema](#nestedatt--gpu_stats))
 - `is_online` (Boolean) Indicates if the Site is currently reachable from Cloud
 - `is_serial_console_enabled` (Boolean) Indicates if Serial Console is enabled for the Site by the Provider
 - `is_serial_console_ssh_keys_enabled` (Boolean) Only visible to Tenant retrieving the Site. Indicates if Serial Console access using SSH Keys is enabled by Tenant
@@ -68,13 +66,11 @@ output "site_name" {
 
 Read-Only:
 
-- `dps_power_management` (Boolean) Whether this Site accepts non-empty power resource groups and power profiles for DPS power management. When false, omission and explicit clearing remain allowed.
 - `flow` (Boolean) Whether the Site supports Flow-based operations
 - `image_based_operating_system` (Boolean) Whether the Site supports image-based operating system provisioning
 - `native_networking` (Boolean) Whether the Site supports native networking
 - `network_security_group` (Boolean) Whether the Site supports Network Security Groups
 - `nv_link_partition` (Boolean) Whether the Site supports NVLink partitioning
-- `vpc_slaac` (Boolean) Whether the latest successfully stored Site configuration inventory reports that Core supports VPCs with SLAAC enabled. False also represents a missing Site configuration or an inventory report that omits the capability. This value is managed by Site configuration inventory and cannot be updated through the Site API.
 
 
 <a id="nestedatt--contact"></a>
@@ -83,16 +79,6 @@ Read-Only:
 Read-Only:
 
 - `email` (String) Email address of the Site contact
-
-
-<a id="nestedatt--gpu_stats"></a>
-### Nested Schema for `gpu_stats`
-
-Read-Only:
-
-- `gpus` (Number) Total number of GPUs (summation of all Machine GPU capability counts)
-- `machines` (Number) Number of machines that have this GPU capability
-- `name` (String) GPU name from the MachineCapability record
 
 
 <a id="nestedatt--location"></a>
@@ -141,7 +127,6 @@ Read-Only:
 Read-Only:
 
 - `decommissioned` (Number) Number of Machines in Decommissioned status
-- `decommissioning` (Number) Number of Machines in Decommissioning status
 - `error` (Number) Number of Machines in Error status
 - `in_use` (Number) Number of Machines in InUse status
 - `initializing` (Number) Number of Machines in Initializing status
@@ -157,7 +142,6 @@ Read-Only:
 Read-Only:
 
 - `decommissioned` (Attributes) Health breakdown for Machines in Decommissioned status (see [below for nested schema](#nestedatt--machine_stats--total_by_status_and_health--decommissioned))
-- `decommissioning` (Attributes) Health breakdown for Machines in Decommissioning status (see [below for nested schema](#nestedatt--machine_stats--total_by_status_and_health--decommissioning))
 - `error` (Attributes) Health breakdown for Machines in Error status (see [below for nested schema](#nestedatt--machine_stats--total_by_status_and_health--error))
 - `in_use` (Attributes) Health breakdown for Machines in InUse status (see [below for nested schema](#nestedatt--machine_stats--total_by_status_and_health--in_use))
 - `initializing` (Attributes) Health breakdown for Machines in Initializing status (see [below for nested schema](#nestedatt--machine_stats--total_by_status_and_health--initializing))
@@ -168,15 +152,6 @@ Read-Only:
 
 <a id="nestedatt--machine_stats--total_by_status_and_health--decommissioned"></a>
 ### Nested Schema for `machine_stats.total_by_status_and_health.decommissioned`
-
-Read-Only:
-
-- `healthy` (Number) Number of healthy Machines
-- `unhealthy` (Number) Number of unhealthy Machines
-
-
-<a id="nestedatt--machine_stats--total_by_status_and_health--decommissioning"></a>
-### Nested Schema for `machine_stats.total_by_status_and_health.decommissioning`
 
 Read-Only:
 

@@ -26,27 +26,26 @@ type MachineValidationResource struct {
 }
 
 type MachineValidationResourceModel struct {
-	Id types.String `tfsdk:"id"`
-	Tags types.List `tfsdk:"tags"`
-	AllowedTests types.List `tfsdk:"allowed_tests"`
-	RunUnverifiedTests types.Bool `tfsdk:"run_unverified_tests"`
-	Contexts types.List `tfsdk:"contexts"`
-	ValidationId types.String `tfsdk:"validation_id"`
-	MachineId types.String `tfsdk:"machine_id"`
-	StartTime types.String `tfsdk:"start_time"`
-	EndTime types.String `tfsdk:"end_time"`
-	Name types.String `tfsdk:"name"`
-	Context types.String `tfsdk:"context"`
-	Status *MachineValidationStatus `tfsdk:"status"`
-	DurationToCompleteSecs types.Int64 `tfsdk:"duration_to_complete_secs"`
+	Id                     types.String             `tfsdk:"id"`
+	Tags                   types.List               `tfsdk:"tags"`
+	AllowedTests           types.List               `tfsdk:"allowed_tests"`
+	RunUnverifiedTests     types.Bool               `tfsdk:"run_unverified_tests"`
+	Contexts               types.List               `tfsdk:"contexts"`
+	ValidationId           types.String             `tfsdk:"validation_id"`
+	MachineId              types.String             `tfsdk:"machine_id"`
+	StartTime              types.String             `tfsdk:"start_time"`
+	EndTime                types.String             `tfsdk:"end_time"`
+	Name                   types.String             `tfsdk:"name"`
+	Context                types.String             `tfsdk:"context"`
+	Status                 *MachineValidationStatus `tfsdk:"status"`
+	DurationToCompleteSecs types.Int64              `tfsdk:"duration_to_complete_secs"`
 }
 
 type MachineValidationStatus struct {
-	State types.String `tfsdk:"state"`
-	Total types.Int64 `tfsdk:"total"`
-	Completed types.Int64 `tfsdk:"completed"`
+	State     types.String `tfsdk:"state"`
+	Total     types.Int64  `tfsdk:"total"`
+	Completed types.Int64  `tfsdk:"completed"`
 }
-
 
 func (r *MachineValidationResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_machine_validation"

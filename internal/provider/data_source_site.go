@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,50 +26,48 @@ type SiteDataSource struct {
 }
 
 type SiteDataSourceModel struct {
-	Id types.String `tfsdk:"id"`
-	InfrastructureProviderId types.String `tfsdk:"infrastructure_provider_id"`
-	TenantId types.String `tfsdk:"tenant_id"`
-	Status types.String `tfsdk:"status"`
-	IsNativeNetworkingEnabled types.String `tfsdk:"is_native_networking_enabled"`
-	IsNetworkSecurityGroupEnabled types.String `tfsdk:"is_network_security_group_enabled"`
-	IsNvLinkPartitionEnabled types.String `tfsdk:"is_nv_link_partition_enabled"`
-	IsFlowEnabled types.String `tfsdk:"is_flow_enabled"`
-	IncludeMachineStats types.String `tfsdk:"include_machine_stats"`
-	IncludeGpuStats types.String `tfsdk:"include_gpu_stats"`
-	Query types.String `tfsdk:"query"`
-	Name types.String `tfsdk:"name"`
-	Description types.String `tfsdk:"description"`
-	Org types.String `tfsdk:"org"`
-	SiteControllerVersion types.String `tfsdk:"site_controller_version"`
-	SiteAgentVersion types.String `tfsdk:"site_agent_version"`
-	RegistrationToken types.String `tfsdk:"registration_token"`
-	RegistrationTokenExpiration types.String `tfsdk:"registration_token_expiration"`
-	SerialConsoleHostname types.String `tfsdk:"serial_console_hostname"`
-	IsSerialConsoleEnabled types.Bool `tfsdk:"is_serial_console_enabled"`
-	SerialConsoleIdleTimeout types.Int64 `tfsdk:"serial_console_idle_timeout"`
-	SerialConsoleMaxSessionLength types.Int64 `tfsdk:"serial_console_max_session_length"`
-	IsSerialConsoleSshKeysEnabled types.Bool `tfsdk:"is_serial_console_ssh_keys_enabled"`
-	IsOnline types.Bool `tfsdk:"is_online"`
-	StatusHistory []SiteDsStatusHistoryItem `tfsdk:"status_history"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
-	Location *SiteDsLocation `tfsdk:"location"`
-	Contact *SiteDsContact `tfsdk:"contact"`
-	Capabilities *SiteDsCapabilities `tfsdk:"capabilities"`
-	MachineStats *SiteDsMachineStats `tfsdk:"machine_stats"`
-	GpuStats []SiteDsGpuStatsItem `tfsdk:"gpu_stats"`
+	Id                            types.String              `tfsdk:"id"`
+	InfrastructureProviderId      types.String              `tfsdk:"infrastructure_provider_id"`
+	TenantId                      types.String              `tfsdk:"tenant_id"`
+	Status                        types.String              `tfsdk:"status"`
+	IsNativeNetworkingEnabled     types.String              `tfsdk:"is_native_networking_enabled"`
+	IsNetworkSecurityGroupEnabled types.String              `tfsdk:"is_network_security_group_enabled"`
+	IsNvLinkPartitionEnabled      types.String              `tfsdk:"is_nv_link_partition_enabled"`
+	IsFlowEnabled                 types.String              `tfsdk:"is_flow_enabled"`
+	IncludeMachineStats           types.String              `tfsdk:"include_machine_stats"`
+	Query                         types.String              `tfsdk:"query"`
+	Name                          types.String              `tfsdk:"name"`
+	Description                   types.String              `tfsdk:"description"`
+	Org                           types.String              `tfsdk:"org"`
+	SiteControllerVersion         types.String              `tfsdk:"site_controller_version"`
+	SiteAgentVersion              types.String              `tfsdk:"site_agent_version"`
+	RegistrationToken             types.String              `tfsdk:"registration_token"`
+	RegistrationTokenExpiration   types.String              `tfsdk:"registration_token_expiration"`
+	SerialConsoleHostname         types.String              `tfsdk:"serial_console_hostname"`
+	IsSerialConsoleEnabled        types.Bool                `tfsdk:"is_serial_console_enabled"`
+	SerialConsoleIdleTimeout      types.Int64               `tfsdk:"serial_console_idle_timeout"`
+	SerialConsoleMaxSessionLength types.Int64               `tfsdk:"serial_console_max_session_length"`
+	IsSerialConsoleSshKeysEnabled types.Bool                `tfsdk:"is_serial_console_ssh_keys_enabled"`
+	IsOnline                      types.Bool                `tfsdk:"is_online"`
+	StatusHistory                 []SiteDsStatusHistoryItem `tfsdk:"status_history"`
+	Created                       types.String              `tfsdk:"created"`
+	Updated                       types.String              `tfsdk:"updated"`
+	Location                      *SiteDsLocation           `tfsdk:"location"`
+	Contact                       *SiteDsContact            `tfsdk:"contact"`
+	Capabilities                  *SiteDsCapabilities       `tfsdk:"capabilities"`
+	MachineStats                  *SiteDsMachineStats       `tfsdk:"machine_stats"`
 }
 
 type SiteDsStatusHistoryItem struct {
-	Status types.String `tfsdk:"status"`
+	Status  types.String `tfsdk:"status"`
 	Message types.String `tfsdk:"message"`
 	Created types.String `tfsdk:"created"`
 	Updated types.String `tfsdk:"updated"`
 }
 
 type SiteDsLocation struct {
-	City types.String `tfsdk:"city"`
-	State types.String `tfsdk:"state"`
+	City    types.String `tfsdk:"city"`
+	State   types.String `tfsdk:"state"`
 	Country types.String `tfsdk:"country"`
 }
 
@@ -78,109 +76,93 @@ type SiteDsContact struct {
 }
 
 type SiteDsCapabilities struct {
-	NativeNetworking types.Bool `tfsdk:"native_networking"`
-	NetworkSecurityGroup types.Bool `tfsdk:"network_security_group"`
-	NvLinkPartition types.Bool `tfsdk:"nv_link_partition"`
-	Flow types.Bool `tfsdk:"flow"`
+	NativeNetworking          types.Bool `tfsdk:"native_networking"`
+	NetworkSecurityGroup      types.Bool `tfsdk:"network_security_group"`
+	NvLinkPartition           types.Bool `tfsdk:"nv_link_partition"`
+	Flow                      types.Bool `tfsdk:"flow"`
 	ImageBasedOperatingSystem types.Bool `tfsdk:"image_based_operating_system"`
-	VpcSlaac types.Bool `tfsdk:"vpc_slaac"`
-	DpsPowerManagement types.Bool `tfsdk:"dps_power_management"`
 }
 
 type SiteDsMachineStats struct {
-	Total types.Int64 `tfsdk:"total"`
-	TotalByStatus *SiteDsMachineStatsTotalByStatus `tfsdk:"total_by_status"`
-	TotalByHealth *SiteDsMachineStatsTotalByHealth `tfsdk:"total_by_health"`
+	Total                  types.Int64                               `tfsdk:"total"`
+	TotalByStatus          *SiteDsMachineStatsTotalByStatus          `tfsdk:"total_by_status"`
+	TotalByHealth          *SiteDsMachineStatsTotalByHealth          `tfsdk:"total_by_health"`
 	TotalByStatusAndHealth *SiteDsMachineStatsTotalByStatusAndHealth `tfsdk:"total_by_status_and_health"`
-	TotalByAllocation *SiteDsMachineStatsTotalByAllocation `tfsdk:"total_by_allocation"`
+	TotalByAllocation      *SiteDsMachineStatsTotalByAllocation      `tfsdk:"total_by_allocation"`
 }
 
 type SiteDsMachineStatsTotalByStatus struct {
 	Decommissioned types.Int64 `tfsdk:"decommissioned"`
-	Decommissioning types.Int64 `tfsdk:"decommissioning"`
-	Error types.Int64 `tfsdk:"error"`
-	Initializing types.Int64 `tfsdk:"initializing"`
-	InUse types.Int64 `tfsdk:"in_use"`
-	Maintenance types.Int64 `tfsdk:"maintenance"`
-	Ready types.Int64 `tfsdk:"ready"`
-	Reset types.Int64 `tfsdk:"reset"`
-	Unknown types.Int64 `tfsdk:"unknown"`
+	Error          types.Int64 `tfsdk:"error"`
+	Initializing   types.Int64 `tfsdk:"initializing"`
+	InUse          types.Int64 `tfsdk:"in_use"`
+	Maintenance    types.Int64 `tfsdk:"maintenance"`
+	Ready          types.Int64 `tfsdk:"ready"`
+	Reset          types.Int64 `tfsdk:"reset"`
+	Unknown        types.Int64 `tfsdk:"unknown"`
 }
 
 type SiteDsMachineStatsTotalByHealth struct {
-	Healthy types.Int64 `tfsdk:"healthy"`
+	Healthy   types.Int64 `tfsdk:"healthy"`
 	Unhealthy types.Int64 `tfsdk:"unhealthy"`
 }
 
 type SiteDsMachineStatsTotalByStatusAndHealth struct {
 	Decommissioned *SiteDsMachineStatsTotalByStatusAndHealthDecommissioned `tfsdk:"decommissioned"`
-	Decommissioning *SiteDsMachineStatsTotalByStatusAndHealthDecommissioning `tfsdk:"decommissioning"`
-	Error *SiteDsMachineStatsTotalByStatusAndHealthError `tfsdk:"error"`
-	Initializing *SiteDsMachineStatsTotalByStatusAndHealthInitializing `tfsdk:"initializing"`
-	InUse *SiteDsMachineStatsTotalByStatusAndHealthInUse `tfsdk:"in_use"`
-	Maintenance *SiteDsMachineStatsTotalByStatusAndHealthMaintenance `tfsdk:"maintenance"`
-	Ready *SiteDsMachineStatsTotalByStatusAndHealthReady `tfsdk:"ready"`
-	Reset *SiteDsMachineStatsTotalByStatusAndHealthReset `tfsdk:"reset"`
-	Unknown *SiteDsMachineStatsTotalByStatusAndHealthUnknown `tfsdk:"unknown"`
+	Error          *SiteDsMachineStatsTotalByStatusAndHealthError          `tfsdk:"error"`
+	Initializing   *SiteDsMachineStatsTotalByStatusAndHealthInitializing   `tfsdk:"initializing"`
+	InUse          *SiteDsMachineStatsTotalByStatusAndHealthInUse          `tfsdk:"in_use"`
+	Maintenance    *SiteDsMachineStatsTotalByStatusAndHealthMaintenance    `tfsdk:"maintenance"`
+	Ready          *SiteDsMachineStatsTotalByStatusAndHealthReady          `tfsdk:"ready"`
+	Reset          *SiteDsMachineStatsTotalByStatusAndHealthReset          `tfsdk:"reset"`
+	Unknown        *SiteDsMachineStatsTotalByStatusAndHealthUnknown        `tfsdk:"unknown"`
 }
 
 type SiteDsMachineStatsTotalByStatusAndHealthDecommissioned struct {
-	Healthy types.Int64 `tfsdk:"healthy"`
-	Unhealthy types.Int64 `tfsdk:"unhealthy"`
-}
-
-type SiteDsMachineStatsTotalByStatusAndHealthDecommissioning struct {
-	Healthy types.Int64 `tfsdk:"healthy"`
+	Healthy   types.Int64 `tfsdk:"healthy"`
 	Unhealthy types.Int64 `tfsdk:"unhealthy"`
 }
 
 type SiteDsMachineStatsTotalByStatusAndHealthError struct {
-	Healthy types.Int64 `tfsdk:"healthy"`
+	Healthy   types.Int64 `tfsdk:"healthy"`
 	Unhealthy types.Int64 `tfsdk:"unhealthy"`
 }
 
 type SiteDsMachineStatsTotalByStatusAndHealthInitializing struct {
-	Healthy types.Int64 `tfsdk:"healthy"`
+	Healthy   types.Int64 `tfsdk:"healthy"`
 	Unhealthy types.Int64 `tfsdk:"unhealthy"`
 }
 
 type SiteDsMachineStatsTotalByStatusAndHealthInUse struct {
-	Healthy types.Int64 `tfsdk:"healthy"`
+	Healthy   types.Int64 `tfsdk:"healthy"`
 	Unhealthy types.Int64 `tfsdk:"unhealthy"`
 }
 
 type SiteDsMachineStatsTotalByStatusAndHealthMaintenance struct {
-	Healthy types.Int64 `tfsdk:"healthy"`
+	Healthy   types.Int64 `tfsdk:"healthy"`
 	Unhealthy types.Int64 `tfsdk:"unhealthy"`
 }
 
 type SiteDsMachineStatsTotalByStatusAndHealthReady struct {
-	Healthy types.Int64 `tfsdk:"healthy"`
+	Healthy   types.Int64 `tfsdk:"healthy"`
 	Unhealthy types.Int64 `tfsdk:"unhealthy"`
 }
 
 type SiteDsMachineStatsTotalByStatusAndHealthReset struct {
-	Healthy types.Int64 `tfsdk:"healthy"`
+	Healthy   types.Int64 `tfsdk:"healthy"`
 	Unhealthy types.Int64 `tfsdk:"unhealthy"`
 }
 
 type SiteDsMachineStatsTotalByStatusAndHealthUnknown struct {
-	Healthy types.Int64 `tfsdk:"healthy"`
+	Healthy   types.Int64 `tfsdk:"healthy"`
 	Unhealthy types.Int64 `tfsdk:"unhealthy"`
 }
 
 type SiteDsMachineStatsTotalByAllocation struct {
-	AllocatedInUse types.Int64 `tfsdk:"allocated_in_use"`
+	AllocatedInUse    types.Int64 `tfsdk:"allocated_in_use"`
 	AllocatedNotInUse types.Int64 `tfsdk:"allocated_not_in_use"`
-	Unallocated types.Int64 `tfsdk:"unallocated"`
+	Unallocated       types.Int64 `tfsdk:"unallocated"`
 }
-
-type SiteDsGpuStatsItem struct {
-	Name types.String `tfsdk:"name"`
-	Gpus types.Int64 `tfsdk:"gpus"`
-	Machines types.Int64 `tfsdk:"machines"`
-}
-
 
 func (d *SiteDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_site"
@@ -195,13 +177,13 @@ func (d *SiteDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "Filter Sites by Infrastructure Provider ID. Deprecated: Infrastructure Provider is now inferred from the org's membership.",
+				Description: "Filter Sites by Infrastructure Provider ID",
 			},
 			"tenant_id": schema.StringAttribute{
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "Filter Sites by Tenant ID. Deprecated: Tenant is now inferred from the org's membership.",
+				Description: "Filter Sites by Tenant ID",
 			},
 			"status": schema.StringAttribute{
 				Required:    false,
@@ -238,12 +220,6 @@ func (d *SiteDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 				Optional:    true,
 				Computed:    true,
 				Description: "Include a breakdown of Machine counts by lifecycle status and health. Requires Provider Admin role.",
-			},
-			"include_gpu_stats": schema.StringAttribute{
-				Required:    false,
-				Optional:    true,
-				Computed:    true,
-				Description: "Include a per-Site breakdown of GPU counts grouped by GPU type. Requires Provider Admin role.",
 			},
 			"query": schema.StringAttribute{
 				Required:    false,
@@ -451,18 +427,6 @@ func (d *SiteDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 						Computed:    true,
 						Description: "Whether the Site supports image-based operating system provisioning",
 					},
-					"vpc_slaac": schema.BoolAttribute{
-						Required:    false,
-						Optional:    false,
-						Computed:    true,
-						Description: "Whether the latest successfully stored Site configuration inventory reports that Core supports VPCs with SLAAC enabled. False also represents a missing Site configuration or an inventory report that omits the capability. This value is managed by Site configuration inventory and cannot be updated through the Site API.",
-					},
-					"dps_power_management": schema.BoolAttribute{
-						Required:    false,
-						Optional:    false,
-						Computed:    true,
-						Description: "Whether this Site accepts non-empty power resource groups and power profiles for DPS power management. When false, omission and explicit clearing remain allowed.",
-					},
 				},
 			},
 			"machine_stats": schema.SingleNestedAttribute{
@@ -488,12 +452,6 @@ func (d *SiteDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 								Optional:    false,
 								Computed:    true,
 								Description: "Number of Machines in Decommissioned status",
-							},
-							"decommissioning": schema.Int64Attribute{
-								Required:    false,
-								Optional:    false,
-								Computed:    true,
-								Description: "Number of Machines in Decommissioning status",
 							},
 							"error": schema.Int64Attribute{
 								Required:    false,
@@ -570,26 +528,6 @@ func (d *SiteDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 								Optional:    false,
 								Computed:    true,
 								Description: "Health breakdown for Machines in Decommissioned status",
-								Attributes: map[string]schema.Attribute{
-									"healthy": schema.Int64Attribute{
-										Required:    false,
-										Optional:    false,
-										Computed:    true,
-										Description: "Number of healthy Machines",
-									},
-									"unhealthy": schema.Int64Attribute{
-										Required:    false,
-										Optional:    false,
-										Computed:    true,
-										Description: "Number of unhealthy Machines",
-									},
-								},
-							},
-							"decommissioning": schema.SingleNestedAttribute{
-								Required:    false,
-								Optional:    false,
-								Computed:    true,
-								Description: "Health breakdown for Machines in Decommissioning status",
 								Attributes: map[string]schema.Attribute{
 									"healthy": schema.Int64Attribute{
 										Required:    false,
@@ -775,34 +713,6 @@ func (d *SiteDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 					},
 				},
 			},
-			"gpu_stats": schema.ListNestedAttribute{
-				Required:    false,
-				Optional:    false,
-				Computed:    true,
-				Description: "GPU counts grouped by GPU type for the Site. Populated when includeGpuStats is set",
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"name": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "GPU name from the MachineCapability record",
-						},
-						"gpus": schema.Int64Attribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Total number of GPUs (summation of all Machine GPU capability counts)",
-						},
-						"machines": schema.Int64Attribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Number of machines that have this GPU capability",
-						},
-					},
-				},
-			},
 		},
 	}
 }
@@ -859,7 +769,9 @@ func (d *SiteDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 			items_status_history := make([]SiteDsStatusHistoryItem, len(rawItems_status_history))
 			for i_status_history, raw_status_history := range rawItems_status_history {
 				m_status_history, _ := raw_status_history.(map[string]interface{})
-				if m_status_history == nil { m_status_history = map[string]interface{}{} }
+				if m_status_history == nil {
+					m_status_history = map[string]interface{}{}
+				}
 				items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 				items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 				items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -896,8 +808,6 @@ func (d *SiteDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 			obj_capabilities.NvLinkPartition = BoolFromAPI(rawObj_capabilities["nvLinkPartition"])
 			obj_capabilities.Flow = BoolFromAPI(rawObj_capabilities["flow"])
 			obj_capabilities.ImageBasedOperatingSystem = BoolFromAPI(rawObj_capabilities["imageBasedOperatingSystem"])
-			obj_capabilities.VpcSlaac = BoolFromAPI(rawObj_capabilities["vpcSlaac"])
-			obj_capabilities.DpsPowerManagement = BoolFromAPI(rawObj_capabilities["dpsPowerManagement"])
 			_ = rawObj_capabilities
 			data.Capabilities = obj_capabilities
 		} else {
@@ -914,19 +824,6 @@ func (d *SiteDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 			data.MachineStats = obj_machine_stats
 		} else {
 			data.MachineStats = nil
-		}
-		if rawItems_gpu_stats, ok := result["gpuStats"].([]interface{}); ok && rawItems_gpu_stats != nil {
-			items_gpu_stats := make([]SiteDsGpuStatsItem, len(rawItems_gpu_stats))
-			for i_gpu_stats, raw_gpu_stats := range rawItems_gpu_stats {
-				m_gpu_stats, _ := raw_gpu_stats.(map[string]interface{})
-				if m_gpu_stats == nil { m_gpu_stats = map[string]interface{}{} }
-				items_gpu_stats[i_gpu_stats].Name = StringFromAPI(m_gpu_stats["name"])
-				items_gpu_stats[i_gpu_stats].Gpus = Int64FromAPI(m_gpu_stats["gpus"])
-				items_gpu_stats[i_gpu_stats].Machines = Int64FromAPI(m_gpu_stats["machines"])
-			}
-			data.GpuStats = items_gpu_stats
-		} else {
-			data.GpuStats = nil
 		}
 		_ = diags
 	} else if true {
@@ -941,92 +838,79 @@ func (d *SiteDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 			data.Id = StringFromAPI(result["id"])
 			diags := resp.Diagnostics
 			data.Name = StringFromAPI(result["name"])
-		data.Description = StringFromAPI(result["description"])
-		data.Org = StringFromAPI(result["org"])
-		data.SiteControllerVersion = StringFromAPI(result["siteControllerVersion"])
-		data.SiteAgentVersion = StringFromAPI(result["siteAgentVersion"])
-		data.RegistrationToken = StringFromAPI(result["registrationToken"])
-		data.RegistrationTokenExpiration = StringFromAPI(result["registrationTokenExpiration"])
-		data.SerialConsoleHostname = StringFromAPI(result["serialConsoleHostname"])
-		data.IsSerialConsoleEnabled = BoolFromAPI(result["isSerialConsoleEnabled"])
-		data.SerialConsoleIdleTimeout = Int64FromAPI(result["serialConsoleIdleTimeout"])
-		data.SerialConsoleMaxSessionLength = Int64FromAPI(result["serialConsoleMaxSessionLength"])
-		data.IsSerialConsoleSshKeysEnabled = BoolFromAPI(result["isSerialConsoleSSHKeysEnabled"])
-		data.IsOnline = BoolFromAPI(result["isOnline"])
-		if rawItems_status_history, ok := result["statusHistory"].([]interface{}); ok && rawItems_status_history != nil {
-			items_status_history := make([]SiteDsStatusHistoryItem, len(rawItems_status_history))
-			for i_status_history, raw_status_history := range rawItems_status_history {
-				m_status_history, _ := raw_status_history.(map[string]interface{})
-				if m_status_history == nil { m_status_history = map[string]interface{}{} }
-				items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
-				items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
-				items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
-				items_status_history[i_status_history].Updated = StringFromAPI(m_status_history["updated"])
+			data.Description = StringFromAPI(result["description"])
+			data.Org = StringFromAPI(result["org"])
+			data.SiteControllerVersion = StringFromAPI(result["siteControllerVersion"])
+			data.SiteAgentVersion = StringFromAPI(result["siteAgentVersion"])
+			data.RegistrationToken = StringFromAPI(result["registrationToken"])
+			data.RegistrationTokenExpiration = StringFromAPI(result["registrationTokenExpiration"])
+			data.SerialConsoleHostname = StringFromAPI(result["serialConsoleHostname"])
+			data.IsSerialConsoleEnabled = BoolFromAPI(result["isSerialConsoleEnabled"])
+			data.SerialConsoleIdleTimeout = Int64FromAPI(result["serialConsoleIdleTimeout"])
+			data.SerialConsoleMaxSessionLength = Int64FromAPI(result["serialConsoleMaxSessionLength"])
+			data.IsSerialConsoleSshKeysEnabled = BoolFromAPI(result["isSerialConsoleSSHKeysEnabled"])
+			data.IsOnline = BoolFromAPI(result["isOnline"])
+			if rawItems_status_history, ok := result["statusHistory"].([]interface{}); ok && rawItems_status_history != nil {
+				items_status_history := make([]SiteDsStatusHistoryItem, len(rawItems_status_history))
+				for i_status_history, raw_status_history := range rawItems_status_history {
+					m_status_history, _ := raw_status_history.(map[string]interface{})
+					if m_status_history == nil {
+						m_status_history = map[string]interface{}{}
+					}
+					items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
+					items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
+					items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
+					items_status_history[i_status_history].Updated = StringFromAPI(m_status_history["updated"])
+				}
+				data.StatusHistory = items_status_history
+			} else {
+				data.StatusHistory = nil
 			}
-			data.StatusHistory = items_status_history
-		} else {
-			data.StatusHistory = nil
-		}
-		data.Created = StringFromAPI(result["created"])
-		data.Updated = StringFromAPI(result["updated"])
-		if rawObj_location, ok := result["location"].(map[string]interface{}); ok {
-			obj_location := &SiteDsLocation{}
-			obj_location.City = StringFromAPI(rawObj_location["city"])
-			obj_location.State = StringFromAPI(rawObj_location["state"])
-			obj_location.Country = StringFromAPI(rawObj_location["country"])
-			_ = rawObj_location
-			data.Location = obj_location
-		} else {
-			data.Location = nil
-		}
-		if rawObj_contact, ok := result["contact"].(map[string]interface{}); ok {
-			obj_contact := &SiteDsContact{}
-			obj_contact.Email = StringFromAPI(rawObj_contact["email"])
-			_ = rawObj_contact
-			data.Contact = obj_contact
-		} else {
-			data.Contact = nil
-		}
-		if rawObj_capabilities, ok := result["capabilities"].(map[string]interface{}); ok {
-			obj_capabilities := &SiteDsCapabilities{}
-			obj_capabilities.NativeNetworking = BoolFromAPI(rawObj_capabilities["nativeNetworking"])
-			obj_capabilities.NetworkSecurityGroup = BoolFromAPI(rawObj_capabilities["networkSecurityGroup"])
-			obj_capabilities.NvLinkPartition = BoolFromAPI(rawObj_capabilities["nvLinkPartition"])
-			obj_capabilities.Flow = BoolFromAPI(rawObj_capabilities["flow"])
-			obj_capabilities.ImageBasedOperatingSystem = BoolFromAPI(rawObj_capabilities["imageBasedOperatingSystem"])
-			obj_capabilities.VpcSlaac = BoolFromAPI(rawObj_capabilities["vpcSlaac"])
-			obj_capabilities.DpsPowerManagement = BoolFromAPI(rawObj_capabilities["dpsPowerManagement"])
-			_ = rawObj_capabilities
-			data.Capabilities = obj_capabilities
-		} else {
-			data.Capabilities = nil
-		}
-		if rawObj_machine_stats, ok := result["machineStats"].(map[string]interface{}); ok {
-			obj_machine_stats := &SiteDsMachineStats{}
-			obj_machine_stats.Total = Int64FromAPI(rawObj_machine_stats["total"])
-			// totalByStatus: nested field — expand manually if needed
-			// totalByHealth: nested field — expand manually if needed
-			// totalByStatusAndHealth: nested field — expand manually if needed
-			// totalByAllocation: nested field — expand manually if needed
-			_ = rawObj_machine_stats
-			data.MachineStats = obj_machine_stats
-		} else {
-			data.MachineStats = nil
-		}
-		if rawItems_gpu_stats, ok := result["gpuStats"].([]interface{}); ok && rawItems_gpu_stats != nil {
-			items_gpu_stats := make([]SiteDsGpuStatsItem, len(rawItems_gpu_stats))
-			for i_gpu_stats, raw_gpu_stats := range rawItems_gpu_stats {
-				m_gpu_stats, _ := raw_gpu_stats.(map[string]interface{})
-				if m_gpu_stats == nil { m_gpu_stats = map[string]interface{}{} }
-				items_gpu_stats[i_gpu_stats].Name = StringFromAPI(m_gpu_stats["name"])
-				items_gpu_stats[i_gpu_stats].Gpus = Int64FromAPI(m_gpu_stats["gpus"])
-				items_gpu_stats[i_gpu_stats].Machines = Int64FromAPI(m_gpu_stats["machines"])
+			data.Created = StringFromAPI(result["created"])
+			data.Updated = StringFromAPI(result["updated"])
+			if rawObj_location, ok := result["location"].(map[string]interface{}); ok {
+				obj_location := &SiteDsLocation{}
+				obj_location.City = StringFromAPI(rawObj_location["city"])
+				obj_location.State = StringFromAPI(rawObj_location["state"])
+				obj_location.Country = StringFromAPI(rawObj_location["country"])
+				_ = rawObj_location
+				data.Location = obj_location
+			} else {
+				data.Location = nil
 			}
-			data.GpuStats = items_gpu_stats
-		} else {
-			data.GpuStats = nil
-		}
-		_ = diags
+			if rawObj_contact, ok := result["contact"].(map[string]interface{}); ok {
+				obj_contact := &SiteDsContact{}
+				obj_contact.Email = StringFromAPI(rawObj_contact["email"])
+				_ = rawObj_contact
+				data.Contact = obj_contact
+			} else {
+				data.Contact = nil
+			}
+			if rawObj_capabilities, ok := result["capabilities"].(map[string]interface{}); ok {
+				obj_capabilities := &SiteDsCapabilities{}
+				obj_capabilities.NativeNetworking = BoolFromAPI(rawObj_capabilities["nativeNetworking"])
+				obj_capabilities.NetworkSecurityGroup = BoolFromAPI(rawObj_capabilities["networkSecurityGroup"])
+				obj_capabilities.NvLinkPartition = BoolFromAPI(rawObj_capabilities["nvLinkPartition"])
+				obj_capabilities.Flow = BoolFromAPI(rawObj_capabilities["flow"])
+				obj_capabilities.ImageBasedOperatingSystem = BoolFromAPI(rawObj_capabilities["imageBasedOperatingSystem"])
+				_ = rawObj_capabilities
+				data.Capabilities = obj_capabilities
+			} else {
+				data.Capabilities = nil
+			}
+			if rawObj_machine_stats, ok := result["machineStats"].(map[string]interface{}); ok {
+				obj_machine_stats := &SiteDsMachineStats{}
+				obj_machine_stats.Total = Int64FromAPI(rawObj_machine_stats["total"])
+				// totalByStatus: nested field — expand manually if needed
+				// totalByHealth: nested field — expand manually if needed
+				// totalByStatusAndHealth: nested field — expand manually if needed
+				// totalByAllocation: nested field — expand manually if needed
+				_ = rawObj_machine_stats
+				data.MachineStats = obj_machine_stats
+			} else {
+				data.MachineStats = nil
+			}
+			_ = diags
 		}
 	}
 
@@ -1051,7 +935,9 @@ func (d *SiteDataSource) populateModel(ctx context.Context, data *SiteDataSource
 		items_status_history := make([]SiteDsStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -1088,8 +974,6 @@ func (d *SiteDataSource) populateModel(ctx context.Context, data *SiteDataSource
 		obj_capabilities.NvLinkPartition = BoolFromAPI(rawObj_capabilities["nvLinkPartition"])
 		obj_capabilities.Flow = BoolFromAPI(rawObj_capabilities["flow"])
 		obj_capabilities.ImageBasedOperatingSystem = BoolFromAPI(rawObj_capabilities["imageBasedOperatingSystem"])
-		obj_capabilities.VpcSlaac = BoolFromAPI(rawObj_capabilities["vpcSlaac"])
-		obj_capabilities.DpsPowerManagement = BoolFromAPI(rawObj_capabilities["dpsPowerManagement"])
 		_ = rawObj_capabilities
 		data.Capabilities = obj_capabilities
 	} else {
@@ -1106,19 +990,6 @@ func (d *SiteDataSource) populateModel(ctx context.Context, data *SiteDataSource
 		data.MachineStats = obj_machine_stats
 	} else {
 		data.MachineStats = nil
-	}
-	if rawItems_gpu_stats, ok := result["gpuStats"].([]interface{}); ok && rawItems_gpu_stats != nil {
-		items_gpu_stats := make([]SiteDsGpuStatsItem, len(rawItems_gpu_stats))
-		for i_gpu_stats, raw_gpu_stats := range rawItems_gpu_stats {
-			m_gpu_stats, _ := raw_gpu_stats.(map[string]interface{})
-			if m_gpu_stats == nil { m_gpu_stats = map[string]interface{}{} }
-			items_gpu_stats[i_gpu_stats].Name = StringFromAPI(m_gpu_stats["name"])
-			items_gpu_stats[i_gpu_stats].Gpus = Int64FromAPI(m_gpu_stats["gpus"])
-			items_gpu_stats[i_gpu_stats].Machines = Int64FromAPI(m_gpu_stats["machines"])
-		}
-		data.GpuStats = items_gpu_stats
-	} else {
-		data.GpuStats = nil
 	}
 	_ = diags
 }

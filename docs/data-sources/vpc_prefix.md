@@ -28,7 +28,7 @@ output "vpc_prefix_name" {
 ### Optional
 
 - `id` (String) ID of the resource to retrieve. When set, returns a single resource.
-- `include_usage_stats` (String) When true, each VPC Prefix with IPv4 includes IPv4 usage statistics using the same structure as IP Block usage. Usage is derived from associated Ethernet interfaces and their IPv4 addresses. IP usage counts two addresses per interface, while prefix usage counts each distinct `/31` containing an assigned IPv4 address.
+- `include_usage_stats` (String) When true, each VPC Prefix object includes usage statistics using the same structure as IP Block usage. Prefix and IP usage data is derived by evaluating associated Ethernet interfaces. Each Interface associated with a VPC Prefix consumes a `/31` prefix.
 - `query` (String) Search for matches across all VPC Prefixes. Input will be matched against name and status fields
 - `site_id` (String) Filter VPC Prefixes by Site, required if the vpcId query parameter is not specified
 - `status` (String) Filter VPC Prefixes by Status
@@ -40,10 +40,10 @@ output "vpc_prefix_name" {
 - `ip_block_id` (String) ID of the IP Block that contains the prefix of the VPC Prefix
 - `name` (String) Name of the VPC Prefix
 - `prefix` (String) The network prefix including prefix length in CIDR notation
-- `prefix_length` (Number) Length of the returned prefix. A VPC Prefix reported by a Site may fall outside the bounds for REST create requests.
+- `prefix_length` (Number) Length of the prefix. Valid range is 8 to 31, and max usable value depends on prefix length of parent IP Block.
 - `status_history` (Attributes List) Details of 20 most recent status changes (see [below for nested schema](#nestedatt--status_history))
 - `updated` (String) Date and time when the VPC Prefix was updated
-- `usage_stats` (Attributes) Present when query parameter `includeUsageStats=true` and the VPC Prefix has IPv4. This statistic reports IPv4 usage only. IP usage counts two addresses per associated Ethernet interface, while prefix usage counts each distinct `/31` containing an assigned IPv4 address. (see [below for nested schema](#nestedatt--usage_stats))
+- `usage_stats` (Attributes) Present when query parameter `includeUsageStats=true`. Prefix and IP usage data is derived by evaluating associated Ethernet interfaces. Each Interface associated with a VPC Prefix consumes a `/31` prefix. (see [below for nested schema](#nestedatt--usage_stats))
 
 <a id="nestedatt--status_history"></a>
 ### Nested Schema for `status_history`
@@ -63,6 +63,6 @@ Read-Only:
 
 - `acquired_i_ps` (Number) Number of individual IP addresses acquired from the block
 - `acquired_prefixes` (Number) Total number of prefixes (of any size) acquired from this block
-- `available_i_ps` (Number) Total number of IP addresses in the block (acquired and unused), capped at 2,147,483,647. An IP Block allocated to one child prefix of the same size reports zero.
+- `available_i_ps` (Number) Total number of IP addresses in the block (acquired and unused)
 - `available_prefixes` (List of String) Example prefixes available to acquire
-- `available_smallest_prefixes` (Number) Number of complete `/30` IPv4 prefixes or `/126` IPv6 prefixes remaining after acquired child prefixes are excluded. Both prefix sizes contain four addresses. The count is capped at 2,147,483,647. The `acquiredIPs` count is not subtracted.
+- `available_smallest_prefixes` (Number) Total number of /30 prefixes that can still be acquired from this block (only reduced if prefixes are acquired, not reduced by acquired IPs)

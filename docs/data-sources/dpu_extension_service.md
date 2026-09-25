@@ -3,12 +3,12 @@
 page_title: "nico_dpu_extension_service Data Source - nico"
 subcategory: ""
 description: |-
-  DPU Extension Service allows users to run custom services in the DPUs of their Instances. KubernetesPod is delivered through the DPU agent; DpfHelmChart is reconciled through DPF.
+  DPU Extension Service allows users to run custom services in the DPUs of their Instances. Currently K8s pods are the only supported service type.
 ---
 
 # nico_dpu_extension_service (Data Source)
 
-DPU Extension Service allows users to run custom services in the DPUs of their Instances. KubernetesPod is delivered through the DPU agent; DpfHelmChart is reconciled through DPF.
+DPU Extension Service allows users to run custom services in the DPUs of their Instances. Currently K8s pods are the only supported service type.
 
 ## Example Usage
 

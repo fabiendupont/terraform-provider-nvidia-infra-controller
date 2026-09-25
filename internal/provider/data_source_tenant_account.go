@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,52 +26,45 @@ type TenantAccountDataSource struct {
 }
 
 type TenantAccountDataSourceModel struct {
-	Id types.String `tfsdk:"id"`
-	InfrastructureProviderId types.String `tfsdk:"infrastructure_provider_id"`
-	TenantId types.String `tfsdk:"tenant_id"`
-	Query types.String `tfsdk:"query"`
-	InfrastructureProviderOrg types.String `tfsdk:"infrastructure_provider_org"`
-	TenantOrg types.String `tfsdk:"tenant_org"`
-	TenantContact *TenantAccountDsTenantContact `tfsdk:"tenant_contact"`
-	AllocationCount types.Int64 `tfsdk:"allocation_count"`
-	Status types.String `tfsdk:"status"`
-	StatusHistory []TenantAccountDsStatusHistoryItem `tfsdk:"status_history"`
-	Deprecations []TenantAccountDsDeprecationsItem `tfsdk:"deprecations"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
-	SiteCapabilities []TenantAccountDsSiteCapabilitiesItem `tfsdk:"site_capabilities"`
+	Id                        types.String                       `tfsdk:"id"`
+	InfrastructureProviderId  types.String                       `tfsdk:"infrastructure_provider_id"`
+	TenantId                  types.String                       `tfsdk:"tenant_id"`
+	Query                     types.String                       `tfsdk:"query"`
+	InfrastructureProviderOrg types.String                       `tfsdk:"infrastructure_provider_org"`
+	TenantOrg                 types.String                       `tfsdk:"tenant_org"`
+	TenantContact             *TenantAccountDsTenantContact      `tfsdk:"tenant_contact"`
+	AllocationCount           types.Int64                        `tfsdk:"allocation_count"`
+	Status                    types.String                       `tfsdk:"status"`
+	StatusHistory             []TenantAccountDsStatusHistoryItem `tfsdk:"status_history"`
+	Deprecations              []TenantAccountDsDeprecationsItem  `tfsdk:"deprecations"`
+	Created                   types.String                       `tfsdk:"created"`
+	Updated                   types.String                       `tfsdk:"updated"`
 }
 
 type TenantAccountDsTenantContact struct {
-	Id types.String `tfsdk:"id"`
-	Email types.String `tfsdk:"email"`
+	Id        types.String `tfsdk:"id"`
+	Email     types.String `tfsdk:"email"`
 	FirstName types.String `tfsdk:"first_name"`
-	LastName types.String `tfsdk:"last_name"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
+	LastName  types.String `tfsdk:"last_name"`
+	Created   types.String `tfsdk:"created"`
+	Updated   types.String `tfsdk:"updated"`
 }
 
 type TenantAccountDsStatusHistoryItem struct {
-	Status types.String `tfsdk:"status"`
+	Status  types.String `tfsdk:"status"`
 	Message types.String `tfsdk:"message"`
 	Created types.String `tfsdk:"created"`
 	Updated types.String `tfsdk:"updated"`
 }
 
 type TenantAccountDsDeprecationsItem struct {
-	Attribute types.String `tfsdk:"attribute"`
-	QueryParam types.String `tfsdk:"query_param"`
-	Endpoint types.String `tfsdk:"endpoint"`
-	ReplacedBy types.String `tfsdk:"replaced_by"`
+	Attribute    types.String `tfsdk:"attribute"`
+	QueryParam   types.String `tfsdk:"query_param"`
+	Endpoint     types.String `tfsdk:"endpoint"`
+	ReplacedBy   types.String `tfsdk:"replaced_by"`
 	TakeActionBy types.String `tfsdk:"take_action_by"`
-	Notice types.String `tfsdk:"notice"`
+	Notice       types.String `tfsdk:"notice"`
 }
-
-type TenantAccountDsSiteCapabilitiesItem struct {
-	SiteIds types.List `tfsdk:"site_ids"`
-	TargetedInstanceCreation types.Bool `tfsdk:"targeted_instance_creation"`
-}
-
 
 func (d *TenantAccountDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_tenant_account"
@@ -260,29 +253,6 @@ func (d *TenantAccountDataSource) Schema(_ context.Context, _ datasource.SchemaR
 				Computed:    true,
 				Description: "Date/time when the Tenant Account was last updated",
 			},
-			"site_capabilities": schema.ListNestedAttribute{
-				Required:    false,
-				Optional:    false,
-				Computed:    true,
-				Description: "Provider-scoped TargetedInstanceCreation settings for this Tenant Account. Replaces the deprecated tenant-level capabilities.targetedInstanceCreation attribute.  When present on a Tenant Account response, the array always includes one entry with omitted `siteIds` derived from TenantAccount.config, followed by zero or more entries with `siteIds` for per-site overrides that differ from the account default.",
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"site_ids": schema.ListAttribute{
-							ElementType: types.StringType,
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Sites to configure. An omitted or empty array identifies the Tenant Account default entry. Each value must be a valid Site UUID, may appear only once across all siteCapabilities entries in the same request, must be associated with the Tenant, and must be owned by the Tenant Account's Infrastructure Provider; otherwise the server rejects the request with 400.",
-						},
-						"targeted_instance_creation": schema.BoolAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Whether TargetedInstanceCreation is enabled for the Tenant Account default or listed Sites. When true, Tenant Admins with a Ready Tenant Account on the Site's Infrastructure Provider may create Instances by Machine ID and perform related privileged actions on that Site.",
-						},
-					},
-				},
-			},
 		},
 	}
 }
@@ -343,7 +313,9 @@ func (d *TenantAccountDataSource) Read(ctx context.Context, req datasource.ReadR
 			items_status_history := make([]TenantAccountDsStatusHistoryItem, len(rawItems_status_history))
 			for i_status_history, raw_status_history := range rawItems_status_history {
 				m_status_history, _ := raw_status_history.(map[string]interface{})
-				if m_status_history == nil { m_status_history = map[string]interface{}{} }
+				if m_status_history == nil {
+					m_status_history = map[string]interface{}{}
+				}
 				items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 				items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 				items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -357,7 +329,9 @@ func (d *TenantAccountDataSource) Read(ctx context.Context, req datasource.ReadR
 			items_deprecations := make([]TenantAccountDsDeprecationsItem, len(rawItems_deprecations))
 			for i_deprecations, raw_deprecations := range rawItems_deprecations {
 				m_deprecations, _ := raw_deprecations.(map[string]interface{})
-				if m_deprecations == nil { m_deprecations = map[string]interface{}{} }
+				if m_deprecations == nil {
+					m_deprecations = map[string]interface{}{}
+				}
 				items_deprecations[i_deprecations].Attribute = StringFromAPI(m_deprecations["attribute"])
 				items_deprecations[i_deprecations].QueryParam = StringFromAPI(m_deprecations["queryParam"])
 				items_deprecations[i_deprecations].Endpoint = StringFromAPI(m_deprecations["endpoint"])
@@ -371,18 +345,6 @@ func (d *TenantAccountDataSource) Read(ctx context.Context, req datasource.ReadR
 		}
 		data.Created = StringFromAPI(result["created"])
 		data.Updated = StringFromAPI(result["updated"])
-		if rawItems_site_capabilities, ok := result["siteCapabilities"].([]interface{}); ok && rawItems_site_capabilities != nil {
-			items_site_capabilities := make([]TenantAccountDsSiteCapabilitiesItem, len(rawItems_site_capabilities))
-			for i_site_capabilities, raw_site_capabilities := range rawItems_site_capabilities {
-				m_site_capabilities, _ := raw_site_capabilities.(map[string]interface{})
-				if m_site_capabilities == nil { m_site_capabilities = map[string]interface{}{} }
-				// siteIds: nested field — expand manually if needed
-				items_site_capabilities[i_site_capabilities].TargetedInstanceCreation = BoolFromAPI(m_site_capabilities["targetedInstanceCreation"])
-			}
-			data.SiteCapabilities = items_site_capabilities
-		} else {
-			data.SiteCapabilities = nil
-		}
 		_ = diags
 	} else if true {
 		url := d.client.ResolvePath("/v2/org/{org}/nico/tenant/account", map[string]string{})
@@ -396,67 +358,59 @@ func (d *TenantAccountDataSource) Read(ctx context.Context, req datasource.ReadR
 			data.Id = StringFromAPI(result["id"])
 			diags := resp.Diagnostics
 			data.InfrastructureProviderOrg = StringFromAPI(result["infrastructureProviderOrg"])
-		data.TenantOrg = StringFromAPI(result["tenantOrg"])
-		if rawObj_tenant_contact, ok := result["tenantContact"].(map[string]interface{}); ok {
-			obj_tenant_contact := &TenantAccountDsTenantContact{}
-			obj_tenant_contact.Id = StringFromAPI(rawObj_tenant_contact["id"])
-			obj_tenant_contact.Email = StringFromAPI(rawObj_tenant_contact["email"])
-			obj_tenant_contact.FirstName = StringFromAPI(rawObj_tenant_contact["firstName"])
-			obj_tenant_contact.LastName = StringFromAPI(rawObj_tenant_contact["lastName"])
-			obj_tenant_contact.Created = StringFromAPI(rawObj_tenant_contact["created"])
-			obj_tenant_contact.Updated = StringFromAPI(rawObj_tenant_contact["updated"])
-			_ = rawObj_tenant_contact
-			data.TenantContact = obj_tenant_contact
-		} else {
-			data.TenantContact = nil
-		}
-		data.AllocationCount = Int64FromAPI(result["allocationCount"])
-		data.Status = StringFromAPI(result["status"])
-		if rawItems_status_history, ok := result["statusHistory"].([]interface{}); ok && rawItems_status_history != nil {
-			items_status_history := make([]TenantAccountDsStatusHistoryItem, len(rawItems_status_history))
-			for i_status_history, raw_status_history := range rawItems_status_history {
-				m_status_history, _ := raw_status_history.(map[string]interface{})
-				if m_status_history == nil { m_status_history = map[string]interface{}{} }
-				items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
-				items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
-				items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
-				items_status_history[i_status_history].Updated = StringFromAPI(m_status_history["updated"])
+			data.TenantOrg = StringFromAPI(result["tenantOrg"])
+			if rawObj_tenant_contact, ok := result["tenantContact"].(map[string]interface{}); ok {
+				obj_tenant_contact := &TenantAccountDsTenantContact{}
+				obj_tenant_contact.Id = StringFromAPI(rawObj_tenant_contact["id"])
+				obj_tenant_contact.Email = StringFromAPI(rawObj_tenant_contact["email"])
+				obj_tenant_contact.FirstName = StringFromAPI(rawObj_tenant_contact["firstName"])
+				obj_tenant_contact.LastName = StringFromAPI(rawObj_tenant_contact["lastName"])
+				obj_tenant_contact.Created = StringFromAPI(rawObj_tenant_contact["created"])
+				obj_tenant_contact.Updated = StringFromAPI(rawObj_tenant_contact["updated"])
+				_ = rawObj_tenant_contact
+				data.TenantContact = obj_tenant_contact
+			} else {
+				data.TenantContact = nil
 			}
-			data.StatusHistory = items_status_history
-		} else {
-			data.StatusHistory = nil
-		}
-		if rawItems_deprecations, ok := result["deprecations"].([]interface{}); ok && rawItems_deprecations != nil {
-			items_deprecations := make([]TenantAccountDsDeprecationsItem, len(rawItems_deprecations))
-			for i_deprecations, raw_deprecations := range rawItems_deprecations {
-				m_deprecations, _ := raw_deprecations.(map[string]interface{})
-				if m_deprecations == nil { m_deprecations = map[string]interface{}{} }
-				items_deprecations[i_deprecations].Attribute = StringFromAPI(m_deprecations["attribute"])
-				items_deprecations[i_deprecations].QueryParam = StringFromAPI(m_deprecations["queryParam"])
-				items_deprecations[i_deprecations].Endpoint = StringFromAPI(m_deprecations["endpoint"])
-				items_deprecations[i_deprecations].ReplacedBy = StringFromAPI(m_deprecations["replacedBy"])
-				items_deprecations[i_deprecations].TakeActionBy = StringFromAPI(m_deprecations["takeActionBy"])
-				items_deprecations[i_deprecations].Notice = StringFromAPI(m_deprecations["notice"])
+			data.AllocationCount = Int64FromAPI(result["allocationCount"])
+			data.Status = StringFromAPI(result["status"])
+			if rawItems_status_history, ok := result["statusHistory"].([]interface{}); ok && rawItems_status_history != nil {
+				items_status_history := make([]TenantAccountDsStatusHistoryItem, len(rawItems_status_history))
+				for i_status_history, raw_status_history := range rawItems_status_history {
+					m_status_history, _ := raw_status_history.(map[string]interface{})
+					if m_status_history == nil {
+						m_status_history = map[string]interface{}{}
+					}
+					items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
+					items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
+					items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
+					items_status_history[i_status_history].Updated = StringFromAPI(m_status_history["updated"])
+				}
+				data.StatusHistory = items_status_history
+			} else {
+				data.StatusHistory = nil
 			}
-			data.Deprecations = items_deprecations
-		} else {
-			data.Deprecations = nil
-		}
-		data.Created = StringFromAPI(result["created"])
-		data.Updated = StringFromAPI(result["updated"])
-		if rawItems_site_capabilities, ok := result["siteCapabilities"].([]interface{}); ok && rawItems_site_capabilities != nil {
-			items_site_capabilities := make([]TenantAccountDsSiteCapabilitiesItem, len(rawItems_site_capabilities))
-			for i_site_capabilities, raw_site_capabilities := range rawItems_site_capabilities {
-				m_site_capabilities, _ := raw_site_capabilities.(map[string]interface{})
-				if m_site_capabilities == nil { m_site_capabilities = map[string]interface{}{} }
-				// siteIds: nested field — expand manually if needed
-				items_site_capabilities[i_site_capabilities].TargetedInstanceCreation = BoolFromAPI(m_site_capabilities["targetedInstanceCreation"])
+			if rawItems_deprecations, ok := result["deprecations"].([]interface{}); ok && rawItems_deprecations != nil {
+				items_deprecations := make([]TenantAccountDsDeprecationsItem, len(rawItems_deprecations))
+				for i_deprecations, raw_deprecations := range rawItems_deprecations {
+					m_deprecations, _ := raw_deprecations.(map[string]interface{})
+					if m_deprecations == nil {
+						m_deprecations = map[string]interface{}{}
+					}
+					items_deprecations[i_deprecations].Attribute = StringFromAPI(m_deprecations["attribute"])
+					items_deprecations[i_deprecations].QueryParam = StringFromAPI(m_deprecations["queryParam"])
+					items_deprecations[i_deprecations].Endpoint = StringFromAPI(m_deprecations["endpoint"])
+					items_deprecations[i_deprecations].ReplacedBy = StringFromAPI(m_deprecations["replacedBy"])
+					items_deprecations[i_deprecations].TakeActionBy = StringFromAPI(m_deprecations["takeActionBy"])
+					items_deprecations[i_deprecations].Notice = StringFromAPI(m_deprecations["notice"])
+				}
+				data.Deprecations = items_deprecations
+			} else {
+				data.Deprecations = nil
 			}
-			data.SiteCapabilities = items_site_capabilities
-		} else {
-			data.SiteCapabilities = nil
-		}
-		_ = diags
+			data.Created = StringFromAPI(result["created"])
+			data.Updated = StringFromAPI(result["updated"])
+			_ = diags
 		}
 	}
 
@@ -485,7 +439,9 @@ func (d *TenantAccountDataSource) populateModel(ctx context.Context, data *Tenan
 		items_status_history := make([]TenantAccountDsStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -499,7 +455,9 @@ func (d *TenantAccountDataSource) populateModel(ctx context.Context, data *Tenan
 		items_deprecations := make([]TenantAccountDsDeprecationsItem, len(rawItems_deprecations))
 		for i_deprecations, raw_deprecations := range rawItems_deprecations {
 			m_deprecations, _ := raw_deprecations.(map[string]interface{})
-			if m_deprecations == nil { m_deprecations = map[string]interface{}{} }
+			if m_deprecations == nil {
+				m_deprecations = map[string]interface{}{}
+			}
 			items_deprecations[i_deprecations].Attribute = StringFromAPI(m_deprecations["attribute"])
 			items_deprecations[i_deprecations].QueryParam = StringFromAPI(m_deprecations["queryParam"])
 			items_deprecations[i_deprecations].Endpoint = StringFromAPI(m_deprecations["endpoint"])
@@ -513,17 +471,5 @@ func (d *TenantAccountDataSource) populateModel(ctx context.Context, data *Tenan
 	}
 	data.Created = StringFromAPI(result["created"])
 	data.Updated = StringFromAPI(result["updated"])
-	if rawItems_site_capabilities, ok := result["siteCapabilities"].([]interface{}); ok && rawItems_site_capabilities != nil {
-		items_site_capabilities := make([]TenantAccountDsSiteCapabilitiesItem, len(rawItems_site_capabilities))
-		for i_site_capabilities, raw_site_capabilities := range rawItems_site_capabilities {
-			m_site_capabilities, _ := raw_site_capabilities.(map[string]interface{})
-			if m_site_capabilities == nil { m_site_capabilities = map[string]interface{}{} }
-			// siteIds: nested field — expand manually if needed
-			items_site_capabilities[i_site_capabilities].TargetedInstanceCreation = BoolFromAPI(m_site_capabilities["targetedInstanceCreation"])
-		}
-		data.SiteCapabilities = items_site_capabilities
-	} else {
-		data.SiteCapabilities = nil
-	}
 	_ = diags
 }

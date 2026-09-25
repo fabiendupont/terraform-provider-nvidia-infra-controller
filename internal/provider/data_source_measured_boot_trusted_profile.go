@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,15 +26,14 @@ type MeasuredBootTrustedProfileDataSource struct {
 }
 
 type MeasuredBootTrustedProfileDataSourceModel struct {
-	SiteId types.String `tfsdk:"site_id"`
-	ApprovalId types.String `tfsdk:"approval_id"`
-	ProfileId types.String `tfsdk:"profile_id"`
+	SiteId       types.String `tfsdk:"site_id"`
+	ApprovalId   types.String `tfsdk:"approval_id"`
+	ProfileId    types.String `tfsdk:"profile_id"`
 	ApprovalType types.String `tfsdk:"approval_type"`
 	PcrRegisters types.String `tfsdk:"pcr_registers"`
-	Comments types.String `tfsdk:"comments"`
-	Created types.String `tfsdk:"created"`
+	Comments     types.String `tfsdk:"comments"`
+	Created      types.String `tfsdk:"created"`
 }
-
 
 func (d *MeasuredBootTrustedProfileDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_measured_boot_trusted_profile"

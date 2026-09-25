@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,13 +26,12 @@ type InfrastructureProviderDataSource struct {
 }
 
 type InfrastructureProviderDataSourceModel struct {
-	Id types.String `tfsdk:"id"`
-	Org types.String `tfsdk:"org"`
+	Id             types.String `tfsdk:"id"`
+	Org            types.String `tfsdk:"org"`
 	OrgDisplayName types.String `tfsdk:"org_display_name"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
+	Created        types.String `tfsdk:"created"`
+	Updated        types.String `tfsdk:"updated"`
 }
-
 
 func (d *InfrastructureProviderDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_infrastructure_provider"

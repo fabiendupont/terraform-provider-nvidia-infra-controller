@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,93 +26,80 @@ type VpcPeeringDataSource struct {
 }
 
 type VpcPeeringDataSourceModel struct {
-	Id types.String `tfsdk:"id"`
-	SiteId types.String `tfsdk:"site_id"`
-	IsMultiTenant types.String `tfsdk:"is_multi_tenant"`
-	Status types.String `tfsdk:"status"`
-	VpcId types.String `tfsdk:"vpc_id"`
-	PeerTenantId types.String `tfsdk:"peer_tenant_id"`
-	Vpc1Id types.String `tfsdk:"vpc1_id"`
-	Vpc1 *VpcPeeringDsVpc1 `tfsdk:"vpc1"`
-	Vpc2Id types.String `tfsdk:"vpc2_id"`
-	Vpc2 *VpcPeeringDsVpc2 `tfsdk:"vpc2"`
-	Site *VpcPeeringDsSite `tfsdk:"site"`
-	TenantId types.String `tfsdk:"tenant_id"`
-	Tenant *VpcPeeringDsTenant `tfsdk:"tenant"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
+	Id            types.String        `tfsdk:"id"`
+	SiteId        types.String        `tfsdk:"site_id"`
+	IsMultiTenant types.String        `tfsdk:"is_multi_tenant"`
+	Status        types.String        `tfsdk:"status"`
+	VpcId         types.String        `tfsdk:"vpc_id"`
+	PeerTenantId  types.String        `tfsdk:"peer_tenant_id"`
+	Vpc1Id        types.String        `tfsdk:"vpc1_id"`
+	Vpc1          *VpcPeeringDsVpc1   `tfsdk:"vpc1"`
+	Vpc2Id        types.String        `tfsdk:"vpc2_id"`
+	Vpc2          *VpcPeeringDsVpc2   `tfsdk:"vpc2"`
+	Site          *VpcPeeringDsSite   `tfsdk:"site"`
+	TenantId      types.String        `tfsdk:"tenant_id"`
+	Tenant        *VpcPeeringDsTenant `tfsdk:"tenant"`
+	Created       types.String        `tfsdk:"created"`
+	Updated       types.String        `tfsdk:"updated"`
 }
 
 type VpcPeeringDsVpc1 struct {
-	Id types.String `tfsdk:"id"`
-	Name types.String `tfsdk:"name"`
-	TenantId types.String `tfsdk:"tenant_id"`
-	Tenant *VpcPeeringDsVpc1Tenant `tfsdk:"tenant"`
-	NetworkVirtualizationType types.String `tfsdk:"network_virtualization_type"`
-	Status types.String `tfsdk:"status"`
+	Id                        types.String            `tfsdk:"id"`
+	Name                      types.String            `tfsdk:"name"`
+	TenantId                  types.String            `tfsdk:"tenant_id"`
+	Tenant                    *VpcPeeringDsVpc1Tenant `tfsdk:"tenant"`
+	NetworkVirtualizationType types.String            `tfsdk:"network_virtualization_type"`
+	Status                    types.String            `tfsdk:"status"`
 }
 
 type VpcPeeringDsVpc1Tenant struct {
-	Id types.String `tfsdk:"id"`
-	Org types.String `tfsdk:"org"`
+	Id             types.String `tfsdk:"id"`
+	Org            types.String `tfsdk:"org"`
 	OrgDisplayName types.String `tfsdk:"org_display_name"`
 }
 
 type VpcPeeringDsVpc2 struct {
-	Id types.String `tfsdk:"id"`
-	Name types.String `tfsdk:"name"`
-	TenantId types.String `tfsdk:"tenant_id"`
-	Tenant *VpcPeeringDsVpc2Tenant `tfsdk:"tenant"`
-	NetworkVirtualizationType types.String `tfsdk:"network_virtualization_type"`
-	Status types.String `tfsdk:"status"`
+	Id                        types.String            `tfsdk:"id"`
+	Name                      types.String            `tfsdk:"name"`
+	TenantId                  types.String            `tfsdk:"tenant_id"`
+	Tenant                    *VpcPeeringDsVpc2Tenant `tfsdk:"tenant"`
+	NetworkVirtualizationType types.String            `tfsdk:"network_virtualization_type"`
+	Status                    types.String            `tfsdk:"status"`
 }
 
 type VpcPeeringDsVpc2Tenant struct {
-	Id types.String `tfsdk:"id"`
-	Org types.String `tfsdk:"org"`
+	Id             types.String `tfsdk:"id"`
+	Org            types.String `tfsdk:"org"`
 	OrgDisplayName types.String `tfsdk:"org_display_name"`
 }
 
 type VpcPeeringDsSite struct {
-	Id types.String `tfsdk:"id"`
-	Name types.String `tfsdk:"name"`
-	InfrastructureProviderId types.String `tfsdk:"infrastructure_provider_id"`
-	IsSerialConsoleEnabled types.Bool `tfsdk:"is_serial_console_enabled"`
-	IsOnline types.Bool `tfsdk:"is_online"`
-	Capabilities *VpcPeeringDsSiteCapabilities `tfsdk:"capabilities"`
-	Status types.String `tfsdk:"status"`
+	Id                       types.String                  `tfsdk:"id"`
+	Name                     types.String                  `tfsdk:"name"`
+	InfrastructureProviderId types.String                  `tfsdk:"infrastructure_provider_id"`
+	IsSerialConsoleEnabled   types.Bool                    `tfsdk:"is_serial_console_enabled"`
+	IsOnline                 types.Bool                    `tfsdk:"is_online"`
+	Capabilities             *VpcPeeringDsSiteCapabilities `tfsdk:"capabilities"`
+	Status                   types.String                  `tfsdk:"status"`
 }
 
 type VpcPeeringDsSiteCapabilities struct {
-	NativeNetworking types.Bool `tfsdk:"native_networking"`
-	NetworkSecurityGroup types.Bool `tfsdk:"network_security_group"`
-	NvLinkPartition types.Bool `tfsdk:"nv_link_partition"`
-	Flow types.Bool `tfsdk:"flow"`
+	NativeNetworking          types.Bool `tfsdk:"native_networking"`
+	NetworkSecurityGroup      types.Bool `tfsdk:"network_security_group"`
+	NvLinkPartition           types.Bool `tfsdk:"nv_link_partition"`
+	Flow                      types.Bool `tfsdk:"flow"`
 	ImageBasedOperatingSystem types.Bool `tfsdk:"image_based_operating_system"`
-	VpcSlaac types.Bool `tfsdk:"vpc_slaac"`
-	DpsPowerManagement types.Bool `tfsdk:"dps_power_management"`
 }
 
 type VpcPeeringDsTenant struct {
-	Org types.String `tfsdk:"org"`
-	OrgDisplayName types.String `tfsdk:"org_display_name"`
-	Capabilities *VpcPeeringDsTenantCapabilities `tfsdk:"capabilities"`
-	Deprecations []VpcPeeringDsTenantDeprecationsItem `tfsdk:"deprecations"`
+	Org            types.String                    `tfsdk:"org"`
+	OrgDisplayName types.String                    `tfsdk:"org_display_name"`
+	Capabilities   *VpcPeeringDsTenantCapabilities `tfsdk:"capabilities"`
 }
 
 type VpcPeeringDsTenantCapabilities struct {
 	TargetedInstanceCreation types.Bool `tfsdk:"targeted_instance_creation"`
 }
-
-type VpcPeeringDsTenantDeprecationsItem struct {
-	Attribute types.String `tfsdk:"attribute"`
-	QueryParam types.String `tfsdk:"query_param"`
-	Endpoint types.String `tfsdk:"endpoint"`
-	ReplacedBy types.String `tfsdk:"replaced_by"`
-	TakeActionBy types.String `tfsdk:"take_action_by"`
-	Notice types.String `tfsdk:"notice"`
-}
-
 
 func (d *VpcPeeringDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_vpc_peering"
@@ -365,18 +352,6 @@ func (d *VpcPeeringDataSource) Schema(_ context.Context, _ datasource.SchemaRequ
 								Computed:    true,
 								Description: "Whether the Site supports image-based operating system provisioning",
 							},
-							"vpc_slaac": schema.BoolAttribute{
-								Required:    false,
-								Optional:    false,
-								Computed:    true,
-								Description: "Whether the latest successfully stored Site configuration inventory reports that Core supports VPCs with SLAAC enabled. False also represents a missing Site configuration or an inventory report that omits the capability. This value is managed by Site configuration inventory and cannot be updated through the Site API.",
-							},
-							"dps_power_management": schema.BoolAttribute{
-								Required:    false,
-								Optional:    false,
-								Computed:    true,
-								Description: "Whether this Site accepts non-empty power resource groups and power profiles for DPS power management. When false, omission and explicit clearing remain allowed.",
-							},
 						},
 					},
 					"status": schema.StringAttribute{
@@ -415,59 +390,13 @@ func (d *VpcPeeringDataSource) Schema(_ context.Context, _ datasource.SchemaRequ
 						Required:    false,
 						Optional:    false,
 						Computed:    true,
-						Description: "Deprecated compatibility object. The targetedInstanceCreation property is omitted; use Tenant Account siteCapabilities for the authoritative configuration.",
+						Description: "Features that are enabled/disabled for Tenant",
 						Attributes: map[string]schema.Attribute{
 							"targeted_instance_creation": schema.BoolAttribute{
 								Required:    false,
 								Optional:    false,
 								Computed:    true,
-								Description: "Deprecated in favor of TenantAccount.siteCapabilities. On GET `/tenant/current`, the property is present and true only when every Ready Tenant Account enables TargetedInstanceCreation and no Tenant Site explicitly disables it; otherwise it is omitted. It is also omitted from embedded TenantSummary objects.",
-							},
-						},
-					},
-					"deprecations": schema.ListNestedAttribute{
-						Required:    false,
-						Optional:    false,
-						Computed:    true,
-						Description: "Deprecation notices for Tenant fields",
-						NestedObject: schema.NestedAttributeObject{
-							Attributes: map[string]schema.Attribute{
-								"attribute": schema.StringAttribute{
-									Required:    false,
-									Optional:    false,
-									Computed:    true,
-									Description: "Name of the attribute that is deprecated. Omitted if queryParam or endpoint is being deprecated.",
-								},
-								"query_param": schema.StringAttribute{
-									Required:    false,
-									Optional:    false,
-									Computed:    true,
-									Description: "Query parameter that is deprecated. Omitted if attribute or endpoint is being deprecated.",
-								},
-								"endpoint": schema.StringAttribute{
-									Required:    false,
-									Optional:    false,
-									Computed:    true,
-									Description: "API endpoint that is deprecated. Omitted if attribute or queryParam is being deprecated.",
-								},
-								"replaced_by": schema.StringAttribute{
-									Required:    false,
-									Optional:    false,
-									Computed:    true,
-									Description: "Name of the attribute, query parameter, or endpoint that replaces the deprecated item. Omitted if no replacement is available.",
-								},
-								"take_action_by": schema.StringAttribute{
-									Required:    false,
-									Optional:    false,
-									Computed:    true,
-									Description: "Date/time by which clients should migrate away from the deprecated API surface",
-								},
-								"notice": schema.StringAttribute{
-									Required:    false,
-									Optional:    false,
-									Computed:    true,
-									Description: "Message describing the deprecation",
-								},
+								Description: "Indicates whether Tenant can create Instances by specifying Machine ID",
 							},
 						},
 					},
@@ -572,7 +501,6 @@ func (d *VpcPeeringDataSource) Read(ctx context.Context, req datasource.ReadRequ
 			obj_tenant.Org = StringFromAPI(rawObj_tenant["org"])
 			obj_tenant.OrgDisplayName = StringFromAPI(rawObj_tenant["orgDisplayName"])
 			// capabilities: nested field — expand manually if needed
-			// deprecations: nested field — expand manually if needed
 			_ = rawObj_tenant
 			data.Tenant = obj_tenant
 		} else {
@@ -593,62 +521,61 @@ func (d *VpcPeeringDataSource) Read(ctx context.Context, req datasource.ReadRequ
 			data.Id = StringFromAPI(result["id"])
 			diags := resp.Diagnostics
 			data.Vpc1Id = StringFromAPI(result["vpc1Id"])
-		if rawObj_vpc1, ok := result["vpc1"].(map[string]interface{}); ok {
-			obj_vpc1 := &VpcPeeringDsVpc1{}
-			obj_vpc1.Id = StringFromAPI(rawObj_vpc1["id"])
-			obj_vpc1.Name = StringFromAPI(rawObj_vpc1["name"])
-			obj_vpc1.TenantId = StringFromAPI(rawObj_vpc1["tenantId"])
-			// tenant: nested field — expand manually if needed
-			obj_vpc1.NetworkVirtualizationType = StringFromAPI(rawObj_vpc1["networkVirtualizationType"])
-			obj_vpc1.Status = StringFromAPI(rawObj_vpc1["status"])
-			_ = rawObj_vpc1
-			data.Vpc1 = obj_vpc1
-		} else {
-			data.Vpc1 = nil
-		}
-		data.Vpc2Id = StringFromAPI(result["vpc2Id"])
-		if rawObj_vpc2, ok := result["vpc2"].(map[string]interface{}); ok {
-			obj_vpc2 := &VpcPeeringDsVpc2{}
-			obj_vpc2.Id = StringFromAPI(rawObj_vpc2["id"])
-			obj_vpc2.Name = StringFromAPI(rawObj_vpc2["name"])
-			obj_vpc2.TenantId = StringFromAPI(rawObj_vpc2["tenantId"])
-			// tenant: nested field — expand manually if needed
-			obj_vpc2.NetworkVirtualizationType = StringFromAPI(rawObj_vpc2["networkVirtualizationType"])
-			obj_vpc2.Status = StringFromAPI(rawObj_vpc2["status"])
-			_ = rawObj_vpc2
-			data.Vpc2 = obj_vpc2
-		} else {
-			data.Vpc2 = nil
-		}
-		if rawObj_site, ok := result["site"].(map[string]interface{}); ok {
-			obj_site := &VpcPeeringDsSite{}
-			obj_site.Id = StringFromAPI(rawObj_site["id"])
-			obj_site.Name = StringFromAPI(rawObj_site["name"])
-			obj_site.InfrastructureProviderId = StringFromAPI(rawObj_site["infrastructureProviderId"])
-			obj_site.IsSerialConsoleEnabled = BoolFromAPI(rawObj_site["isSerialConsoleEnabled"])
-			obj_site.IsOnline = BoolFromAPI(rawObj_site["isOnline"])
-			// capabilities: nested field — expand manually if needed
-			obj_site.Status = StringFromAPI(rawObj_site["status"])
-			_ = rawObj_site
-			data.Site = obj_site
-		} else {
-			data.Site = nil
-		}
-		data.TenantId = StringFromAPI(result["tenantId"])
-		if rawObj_tenant, ok := result["tenant"].(map[string]interface{}); ok {
-			obj_tenant := &VpcPeeringDsTenant{}
-			obj_tenant.Org = StringFromAPI(rawObj_tenant["org"])
-			obj_tenant.OrgDisplayName = StringFromAPI(rawObj_tenant["orgDisplayName"])
-			// capabilities: nested field — expand manually if needed
-			// deprecations: nested field — expand manually if needed
-			_ = rawObj_tenant
-			data.Tenant = obj_tenant
-		} else {
-			data.Tenant = nil
-		}
-		data.Created = StringFromAPI(result["created"])
-		data.Updated = StringFromAPI(result["updated"])
-		_ = diags
+			if rawObj_vpc1, ok := result["vpc1"].(map[string]interface{}); ok {
+				obj_vpc1 := &VpcPeeringDsVpc1{}
+				obj_vpc1.Id = StringFromAPI(rawObj_vpc1["id"])
+				obj_vpc1.Name = StringFromAPI(rawObj_vpc1["name"])
+				obj_vpc1.TenantId = StringFromAPI(rawObj_vpc1["tenantId"])
+				// tenant: nested field — expand manually if needed
+				obj_vpc1.NetworkVirtualizationType = StringFromAPI(rawObj_vpc1["networkVirtualizationType"])
+				obj_vpc1.Status = StringFromAPI(rawObj_vpc1["status"])
+				_ = rawObj_vpc1
+				data.Vpc1 = obj_vpc1
+			} else {
+				data.Vpc1 = nil
+			}
+			data.Vpc2Id = StringFromAPI(result["vpc2Id"])
+			if rawObj_vpc2, ok := result["vpc2"].(map[string]interface{}); ok {
+				obj_vpc2 := &VpcPeeringDsVpc2{}
+				obj_vpc2.Id = StringFromAPI(rawObj_vpc2["id"])
+				obj_vpc2.Name = StringFromAPI(rawObj_vpc2["name"])
+				obj_vpc2.TenantId = StringFromAPI(rawObj_vpc2["tenantId"])
+				// tenant: nested field — expand manually if needed
+				obj_vpc2.NetworkVirtualizationType = StringFromAPI(rawObj_vpc2["networkVirtualizationType"])
+				obj_vpc2.Status = StringFromAPI(rawObj_vpc2["status"])
+				_ = rawObj_vpc2
+				data.Vpc2 = obj_vpc2
+			} else {
+				data.Vpc2 = nil
+			}
+			if rawObj_site, ok := result["site"].(map[string]interface{}); ok {
+				obj_site := &VpcPeeringDsSite{}
+				obj_site.Id = StringFromAPI(rawObj_site["id"])
+				obj_site.Name = StringFromAPI(rawObj_site["name"])
+				obj_site.InfrastructureProviderId = StringFromAPI(rawObj_site["infrastructureProviderId"])
+				obj_site.IsSerialConsoleEnabled = BoolFromAPI(rawObj_site["isSerialConsoleEnabled"])
+				obj_site.IsOnline = BoolFromAPI(rawObj_site["isOnline"])
+				// capabilities: nested field — expand manually if needed
+				obj_site.Status = StringFromAPI(rawObj_site["status"])
+				_ = rawObj_site
+				data.Site = obj_site
+			} else {
+				data.Site = nil
+			}
+			data.TenantId = StringFromAPI(result["tenantId"])
+			if rawObj_tenant, ok := result["tenant"].(map[string]interface{}); ok {
+				obj_tenant := &VpcPeeringDsTenant{}
+				obj_tenant.Org = StringFromAPI(rawObj_tenant["org"])
+				obj_tenant.OrgDisplayName = StringFromAPI(rawObj_tenant["orgDisplayName"])
+				// capabilities: nested field — expand manually if needed
+				_ = rawObj_tenant
+				data.Tenant = obj_tenant
+			} else {
+				data.Tenant = nil
+			}
+			data.Created = StringFromAPI(result["created"])
+			data.Updated = StringFromAPI(result["updated"])
+			_ = diags
 		}
 	}
 
@@ -704,7 +631,6 @@ func (d *VpcPeeringDataSource) populateModel(ctx context.Context, data *VpcPeeri
 		obj_tenant.Org = StringFromAPI(rawObj_tenant["org"])
 		obj_tenant.OrgDisplayName = StringFromAPI(rawObj_tenant["orgDisplayName"])
 		// capabilities: nested field — expand manually if needed
-		// deprecations: nested field — expand manually if needed
 		_ = rawObj_tenant
 		data.Tenant = obj_tenant
 	} else {

@@ -26,31 +26,30 @@ type NvlinkLogicalPartitionResource struct {
 }
 
 type NvlinkLogicalPartitionResourceModel struct {
-	Id types.String `tfsdk:"id"`
-	Name types.String `tfsdk:"name"`
-	Description types.String `tfsdk:"description"`
-	SiteId types.String `tfsdk:"site_id"`
-	TenantId types.String `tfsdk:"tenant_id"`
-	Status types.String `tfsdk:"status"`
-	StatusHistory []NvlinkLogicalPartitionStatusHistoryItem `tfsdk:"status_history"`
+	Id                          types.String                                       `tfsdk:"id"`
+	Name                        types.String                                       `tfsdk:"name"`
+	Description                 types.String                                       `tfsdk:"description"`
+	SiteId                      types.String                                       `tfsdk:"site_id"`
+	TenantId                    types.String                                       `tfsdk:"tenant_id"`
+	Status                      types.String                                       `tfsdk:"status"`
+	StatusHistory               []NvlinkLogicalPartitionStatusHistoryItem          `tfsdk:"status_history"`
 	NvLinkLogicalPartitionStats *NvlinkLogicalPartitionNvLinkLogicalPartitionStats `tfsdk:"nv_link_logical_partition_stats"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
-	NvLinkLogicalPartitionId types.String `tfsdk:"nv_link_logical_partition_id"`
+	Created                     types.String                                       `tfsdk:"created"`
+	Updated                     types.String                                       `tfsdk:"updated"`
+	NvLinkLogicalPartitionId    types.String                                       `tfsdk:"nv_link_logical_partition_id"`
 }
 
 type NvlinkLogicalPartitionStatusHistoryItem struct {
-	Status types.String `tfsdk:"status"`
+	Status  types.String `tfsdk:"status"`
 	Message types.String `tfsdk:"message"`
 	Created types.String `tfsdk:"created"`
 	Updated types.String `tfsdk:"updated"`
 }
 
 type NvlinkLogicalPartitionNvLinkLogicalPartitionStats struct {
-	TotalGpus types.Int64 `tfsdk:"total_gpus"`
+	TotalGpus              types.Int64 `tfsdk:"total_gpus"`
 	TotalDistinctInstances types.Int64 `tfsdk:"total_distinct_instances"`
 }
-
 
 func (r *NvlinkLogicalPartitionResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_nvlink_logical_partition"
@@ -219,7 +218,9 @@ func (r *NvlinkLogicalPartitionResource) Create(ctx context.Context, req resourc
 		items_status_history := make([]NvlinkLogicalPartitionStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -274,7 +275,9 @@ func (r *NvlinkLogicalPartitionResource) Read(ctx context.Context, req resource.
 		items_status_history := make([]NvlinkLogicalPartitionStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -333,7 +336,9 @@ func (r *NvlinkLogicalPartitionResource) Update(ctx context.Context, req resourc
 		items_status_history := make([]NvlinkLogicalPartitionStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -383,7 +388,9 @@ func (r *NvlinkLogicalPartitionResource) populateModel(ctx context.Context, data
 		items_status_history := make([]NvlinkLogicalPartitionStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])

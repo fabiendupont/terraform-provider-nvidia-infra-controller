@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,21 +26,17 @@ type TaskDataSource struct {
 }
 
 type TaskDataSourceModel struct {
-	Id types.String `tfsdk:"id"`
-	SiteId types.String `tfsdk:"site_id"`
-	ActiveOnly types.String `tfsdk:"active_only"`
-	IncludeReport types.String `tfsdk:"include_report"`
-	Status types.String `tfsdk:"status"`
+	Id          types.String `tfsdk:"id"`
+	Status      types.String `tfsdk:"status"`
 	Description types.String `tfsdk:"description"`
-	Message types.String `tfsdk:"message"`
-	RuleId types.String `tfsdk:"rule_id"`
-	Started types.String `tfsdk:"started"`
-	Finished types.String `tfsdk:"finished"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
-	Report types.String `tfsdk:"report"`
+	Message     types.String `tfsdk:"message"`
+	RuleId      types.String `tfsdk:"rule_id"`
+	Started     types.String `tfsdk:"started"`
+	Finished    types.String `tfsdk:"finished"`
+	Created     types.String `tfsdk:"created"`
+	Updated     types.String `tfsdk:"updated"`
+	Report      types.String `tfsdk:"report"`
 }
-
 
 func (d *TaskDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_task"
@@ -51,24 +47,6 @@ func (d *TaskDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 		Description: "Task represents an asynchronous, site-scoped operation (for example firmware update, power state change, or rack bring-up). Tasks are created when operations run against Racks, Trays, or other components. Endpoints in this tag retrieve or cancel a Task by ID; list Tasks for a Rack or Tray under the Rack and Tray tags.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{Optional: true, Computed: true, Description: "ID of the resource to retrieve. When set, returns a single resource."},
-			"site_id": schema.StringAttribute{
-				Required:    false,
-				Optional:    true,
-				Computed:    true,
-				Description: "ID of the Site whose Tasks are returned.",
-			},
-			"active_only": schema.StringAttribute{
-				Required:    false,
-				Optional:    true,
-				Computed:    true,
-				Description: "Restrict results to non-terminal Tasks.",
-			},
-			"include_report": schema.StringAttribute{
-				Required:    false,
-				Optional:    true,
-				Computed:    true,
-				Description: "Include the per-task execution report on each returned Task.",
-			},
 			"status": schema.StringAttribute{
 				Required:    false,
 				Optional:    false,
@@ -172,7 +150,7 @@ func (d *TaskDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 		data.Updated = StringFromAPI(result["updated"])
 		data.Report = StringFromAPI(result["report"])
 		_ = diags
-	} else if true {
+	} else if false {
 		url := d.client.ResolvePath("/v2/org/{org}/nico/task/{id}/cancel", map[string]string{"id": data.Id.ValueString()})
 		items, err := d.client.List(ctx, url, map[string]string{})
 		if err != nil {
@@ -184,15 +162,15 @@ func (d *TaskDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 			data.Id = StringFromAPI(result["id"])
 			diags := resp.Diagnostics
 			data.Status = StringFromAPI(result["status"])
-		data.Description = StringFromAPI(result["description"])
-		data.Message = StringFromAPI(result["message"])
-		data.RuleId = StringFromAPI(result["ruleId"])
-		data.Started = StringFromAPI(result["started"])
-		data.Finished = StringFromAPI(result["finished"])
-		data.Created = StringFromAPI(result["created"])
-		data.Updated = StringFromAPI(result["updated"])
-		data.Report = StringFromAPI(result["report"])
-		_ = diags
+			data.Description = StringFromAPI(result["description"])
+			data.Message = StringFromAPI(result["message"])
+			data.RuleId = StringFromAPI(result["ruleId"])
+			data.Started = StringFromAPI(result["started"])
+			data.Finished = StringFromAPI(result["finished"])
+			data.Created = StringFromAPI(result["created"])
+			data.Updated = StringFromAPI(result["updated"])
+			data.Report = StringFromAPI(result["report"])
+			_ = diags
 		}
 	}
 

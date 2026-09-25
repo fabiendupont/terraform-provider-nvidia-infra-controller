@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,11 +26,10 @@ type ServiceAccountDataSource struct {
 }
 
 type ServiceAccountDataSourceModel struct {
-	Enabled types.Bool `tfsdk:"enabled"`
+	Enabled                  types.Bool   `tfsdk:"enabled"`
 	InfrastructureProviderId types.String `tfsdk:"infrastructure_provider_id"`
-	TenantId types.String `tfsdk:"tenant_id"`
+	TenantId                 types.String `tfsdk:"tenant_id"`
 }
-
 
 func (d *ServiceAccountDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_service_account"
@@ -38,13 +37,13 @@ func (d *ServiceAccountDataSource) Metadata(_ context.Context, req datasource.Me
 
 func (d *ServiceAccountDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "When the API service is configured in Service Account mode, API users can act as both Provider and Tenant. Privileged Tenant behavior (for example, creating Instances by Machine ID) is determined by `siteCapabilities` on a Ready Tenant Account, not by tenant-level configuration.",
+		Description: "When the API service is configured in Service Account mode, API users can act as both Provider and Tenant. For service accounts, the Tenant entity is initialized as a privileged Tenant with `targetedInstanceCreation` capability enabled.",
 		Attributes: map[string]schema.Attribute{
 			"enabled": schema.BoolAttribute{
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
-				Description: "Indicates whether the calling token is authenticated as a Service Account. This is determined per request from how the token's issuer is configured at deployment time (the issuer config in the `nico-rest-api-config` ConfigMap); it cannot be toggled via the API. Rules by issuer origin:   - `keycloak`: true for a client-credentials (service-to-service) token —     i.e. the token carries a client ID — when the issuer is deployed with     `keycloak.serviceAccount: true`.   - `custom`: true when the `claimMapping` matched for this org sets     `isServiceAccount: true`. Only permitted when the API runs in     disconnected mode.   - `kas-ssa` / `kas-legacy`: always false; service accounts are not     supported for these origins.  For details on issuer origins and configuration, see the NICo REST `auth` module [README](https://github.com/NVIDIA/infra-controller/tree/main/rest-api/auth).",
+				Description: "Indicates whether the calling token is authenticated as a Service Account. This is determined per request from how the token's issuer is configured at deployment time (the issuer config in the `nico-rest-api-config` ConfigMap); it cannot be toggled via the API. Rules by issuer origin:   - `keycloak`: true for a client-credentials (service-to-service) token —     i.e. the token carries a client ID — when the issuer is deployed with     `keycloak.serviceAccount: true`.   - `custom`: true when the `claimMapping` matched for this org sets     `isServiceAccount: true`. Only permitted when the API runs in     disconnected mode.   - `kas-ssa` / `kas-legacy`: always false; service accounts are not     supported for these origins.  For details on issuer origins and configuration, see the NICo REST `auth` module [README](https://github.com/NVIDIA/infra-controller/rest-api/tree/main/auth).",
 			},
 			"infrastructure_provider_id": schema.StringAttribute{
 				Required:    false,

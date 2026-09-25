@@ -26,83 +26,82 @@ type InstanceTypeResource struct {
 }
 
 type InstanceTypeResourceModel struct {
-	Id types.String `tfsdk:"id"`
-	MachineIds types.List `tfsdk:"machine_ids"`
-	Name types.String `tfsdk:"name"`
-	Description types.String `tfsdk:"description"`
-	Labels types.Map `tfsdk:"labels"`
-	MachineCapabilities []InstanceTypeMachineCapabilitiesItem `tfsdk:"machine_capabilities"`
-	ControllerMachineType types.String `tfsdk:"controller_machine_type"`
-	InfrastructureProviderId types.String `tfsdk:"infrastructure_provider_id"`
-	SiteId types.String `tfsdk:"site_id"`
-	MachineInstanceTypes []InstanceTypeMachineInstanceTypesItem `tfsdk:"machine_instance_types"`
-	AllocationStats *InstanceTypeAllocationStats `tfsdk:"allocation_stats"`
-	Status types.String `tfsdk:"status"`
-	StatusHistory []InstanceTypeStatusHistoryItem `tfsdk:"status_history"`
-	Deprecations []InstanceTypeDeprecationsItem `tfsdk:"deprecations"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
-	InstanceTypeId types.String `tfsdk:"instance_type_id"`
-	MachineAssociationId types.String `tfsdk:"machine_association_id"`
+	Id                       types.String                           `tfsdk:"id"`
+	MachineIds               types.List                             `tfsdk:"machine_ids"`
+	Name                     types.String                           `tfsdk:"name"`
+	Description              types.String                           `tfsdk:"description"`
+	Labels                   types.Map                              `tfsdk:"labels"`
+	MachineCapabilities      []InstanceTypeMachineCapabilitiesItem  `tfsdk:"machine_capabilities"`
+	ControllerMachineType    types.String                           `tfsdk:"controller_machine_type"`
+	InfrastructureProviderId types.String                           `tfsdk:"infrastructure_provider_id"`
+	SiteId                   types.String                           `tfsdk:"site_id"`
+	MachineInstanceTypes     []InstanceTypeMachineInstanceTypesItem `tfsdk:"machine_instance_types"`
+	AllocationStats          *InstanceTypeAllocationStats           `tfsdk:"allocation_stats"`
+	Status                   types.String                           `tfsdk:"status"`
+	StatusHistory            []InstanceTypeStatusHistoryItem        `tfsdk:"status_history"`
+	Deprecations             []InstanceTypeDeprecationsItem         `tfsdk:"deprecations"`
+	Created                  types.String                           `tfsdk:"created"`
+	Updated                  types.String                           `tfsdk:"updated"`
+	InstanceTypeId           types.String                           `tfsdk:"instance_type_id"`
+	MachineAssociationId     types.String                           `tfsdk:"machine_association_id"`
 }
 
 type InstanceTypeMachineCapabilitiesItem struct {
-	Type types.String `tfsdk:"type"`
-	Name types.String `tfsdk:"name"`
-	Frequency types.String `tfsdk:"frequency"`
-	Cores types.Int64 `tfsdk:"cores"`
-	Threads types.Int64 `tfsdk:"threads"`
-	Capacity types.String `tfsdk:"capacity"`
-	Vendor types.String `tfsdk:"vendor"`
+	Type             types.String `tfsdk:"type"`
+	Name             types.String `tfsdk:"name"`
+	Frequency        types.String `tfsdk:"frequency"`
+	Cores            types.Int64  `tfsdk:"cores"`
+	Threads          types.Int64  `tfsdk:"threads"`
+	Capacity         types.String `tfsdk:"capacity"`
+	Vendor           types.String `tfsdk:"vendor"`
 	HardwareRevision types.String `tfsdk:"hardware_revision"`
-	InactiveDevices types.List `tfsdk:"inactive_devices"`
-	CountValue types.Int64 `tfsdk:"count_value"`
-	DeviceType types.String `tfsdk:"device_type"`
+	InactiveDevices  types.List   `tfsdk:"inactive_devices"`
+	CountValue       types.Int64  `tfsdk:"count_value"`
+	DeviceType       types.String `tfsdk:"device_type"`
 }
 
 type InstanceTypeMachineInstanceTypesItem struct {
-	Id types.String `tfsdk:"id"`
-	MachineId types.String `tfsdk:"machine_id"`
-	InstanceTypeId types.String `tfsdk:"instance_type_id"`
-	Deprecations []InstanceTypeMachineInstanceTypesItemDeprecationsItem `tfsdk:"deprecations"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
+	Id             types.String                                           `tfsdk:"id"`
+	MachineId      types.String                                           `tfsdk:"machine_id"`
+	InstanceTypeId types.String                                           `tfsdk:"instance_type_id"`
+	Deprecations   []InstanceTypeMachineInstanceTypesItemDeprecationsItem `tfsdk:"deprecations"`
+	Created        types.String                                           `tfsdk:"created"`
+	Updated        types.String                                           `tfsdk:"updated"`
 }
 
 type InstanceTypeMachineInstanceTypesItemDeprecationsItem struct {
-	Attribute types.String `tfsdk:"attribute"`
-	QueryParam types.String `tfsdk:"query_param"`
-	Endpoint types.String `tfsdk:"endpoint"`
-	ReplacedBy types.String `tfsdk:"replaced_by"`
+	Attribute    types.String `tfsdk:"attribute"`
+	QueryParam   types.String `tfsdk:"query_param"`
+	Endpoint     types.String `tfsdk:"endpoint"`
+	ReplacedBy   types.String `tfsdk:"replaced_by"`
 	TakeActionBy types.String `tfsdk:"take_action_by"`
-	Notice types.String `tfsdk:"notice"`
+	Notice       types.String `tfsdk:"notice"`
 }
 
 type InstanceTypeAllocationStats struct {
-	Assigned types.Int64 `tfsdk:"assigned"`
-	Total types.Int64 `tfsdk:"total"`
-	Used types.Int64 `tfsdk:"used"`
-	Unused types.Int64 `tfsdk:"unused"`
-	UnusedUsable types.Int64 `tfsdk:"unused_usable"`
+	Assigned       types.Int64 `tfsdk:"assigned"`
+	Total          types.Int64 `tfsdk:"total"`
+	Used           types.Int64 `tfsdk:"used"`
+	Unused         types.Int64 `tfsdk:"unused"`
+	UnusedUsable   types.Int64 `tfsdk:"unused_usable"`
 	MaxAllocatable types.Int64 `tfsdk:"max_allocatable"`
 }
 
 type InstanceTypeStatusHistoryItem struct {
-	Status types.String `tfsdk:"status"`
+	Status  types.String `tfsdk:"status"`
 	Message types.String `tfsdk:"message"`
 	Created types.String `tfsdk:"created"`
 	Updated types.String `tfsdk:"updated"`
 }
 
 type InstanceTypeDeprecationsItem struct {
-	Attribute types.String `tfsdk:"attribute"`
-	QueryParam types.String `tfsdk:"query_param"`
-	Endpoint types.String `tfsdk:"endpoint"`
-	ReplacedBy types.String `tfsdk:"replaced_by"`
+	Attribute    types.String `tfsdk:"attribute"`
+	QueryParam   types.String `tfsdk:"query_param"`
+	Endpoint     types.String `tfsdk:"endpoint"`
+	ReplacedBy   types.String `tfsdk:"replaced_by"`
 	TakeActionBy types.String `tfsdk:"take_action_by"`
-	Notice types.String `tfsdk:"notice"`
+	Notice       types.String `tfsdk:"notice"`
 }
-
 
 func (r *InstanceTypeResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_instance_type"
@@ -537,7 +536,9 @@ func (r *InstanceTypeResource) Create(ctx context.Context, req resource.CreateRe
 		items_machine_capabilities := make([]InstanceTypeMachineCapabilitiesItem, len(rawItems_machine_capabilities))
 		for i_machine_capabilities, raw_machine_capabilities := range rawItems_machine_capabilities {
 			m_machine_capabilities, _ := raw_machine_capabilities.(map[string]interface{})
-			if m_machine_capabilities == nil { m_machine_capabilities = map[string]interface{}{} }
+			if m_machine_capabilities == nil {
+				m_machine_capabilities = map[string]interface{}{}
+			}
 			items_machine_capabilities[i_machine_capabilities].Type = StringFromAPI(m_machine_capabilities["type"])
 			items_machine_capabilities[i_machine_capabilities].Name = StringFromAPI(m_machine_capabilities["name"])
 			items_machine_capabilities[i_machine_capabilities].Frequency = StringFromAPI(m_machine_capabilities["frequency"])
@@ -561,7 +562,9 @@ func (r *InstanceTypeResource) Create(ctx context.Context, req resource.CreateRe
 		items_machine_instance_types := make([]InstanceTypeMachineInstanceTypesItem, len(rawItems_machine_instance_types))
 		for i_machine_instance_types, raw_machine_instance_types := range rawItems_machine_instance_types {
 			m_machine_instance_types, _ := raw_machine_instance_types.(map[string]interface{})
-			if m_machine_instance_types == nil { m_machine_instance_types = map[string]interface{}{} }
+			if m_machine_instance_types == nil {
+				m_machine_instance_types = map[string]interface{}{}
+			}
 			items_machine_instance_types[i_machine_instance_types].Id = StringFromAPI(m_machine_instance_types["id"])
 			items_machine_instance_types[i_machine_instance_types].MachineId = StringFromAPI(m_machine_instance_types["machineId"])
 			items_machine_instance_types[i_machine_instance_types].InstanceTypeId = StringFromAPI(m_machine_instance_types["instanceTypeId"])
@@ -591,7 +594,9 @@ func (r *InstanceTypeResource) Create(ctx context.Context, req resource.CreateRe
 		items_status_history := make([]InstanceTypeStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -605,7 +610,9 @@ func (r *InstanceTypeResource) Create(ctx context.Context, req resource.CreateRe
 		items_deprecations := make([]InstanceTypeDeprecationsItem, len(rawItems_deprecations))
 		for i_deprecations, raw_deprecations := range rawItems_deprecations {
 			m_deprecations, _ := raw_deprecations.(map[string]interface{})
-			if m_deprecations == nil { m_deprecations = map[string]interface{}{} }
+			if m_deprecations == nil {
+				m_deprecations = map[string]interface{}{}
+			}
 			items_deprecations[i_deprecations].Attribute = StringFromAPI(m_deprecations["attribute"])
 			items_deprecations[i_deprecations].QueryParam = StringFromAPI(m_deprecations["queryParam"])
 			items_deprecations[i_deprecations].Endpoint = StringFromAPI(m_deprecations["endpoint"])
@@ -665,7 +672,9 @@ func (r *InstanceTypeResource) Read(ctx context.Context, req resource.ReadReques
 		items_machine_capabilities := make([]InstanceTypeMachineCapabilitiesItem, len(rawItems_machine_capabilities))
 		for i_machine_capabilities, raw_machine_capabilities := range rawItems_machine_capabilities {
 			m_machine_capabilities, _ := raw_machine_capabilities.(map[string]interface{})
-			if m_machine_capabilities == nil { m_machine_capabilities = map[string]interface{}{} }
+			if m_machine_capabilities == nil {
+				m_machine_capabilities = map[string]interface{}{}
+			}
 			items_machine_capabilities[i_machine_capabilities].Type = StringFromAPI(m_machine_capabilities["type"])
 			items_machine_capabilities[i_machine_capabilities].Name = StringFromAPI(m_machine_capabilities["name"])
 			items_machine_capabilities[i_machine_capabilities].Frequency = StringFromAPI(m_machine_capabilities["frequency"])
@@ -689,7 +698,9 @@ func (r *InstanceTypeResource) Read(ctx context.Context, req resource.ReadReques
 		items_machine_instance_types := make([]InstanceTypeMachineInstanceTypesItem, len(rawItems_machine_instance_types))
 		for i_machine_instance_types, raw_machine_instance_types := range rawItems_machine_instance_types {
 			m_machine_instance_types, _ := raw_machine_instance_types.(map[string]interface{})
-			if m_machine_instance_types == nil { m_machine_instance_types = map[string]interface{}{} }
+			if m_machine_instance_types == nil {
+				m_machine_instance_types = map[string]interface{}{}
+			}
 			items_machine_instance_types[i_machine_instance_types].Id = StringFromAPI(m_machine_instance_types["id"])
 			items_machine_instance_types[i_machine_instance_types].MachineId = StringFromAPI(m_machine_instance_types["machineId"])
 			items_machine_instance_types[i_machine_instance_types].InstanceTypeId = StringFromAPI(m_machine_instance_types["instanceTypeId"])
@@ -719,7 +730,9 @@ func (r *InstanceTypeResource) Read(ctx context.Context, req resource.ReadReques
 		items_status_history := make([]InstanceTypeStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -733,7 +746,9 @@ func (r *InstanceTypeResource) Read(ctx context.Context, req resource.ReadReques
 		items_deprecations := make([]InstanceTypeDeprecationsItem, len(rawItems_deprecations))
 		for i_deprecations, raw_deprecations := range rawItems_deprecations {
 			m_deprecations, _ := raw_deprecations.(map[string]interface{})
-			if m_deprecations == nil { m_deprecations = map[string]interface{}{} }
+			if m_deprecations == nil {
+				m_deprecations = map[string]interface{}{}
+			}
 			items_deprecations[i_deprecations].Attribute = StringFromAPI(m_deprecations["attribute"])
 			items_deprecations[i_deprecations].QueryParam = StringFromAPI(m_deprecations["queryParam"])
 			items_deprecations[i_deprecations].Endpoint = StringFromAPI(m_deprecations["endpoint"])
@@ -776,17 +791,37 @@ func (r *InstanceTypeResource) Update(ctx context.Context, req resource.UpdateRe
 		items_machine_capabilities := make([]map[string]interface{}, len(data.MachineCapabilities))
 		for i_machine_capabilities, item_machine_capabilities := range data.MachineCapabilities {
 			m_machine_capabilities := map[string]interface{}{}
-			if !item_machine_capabilities.Type.IsNull() { m_machine_capabilities["type"] = item_machine_capabilities.Type.ValueString() }
-			if !item_machine_capabilities.Name.IsNull() { m_machine_capabilities["name"] = item_machine_capabilities.Name.ValueString() }
-			if !item_machine_capabilities.Frequency.IsNull() { m_machine_capabilities["frequency"] = item_machine_capabilities.Frequency.ValueString() }
-			if !item_machine_capabilities.Cores.IsNull() { m_machine_capabilities["cores"] = item_machine_capabilities.Cores.ValueInt64() }
-			if !item_machine_capabilities.Threads.IsNull() { m_machine_capabilities["threads"] = item_machine_capabilities.Threads.ValueInt64() }
-			if !item_machine_capabilities.Capacity.IsNull() { m_machine_capabilities["capacity"] = item_machine_capabilities.Capacity.ValueString() }
-			if !item_machine_capabilities.Vendor.IsNull() { m_machine_capabilities["vendor"] = item_machine_capabilities.Vendor.ValueString() }
-			if !item_machine_capabilities.HardwareRevision.IsNull() { m_machine_capabilities["hardwareRevision"] = item_machine_capabilities.HardwareRevision.ValueString() }
+			if !item_machine_capabilities.Type.IsNull() {
+				m_machine_capabilities["type"] = item_machine_capabilities.Type.ValueString()
+			}
+			if !item_machine_capabilities.Name.IsNull() {
+				m_machine_capabilities["name"] = item_machine_capabilities.Name.ValueString()
+			}
+			if !item_machine_capabilities.Frequency.IsNull() {
+				m_machine_capabilities["frequency"] = item_machine_capabilities.Frequency.ValueString()
+			}
+			if !item_machine_capabilities.Cores.IsNull() {
+				m_machine_capabilities["cores"] = item_machine_capabilities.Cores.ValueInt64()
+			}
+			if !item_machine_capabilities.Threads.IsNull() {
+				m_machine_capabilities["threads"] = item_machine_capabilities.Threads.ValueInt64()
+			}
+			if !item_machine_capabilities.Capacity.IsNull() {
+				m_machine_capabilities["capacity"] = item_machine_capabilities.Capacity.ValueString()
+			}
+			if !item_machine_capabilities.Vendor.IsNull() {
+				m_machine_capabilities["vendor"] = item_machine_capabilities.Vendor.ValueString()
+			}
+			if !item_machine_capabilities.HardwareRevision.IsNull() {
+				m_machine_capabilities["hardwareRevision"] = item_machine_capabilities.HardwareRevision.ValueString()
+			}
 			// inactiveDevices: complex nested field — expand manually if needed
-			if !item_machine_capabilities.CountValue.IsNull() { m_machine_capabilities["count"] = item_machine_capabilities.CountValue.ValueInt64() }
-			if !item_machine_capabilities.DeviceType.IsNull() { m_machine_capabilities["deviceType"] = item_machine_capabilities.DeviceType.ValueString() }
+			if !item_machine_capabilities.CountValue.IsNull() {
+				m_machine_capabilities["count"] = item_machine_capabilities.CountValue.ValueInt64()
+			}
+			if !item_machine_capabilities.DeviceType.IsNull() {
+				m_machine_capabilities["deviceType"] = item_machine_capabilities.DeviceType.ValueString()
+			}
 			items_machine_capabilities[i_machine_capabilities] = m_machine_capabilities
 		}
 		body["machineCapabilities"] = items_machine_capabilities
@@ -821,7 +856,9 @@ func (r *InstanceTypeResource) Update(ctx context.Context, req resource.UpdateRe
 		items_machine_capabilities := make([]InstanceTypeMachineCapabilitiesItem, len(rawItems_machine_capabilities))
 		for i_machine_capabilities, raw_machine_capabilities := range rawItems_machine_capabilities {
 			m_machine_capabilities, _ := raw_machine_capabilities.(map[string]interface{})
-			if m_machine_capabilities == nil { m_machine_capabilities = map[string]interface{}{} }
+			if m_machine_capabilities == nil {
+				m_machine_capabilities = map[string]interface{}{}
+			}
 			items_machine_capabilities[i_machine_capabilities].Type = StringFromAPI(m_machine_capabilities["type"])
 			items_machine_capabilities[i_machine_capabilities].Name = StringFromAPI(m_machine_capabilities["name"])
 			items_machine_capabilities[i_machine_capabilities].Frequency = StringFromAPI(m_machine_capabilities["frequency"])
@@ -845,7 +882,9 @@ func (r *InstanceTypeResource) Update(ctx context.Context, req resource.UpdateRe
 		items_machine_instance_types := make([]InstanceTypeMachineInstanceTypesItem, len(rawItems_machine_instance_types))
 		for i_machine_instance_types, raw_machine_instance_types := range rawItems_machine_instance_types {
 			m_machine_instance_types, _ := raw_machine_instance_types.(map[string]interface{})
-			if m_machine_instance_types == nil { m_machine_instance_types = map[string]interface{}{} }
+			if m_machine_instance_types == nil {
+				m_machine_instance_types = map[string]interface{}{}
+			}
 			items_machine_instance_types[i_machine_instance_types].Id = StringFromAPI(m_machine_instance_types["id"])
 			items_machine_instance_types[i_machine_instance_types].MachineId = StringFromAPI(m_machine_instance_types["machineId"])
 			items_machine_instance_types[i_machine_instance_types].InstanceTypeId = StringFromAPI(m_machine_instance_types["instanceTypeId"])
@@ -875,7 +914,9 @@ func (r *InstanceTypeResource) Update(ctx context.Context, req resource.UpdateRe
 		items_status_history := make([]InstanceTypeStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -889,7 +930,9 @@ func (r *InstanceTypeResource) Update(ctx context.Context, req resource.UpdateRe
 		items_deprecations := make([]InstanceTypeDeprecationsItem, len(rawItems_deprecations))
 		for i_deprecations, raw_deprecations := range rawItems_deprecations {
 			m_deprecations, _ := raw_deprecations.(map[string]interface{})
-			if m_deprecations == nil { m_deprecations = map[string]interface{}{} }
+			if m_deprecations == nil {
+				m_deprecations = map[string]interface{}{}
+			}
 			items_deprecations[i_deprecations].Attribute = StringFromAPI(m_deprecations["attribute"])
 			items_deprecations[i_deprecations].QueryParam = StringFromAPI(m_deprecations["queryParam"])
 			items_deprecations[i_deprecations].Endpoint = StringFromAPI(m_deprecations["endpoint"])
@@ -944,7 +987,9 @@ func (r *InstanceTypeResource) populateModel(ctx context.Context, data *Instance
 		items_machine_capabilities := make([]InstanceTypeMachineCapabilitiesItem, len(rawItems_machine_capabilities))
 		for i_machine_capabilities, raw_machine_capabilities := range rawItems_machine_capabilities {
 			m_machine_capabilities, _ := raw_machine_capabilities.(map[string]interface{})
-			if m_machine_capabilities == nil { m_machine_capabilities = map[string]interface{}{} }
+			if m_machine_capabilities == nil {
+				m_machine_capabilities = map[string]interface{}{}
+			}
 			items_machine_capabilities[i_machine_capabilities].Type = StringFromAPI(m_machine_capabilities["type"])
 			items_machine_capabilities[i_machine_capabilities].Name = StringFromAPI(m_machine_capabilities["name"])
 			items_machine_capabilities[i_machine_capabilities].Frequency = StringFromAPI(m_machine_capabilities["frequency"])
@@ -968,7 +1013,9 @@ func (r *InstanceTypeResource) populateModel(ctx context.Context, data *Instance
 		items_machine_instance_types := make([]InstanceTypeMachineInstanceTypesItem, len(rawItems_machine_instance_types))
 		for i_machine_instance_types, raw_machine_instance_types := range rawItems_machine_instance_types {
 			m_machine_instance_types, _ := raw_machine_instance_types.(map[string]interface{})
-			if m_machine_instance_types == nil { m_machine_instance_types = map[string]interface{}{} }
+			if m_machine_instance_types == nil {
+				m_machine_instance_types = map[string]interface{}{}
+			}
 			items_machine_instance_types[i_machine_instance_types].Id = StringFromAPI(m_machine_instance_types["id"])
 			items_machine_instance_types[i_machine_instance_types].MachineId = StringFromAPI(m_machine_instance_types["machineId"])
 			items_machine_instance_types[i_machine_instance_types].InstanceTypeId = StringFromAPI(m_machine_instance_types["instanceTypeId"])
@@ -998,7 +1045,9 @@ func (r *InstanceTypeResource) populateModel(ctx context.Context, data *Instance
 		items_status_history := make([]InstanceTypeStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -1012,7 +1061,9 @@ func (r *InstanceTypeResource) populateModel(ctx context.Context, data *Instance
 		items_deprecations := make([]InstanceTypeDeprecationsItem, len(rawItems_deprecations))
 		for i_deprecations, raw_deprecations := range rawItems_deprecations {
 			m_deprecations, _ := raw_deprecations.(map[string]interface{})
-			if m_deprecations == nil { m_deprecations = map[string]interface{}{} }
+			if m_deprecations == nil {
+				m_deprecations = map[string]interface{}{}
+			}
 			items_deprecations[i_deprecations].Attribute = StringFromAPI(m_deprecations["attribute"])
 			items_deprecations[i_deprecations].QueryParam = StringFromAPI(m_deprecations["queryParam"])
 			items_deprecations[i_deprecations].Endpoint = StringFromAPI(m_deprecations["endpoint"])

@@ -27,9 +27,9 @@ resource "nico_vpc_prefix" "example" {
 
 ### Required
 
-- `ip_block_id` (String) ID of the Ready tenant IPv4 or IPv6 IP Block to allocate the VPC Prefix from. The block must be at the FNN VPC's Site.
+- `ip_block_id` (String) ID of the IP Block to allocate the VPC Prefix from
 - `name` (String) Human readable name for the VPC Prefix
-- `prefix_length` (Number) Prefix length for the VPC Prefix. IPv4 accepts 8 through 31. IPv6 accepts 8 through 63 when the FNN VPC has `slaacEnabled=true`, or 8 through 126 otherwise. The selected IP Block must contain a prefix of the requested length.
+- `prefix_length` (Number) Prefix length for the VPC Prefix. Valid range is 8 to 31, and max usable value depends on prefix length of parent IP Block.
 
 ### Optional
 
@@ -45,7 +45,7 @@ resource "nico_vpc_prefix" "example" {
 - `status` (String) Status of the VPC Prefix
 - `status_history` (Attributes List) Details of 20 most recent status changes (see [below for nested schema](#nestedatt--status_history))
 - `updated` (String) Date and time when the VPC Prefix was updated
-- `usage_stats` (Attributes) Present when query parameter `includeUsageStats=true` and the VPC Prefix has IPv4. This statistic reports IPv4 usage only. IP usage counts two addresses per associated Ethernet interface, while prefix usage counts each distinct `/31` containing an assigned IPv4 address. (see [below for nested schema](#nestedatt--usage_stats))
+- `usage_stats` (Attributes) Present when query parameter `includeUsageStats=true`. Prefix and IP usage data is derived by evaluating associated Ethernet interfaces. Each Interface associated with a VPC Prefix consumes a `/31` prefix. (see [below for nested schema](#nestedatt--usage_stats))
 
 <a id="nestedatt--status_history"></a>
 ### Nested Schema for `status_history`
@@ -65,6 +65,6 @@ Read-Only:
 
 - `acquired_i_ps` (Number) Number of individual IP addresses acquired from the block
 - `acquired_prefixes` (Number) Total number of prefixes (of any size) acquired from this block
-- `available_i_ps` (Number) Total number of IP addresses in the block (acquired and unused), capped at 2,147,483,647. An IP Block allocated to one child prefix of the same size reports zero.
+- `available_i_ps` (Number) Total number of IP addresses in the block (acquired and unused)
 - `available_prefixes` (List of String) Example prefixes available to acquire
-- `available_smallest_prefixes` (Number) Number of complete `/30` IPv4 prefixes or `/126` IPv6 prefixes remaining after acquired child prefixes are excluded. Both prefix sizes contain four addresses. The count is capped at 2,147,483,647. The `acquiredIPs` count is not subtracted.
+- `available_smallest_prefixes` (Number) Total number of /30 prefixes that can still be acquired from this block (only reduced if prefixes are acquired, not reduced by acquired IPs)

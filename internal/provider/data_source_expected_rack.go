@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,17 +26,16 @@ type ExpectedRackDataSource struct {
 }
 
 type ExpectedRackDataSourceModel struct {
-	Id types.String `tfsdk:"id"`
-	SiteId types.String `tfsdk:"site_id"`
-	RackId types.String `tfsdk:"rack_id"`
+	Id            types.String `tfsdk:"id"`
+	SiteId        types.String `tfsdk:"site_id"`
+	RackId        types.String `tfsdk:"rack_id"`
 	RackProfileId types.String `tfsdk:"rack_profile_id"`
-	Name types.String `tfsdk:"name"`
-	Description types.String `tfsdk:"description"`
-	Labels types.Map `tfsdk:"labels"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
+	Name          types.String `tfsdk:"name"`
+	Description   types.String `tfsdk:"description"`
+	Labels        types.Map    `tfsdk:"labels"`
+	Created       types.String `tfsdk:"created"`
+	Updated       types.String `tfsdk:"updated"`
 }
-
 
 func (d *ExpectedRackDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_expected_rack"
@@ -161,19 +160,19 @@ func (d *ExpectedRackDataSource) Read(ctx context.Context, req datasource.ReadRe
 			data.Id = StringFromAPI(result["id"])
 			diags := resp.Diagnostics
 			data.RackId = StringFromAPI(result["rackId"])
-		data.RackProfileId = StringFromAPI(result["rackProfileId"])
-		data.Name = StringFromAPI(result["name"])
-		data.Description = StringFromAPI(result["description"])
-		if rawMap_labels := StringMapFromAPI(result["labels"]); rawMap_labels != nil {
-			mv, d := types.MapValueFrom(ctx, types.StringType, rawMap_labels)
-			diags.Append(d...)
-			data.Labels = mv
-		} else {
-			data.Labels = types.MapNull(types.StringType)
-		}
-		data.Created = StringFromAPI(result["created"])
-		data.Updated = StringFromAPI(result["updated"])
-		_ = diags
+			data.RackProfileId = StringFromAPI(result["rackProfileId"])
+			data.Name = StringFromAPI(result["name"])
+			data.Description = StringFromAPI(result["description"])
+			if rawMap_labels := StringMapFromAPI(result["labels"]); rawMap_labels != nil {
+				mv, d := types.MapValueFrom(ctx, types.StringType, rawMap_labels)
+				diags.Append(d...)
+				data.Labels = mv
+			} else {
+				data.Labels = types.MapNull(types.StringType)
+			}
+			data.Created = StringFromAPI(result["created"])
+			data.Updated = StringFromAPI(result["updated"])
+			_ = diags
 		}
 	}
 

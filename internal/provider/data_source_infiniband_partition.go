@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,35 +26,34 @@ type InfinibandPartitionDataSource struct {
 }
 
 type InfinibandPartitionDataSourceModel struct {
-	Id types.String `tfsdk:"id"`
-	SiteId types.String `tfsdk:"site_id"`
-	Status types.String `tfsdk:"status"`
-	Query types.String `tfsdk:"query"`
-	InstanceId types.String `tfsdk:"instance_id"`
-	InfinibandPartitionId types.String `tfsdk:"infiniband_partition_id"`
-	Name types.String `tfsdk:"name"`
-	Description types.String `tfsdk:"description"`
-	TenantId types.String `tfsdk:"tenant_id"`
-	ControllerIbPartitionId types.String `tfsdk:"controller_ib_partition_id"`
-	PartitionKey types.String `tfsdk:"partition_key"`
-	PartitionName types.String `tfsdk:"partition_name"`
-	ServiceLevel types.Int64 `tfsdk:"service_level"`
-	RateLimit types.Float64 `tfsdk:"rate_limit"`
-	Mtu types.Int64 `tfsdk:"mtu"`
-	EnableSharp types.Bool `tfsdk:"enable_sharp"`
-	Labels types.Map `tfsdk:"labels"`
-	StatusHistory []InfinibandPartitionDsStatusHistoryItem `tfsdk:"status_history"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
+	Id                      types.String                             `tfsdk:"id"`
+	SiteId                  types.String                             `tfsdk:"site_id"`
+	Status                  types.String                             `tfsdk:"status"`
+	Query                   types.String                             `tfsdk:"query"`
+	InstanceId              types.String                             `tfsdk:"instance_id"`
+	InfinibandPartitionId   types.String                             `tfsdk:"infiniband_partition_id"`
+	Name                    types.String                             `tfsdk:"name"`
+	Description             types.String                             `tfsdk:"description"`
+	TenantId                types.String                             `tfsdk:"tenant_id"`
+	ControllerIbPartitionId types.String                             `tfsdk:"controller_ib_partition_id"`
+	PartitionKey            types.String                             `tfsdk:"partition_key"`
+	PartitionName           types.String                             `tfsdk:"partition_name"`
+	ServiceLevel            types.Int64                              `tfsdk:"service_level"`
+	RateLimit               types.Float64                            `tfsdk:"rate_limit"`
+	Mtu                     types.Int64                              `tfsdk:"mtu"`
+	EnableSharp             types.Bool                               `tfsdk:"enable_sharp"`
+	Labels                  types.Map                                `tfsdk:"labels"`
+	StatusHistory           []InfinibandPartitionDsStatusHistoryItem `tfsdk:"status_history"`
+	Created                 types.String                             `tfsdk:"created"`
+	Updated                 types.String                             `tfsdk:"updated"`
 }
 
 type InfinibandPartitionDsStatusHistoryItem struct {
-	Status types.String `tfsdk:"status"`
+	Status  types.String `tfsdk:"status"`
 	Message types.String `tfsdk:"message"`
 	Created types.String `tfsdk:"created"`
 	Updated types.String `tfsdk:"updated"`
 }
-
 
 func (d *InfinibandPartitionDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_infiniband_partition"
@@ -268,7 +267,9 @@ func (d *InfinibandPartitionDataSource) Read(ctx context.Context, req datasource
 			items_status_history := make([]InfinibandPartitionDsStatusHistoryItem, len(rawItems_status_history))
 			for i_status_history, raw_status_history := range rawItems_status_history {
 				m_status_history, _ := raw_status_history.(map[string]interface{})
-				if m_status_history == nil { m_status_history = map[string]interface{}{} }
+				if m_status_history == nil {
+					m_status_history = map[string]interface{}{}
+				}
 				items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 				items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 				items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -293,39 +294,41 @@ func (d *InfinibandPartitionDataSource) Read(ctx context.Context, req datasource
 			data.Id = StringFromAPI(result["id"])
 			diags := resp.Diagnostics
 			data.Name = StringFromAPI(result["name"])
-		data.Description = StringFromAPI(result["description"])
-		data.TenantId = StringFromAPI(result["tenantId"])
-		data.ControllerIbPartitionId = StringFromAPI(result["controllerIBPartitionId"])
-		data.PartitionKey = StringFromAPI(result["partitionKey"])
-		data.PartitionName = StringFromAPI(result["partitionName"])
-		data.ServiceLevel = Int64FromAPI(result["serviceLevel"])
-		data.RateLimit = Float64FromAPI(result["rateLimit"])
-		data.Mtu = Int64FromAPI(result["mtu"])
-		data.EnableSharp = BoolFromAPI(result["enableSharp"])
-		if rawMap_labels := StringMapFromAPI(result["labels"]); rawMap_labels != nil {
-			mv, d := types.MapValueFrom(ctx, types.StringType, rawMap_labels)
-			diags.Append(d...)
-			data.Labels = mv
-		} else {
-			data.Labels = types.MapNull(types.StringType)
-		}
-		if rawItems_status_history, ok := result["statusHistory"].([]interface{}); ok && rawItems_status_history != nil {
-			items_status_history := make([]InfinibandPartitionDsStatusHistoryItem, len(rawItems_status_history))
-			for i_status_history, raw_status_history := range rawItems_status_history {
-				m_status_history, _ := raw_status_history.(map[string]interface{})
-				if m_status_history == nil { m_status_history = map[string]interface{}{} }
-				items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
-				items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
-				items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
-				items_status_history[i_status_history].Updated = StringFromAPI(m_status_history["updated"])
+			data.Description = StringFromAPI(result["description"])
+			data.TenantId = StringFromAPI(result["tenantId"])
+			data.ControllerIbPartitionId = StringFromAPI(result["controllerIBPartitionId"])
+			data.PartitionKey = StringFromAPI(result["partitionKey"])
+			data.PartitionName = StringFromAPI(result["partitionName"])
+			data.ServiceLevel = Int64FromAPI(result["serviceLevel"])
+			data.RateLimit = Float64FromAPI(result["rateLimit"])
+			data.Mtu = Int64FromAPI(result["mtu"])
+			data.EnableSharp = BoolFromAPI(result["enableSharp"])
+			if rawMap_labels := StringMapFromAPI(result["labels"]); rawMap_labels != nil {
+				mv, d := types.MapValueFrom(ctx, types.StringType, rawMap_labels)
+				diags.Append(d...)
+				data.Labels = mv
+			} else {
+				data.Labels = types.MapNull(types.StringType)
 			}
-			data.StatusHistory = items_status_history
-		} else {
-			data.StatusHistory = nil
-		}
-		data.Created = StringFromAPI(result["created"])
-		data.Updated = StringFromAPI(result["updated"])
-		_ = diags
+			if rawItems_status_history, ok := result["statusHistory"].([]interface{}); ok && rawItems_status_history != nil {
+				items_status_history := make([]InfinibandPartitionDsStatusHistoryItem, len(rawItems_status_history))
+				for i_status_history, raw_status_history := range rawItems_status_history {
+					m_status_history, _ := raw_status_history.(map[string]interface{})
+					if m_status_history == nil {
+						m_status_history = map[string]interface{}{}
+					}
+					items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
+					items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
+					items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
+					items_status_history[i_status_history].Updated = StringFromAPI(m_status_history["updated"])
+				}
+				data.StatusHistory = items_status_history
+			} else {
+				data.StatusHistory = nil
+			}
+			data.Created = StringFromAPI(result["created"])
+			data.Updated = StringFromAPI(result["updated"])
+			_ = diags
 		}
 	}
 
@@ -354,7 +357,9 @@ func (d *InfinibandPartitionDataSource) populateModel(ctx context.Context, data 
 		items_status_history := make([]InfinibandPartitionDsStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])

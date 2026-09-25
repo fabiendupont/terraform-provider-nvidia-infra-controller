@@ -26,30 +26,28 @@ type ExpectedSwitchResource struct {
 }
 
 type ExpectedSwitchResourceModel struct {
-	Id types.String `tfsdk:"id"`
-	SiteId types.String `tfsdk:"site_id"`
-	BmcMacAddress types.String `tfsdk:"bmc_mac_address"`
+	Id                 types.String `tfsdk:"id"`
+	SiteId             types.String `tfsdk:"site_id"`
+	BmcMacAddress      types.String `tfsdk:"bmc_mac_address"`
 	DefaultBmcUsername types.String `tfsdk:"default_bmc_username"`
 	DefaultBmcPassword types.String `tfsdk:"default_bmc_password"`
 	SwitchSerialNumber types.String `tfsdk:"switch_serial_number"`
-	NvOsUsername types.String `tfsdk:"nv_os_username"`
-	NvOsPassword types.String `tfsdk:"nv_os_password"`
-	NvosMacAddresses types.List `tfsdk:"nvos_mac_addresses"`
-	RackId types.String `tfsdk:"rack_id"`
-	BmcIpAddress types.String `tfsdk:"bmc_ip_address"`
-	Name types.String `tfsdk:"name"`
-	Manufacturer types.String `tfsdk:"manufacturer"`
-	Model types.String `tfsdk:"model"`
-	Description types.String `tfsdk:"description"`
-	SlotId types.Int64 `tfsdk:"slot_id"`
-	TrayIdx types.Int64 `tfsdk:"tray_idx"`
-	HostId types.Int64 `tfsdk:"host_id"`
-	Labels types.Map `tfsdk:"labels"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
-	ExpectedSwitchId types.String `tfsdk:"expected_switch_id"`
+	NvOsUsername       types.String `tfsdk:"nv_os_username"`
+	NvOsPassword       types.String `tfsdk:"nv_os_password"`
+	RackId             types.String `tfsdk:"rack_id"`
+	BmcIpAddress       types.String `tfsdk:"bmc_ip_address"`
+	Name               types.String `tfsdk:"name"`
+	Manufacturer       types.String `tfsdk:"manufacturer"`
+	Model              types.String `tfsdk:"model"`
+	Description        types.String `tfsdk:"description"`
+	SlotId             types.Int64  `tfsdk:"slot_id"`
+	TrayIdx            types.Int64  `tfsdk:"tray_idx"`
+	HostId             types.Int64  `tfsdk:"host_id"`
+	Labels             types.Map    `tfsdk:"labels"`
+	Created            types.String `tfsdk:"created"`
+	Updated            types.String `tfsdk:"updated"`
+	ExpectedSwitchId   types.String `tfsdk:"expected_switch_id"`
 }
-
 
 func (r *ExpectedSwitchResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_expected_switch"
@@ -102,13 +100,6 @@ func (r *ExpectedSwitchResource) Schema(_ context.Context, _ resource.SchemaRequ
 				Optional:    true,
 				Computed:    true,
 				Description: "NvOS password for the Expected Switch",
-			},
-			"nvos_mac_addresses": schema.ListAttribute{
-				ElementType: types.StringType,
-				Required:    false,
-				Optional:    true,
-				Computed:    true,
-				Description: "MAC addresses of the Expected Switch's NvOS management interfaces",
 			},
 			"rack_id": schema.StringAttribute{
 				Required:    false,
@@ -237,11 +228,6 @@ func (r *ExpectedSwitchResource) Create(ctx context.Context, req resource.Create
 	if !data.NvOsPassword.IsNull() && !data.NvOsPassword.IsUnknown() {
 		body["nvOsPassword"] = data.NvOsPassword.ValueString()
 	}
-	if !data.NvosMacAddresses.IsNull() && !data.NvosMacAddresses.IsUnknown() {
-		var sl_nvos_mac_addresses []string
-		data.NvosMacAddresses.ElementsAs(ctx, &sl_nvos_mac_addresses, false)
-		body["nvosMacAddresses"] = sl_nvos_mac_addresses
-	}
 	if !data.RackId.IsNull() && !data.RackId.IsUnknown() {
 		body["rackId"] = data.RackId.ValueString()
 	}
@@ -291,13 +277,6 @@ func (r *ExpectedSwitchResource) Create(ctx context.Context, req resource.Create
 	data.SwitchSerialNumber = StringFromAPI(result["switchSerialNumber"])
 	data.NvOsUsername = StringFromAPI(result["nvOsUsername"])
 	data.NvOsPassword = StringFromAPI(result["nvOsPassword"])
-	if rawSlice_nvos_mac_addresses := StringSliceFromAPI(result["nvosMacAddresses"]); rawSlice_nvos_mac_addresses != nil {
-		lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_nvos_mac_addresses)
-		diags.Append(d...)
-		data.NvosMacAddresses = lv
-	} else {
-		data.NvosMacAddresses = types.ListNull(types.StringType)
-	}
 	data.RackId = StringFromAPI(result["rackId"])
 	data.BmcIpAddress = StringFromAPI(result["bmcIpAddress"])
 	data.Name = StringFromAPI(result["name"])
@@ -348,13 +327,6 @@ func (r *ExpectedSwitchResource) Read(ctx context.Context, req resource.ReadRequ
 	data.SwitchSerialNumber = StringFromAPI(result["switchSerialNumber"])
 	data.NvOsUsername = StringFromAPI(result["nvOsUsername"])
 	data.NvOsPassword = StringFromAPI(result["nvOsPassword"])
-	if rawSlice_nvos_mac_addresses := StringSliceFromAPI(result["nvosMacAddresses"]); rawSlice_nvos_mac_addresses != nil {
-		lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_nvos_mac_addresses)
-		diags.Append(d...)
-		data.NvosMacAddresses = lv
-	} else {
-		data.NvosMacAddresses = types.ListNull(types.StringType)
-	}
 	data.RackId = StringFromAPI(result["rackId"])
 	data.BmcIpAddress = StringFromAPI(result["bmcIpAddress"])
 	data.Name = StringFromAPI(result["name"])
@@ -403,11 +375,6 @@ func (r *ExpectedSwitchResource) Update(ctx context.Context, req resource.Update
 	}
 	if !data.NvOsPassword.IsNull() && !data.NvOsPassword.IsUnknown() {
 		body["nvOsPassword"] = data.NvOsPassword.ValueString()
-	}
-	if !data.NvosMacAddresses.IsNull() && !data.NvosMacAddresses.IsUnknown() {
-		var sl_nvos_mac_addresses []string
-		data.NvosMacAddresses.ElementsAs(ctx, &sl_nvos_mac_addresses, false)
-		body["nvosMacAddresses"] = sl_nvos_mac_addresses
 	}
 	if !data.RackId.IsNull() && !data.RackId.IsUnknown() {
 		body["rackId"] = data.RackId.ValueString()
@@ -461,13 +428,6 @@ func (r *ExpectedSwitchResource) Update(ctx context.Context, req resource.Update
 	data.SwitchSerialNumber = StringFromAPI(result["switchSerialNumber"])
 	data.NvOsUsername = StringFromAPI(result["nvOsUsername"])
 	data.NvOsPassword = StringFromAPI(result["nvOsPassword"])
-	if rawSlice_nvos_mac_addresses := StringSliceFromAPI(result["nvosMacAddresses"]); rawSlice_nvos_mac_addresses != nil {
-		lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_nvos_mac_addresses)
-		diags.Append(d...)
-		data.NvosMacAddresses = lv
-	} else {
-		data.NvosMacAddresses = types.ListNull(types.StringType)
-	}
 	data.RackId = StringFromAPI(result["rackId"])
 	data.BmcIpAddress = StringFromAPI(result["bmcIpAddress"])
 	data.Name = StringFromAPI(result["name"])
@@ -513,13 +473,6 @@ func (r *ExpectedSwitchResource) populateModel(ctx context.Context, data *Expect
 	data.SwitchSerialNumber = StringFromAPI(result["switchSerialNumber"])
 	data.NvOsUsername = StringFromAPI(result["nvOsUsername"])
 	data.NvOsPassword = StringFromAPI(result["nvOsPassword"])
-	if rawSlice_nvos_mac_addresses := StringSliceFromAPI(result["nvosMacAddresses"]); rawSlice_nvos_mac_addresses != nil {
-		lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_nvos_mac_addresses)
-		diags.Append(d...)
-		data.NvosMacAddresses = lv
-	} else {
-		data.NvosMacAddresses = types.ListNull(types.StringType)
-	}
 	data.RackId = StringFromAPI(result["rackId"])
 	data.BmcIpAddress = StringFromAPI(result["bmcIpAddress"])
 	data.Name = StringFromAPI(result["name"])

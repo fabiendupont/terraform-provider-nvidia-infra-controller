@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,37 +26,36 @@ type NvlinkLogicalPartitionDataSource struct {
 }
 
 type NvlinkLogicalPartitionDataSourceModel struct {
-	Id types.String `tfsdk:"id"`
-	SiteId types.String `tfsdk:"site_id"`
-	Status types.String `tfsdk:"status"`
-	Query types.String `tfsdk:"query"`
-	IncludeInterfaces types.String `tfsdk:"include_interfaces"`
-	IncludeStats types.String `tfsdk:"include_stats"`
-	IncludeVpcs types.String `tfsdk:"include_vpcs"`
-	InstanceId types.String `tfsdk:"instance_id"`
-	NvLinkLogicalPartitionId types.String `tfsdk:"nv_link_logical_partition_id"`
-	NvLinkDomainId types.String `tfsdk:"nv_link_domain_id"`
-	Name types.String `tfsdk:"name"`
-	Description types.String `tfsdk:"description"`
-	TenantId types.String `tfsdk:"tenant_id"`
-	StatusHistory []NvlinkLogicalPartitionDsStatusHistoryItem `tfsdk:"status_history"`
+	Id                          types.String                                         `tfsdk:"id"`
+	SiteId                      types.String                                         `tfsdk:"site_id"`
+	Status                      types.String                                         `tfsdk:"status"`
+	Query                       types.String                                         `tfsdk:"query"`
+	IncludeInterfaces           types.String                                         `tfsdk:"include_interfaces"`
+	IncludeStats                types.String                                         `tfsdk:"include_stats"`
+	IncludeVpcs                 types.String                                         `tfsdk:"include_vpcs"`
+	InstanceId                  types.String                                         `tfsdk:"instance_id"`
+	NvLinkLogicalPartitionId    types.String                                         `tfsdk:"nv_link_logical_partition_id"`
+	NvLinkDomainId              types.String                                         `tfsdk:"nv_link_domain_id"`
+	Name                        types.String                                         `tfsdk:"name"`
+	Description                 types.String                                         `tfsdk:"description"`
+	TenantId                    types.String                                         `tfsdk:"tenant_id"`
+	StatusHistory               []NvlinkLogicalPartitionDsStatusHistoryItem          `tfsdk:"status_history"`
 	NvLinkLogicalPartitionStats *NvlinkLogicalPartitionDsNvLinkLogicalPartitionStats `tfsdk:"nv_link_logical_partition_stats"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
+	Created                     types.String                                         `tfsdk:"created"`
+	Updated                     types.String                                         `tfsdk:"updated"`
 }
 
 type NvlinkLogicalPartitionDsStatusHistoryItem struct {
-	Status types.String `tfsdk:"status"`
+	Status  types.String `tfsdk:"status"`
 	Message types.String `tfsdk:"message"`
 	Created types.String `tfsdk:"created"`
 	Updated types.String `tfsdk:"updated"`
 }
 
 type NvlinkLogicalPartitionDsNvLinkLogicalPartitionStats struct {
-	TotalGpus types.Int64 `tfsdk:"total_gpus"`
+	TotalGpus              types.Int64 `tfsdk:"total_gpus"`
 	TotalDistinctInstances types.Int64 `tfsdk:"total_distinct_instances"`
 }
-
 
 func (d *NvlinkLogicalPartitionDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_nvlink_logical_partition"
@@ -251,7 +250,9 @@ func (d *NvlinkLogicalPartitionDataSource) Read(ctx context.Context, req datasou
 			items_status_history := make([]NvlinkLogicalPartitionDsStatusHistoryItem, len(rawItems_status_history))
 			for i_status_history, raw_status_history := range rawItems_status_history {
 				m_status_history, _ := raw_status_history.(map[string]interface{})
-				if m_status_history == nil { m_status_history = map[string]interface{}{} }
+				if m_status_history == nil {
+					m_status_history = map[string]interface{}{}
+				}
 				items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 				items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 				items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -285,34 +286,36 @@ func (d *NvlinkLogicalPartitionDataSource) Read(ctx context.Context, req datasou
 			data.Id = StringFromAPI(result["id"])
 			diags := resp.Diagnostics
 			data.Name = StringFromAPI(result["name"])
-		data.Description = StringFromAPI(result["description"])
-		data.TenantId = StringFromAPI(result["tenantId"])
-		if rawItems_status_history, ok := result["statusHistory"].([]interface{}); ok && rawItems_status_history != nil {
-			items_status_history := make([]NvlinkLogicalPartitionDsStatusHistoryItem, len(rawItems_status_history))
-			for i_status_history, raw_status_history := range rawItems_status_history {
-				m_status_history, _ := raw_status_history.(map[string]interface{})
-				if m_status_history == nil { m_status_history = map[string]interface{}{} }
-				items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
-				items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
-				items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
-				items_status_history[i_status_history].Updated = StringFromAPI(m_status_history["updated"])
+			data.Description = StringFromAPI(result["description"])
+			data.TenantId = StringFromAPI(result["tenantId"])
+			if rawItems_status_history, ok := result["statusHistory"].([]interface{}); ok && rawItems_status_history != nil {
+				items_status_history := make([]NvlinkLogicalPartitionDsStatusHistoryItem, len(rawItems_status_history))
+				for i_status_history, raw_status_history := range rawItems_status_history {
+					m_status_history, _ := raw_status_history.(map[string]interface{})
+					if m_status_history == nil {
+						m_status_history = map[string]interface{}{}
+					}
+					items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
+					items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
+					items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
+					items_status_history[i_status_history].Updated = StringFromAPI(m_status_history["updated"])
+				}
+				data.StatusHistory = items_status_history
+			} else {
+				data.StatusHistory = nil
 			}
-			data.StatusHistory = items_status_history
-		} else {
-			data.StatusHistory = nil
-		}
-		if rawObj_nv_link_logical_partition_stats, ok := result["nvLinkLogicalPartitionStats"].(map[string]interface{}); ok {
-			obj_nv_link_logical_partition_stats := &NvlinkLogicalPartitionDsNvLinkLogicalPartitionStats{}
-			obj_nv_link_logical_partition_stats.TotalGpus = Int64FromAPI(rawObj_nv_link_logical_partition_stats["totalGpus"])
-			obj_nv_link_logical_partition_stats.TotalDistinctInstances = Int64FromAPI(rawObj_nv_link_logical_partition_stats["totalDistinctInstances"])
-			_ = rawObj_nv_link_logical_partition_stats
-			data.NvLinkLogicalPartitionStats = obj_nv_link_logical_partition_stats
-		} else {
-			data.NvLinkLogicalPartitionStats = nil
-		}
-		data.Created = StringFromAPI(result["created"])
-		data.Updated = StringFromAPI(result["updated"])
-		_ = diags
+			if rawObj_nv_link_logical_partition_stats, ok := result["nvLinkLogicalPartitionStats"].(map[string]interface{}); ok {
+				obj_nv_link_logical_partition_stats := &NvlinkLogicalPartitionDsNvLinkLogicalPartitionStats{}
+				obj_nv_link_logical_partition_stats.TotalGpus = Int64FromAPI(rawObj_nv_link_logical_partition_stats["totalGpus"])
+				obj_nv_link_logical_partition_stats.TotalDistinctInstances = Int64FromAPI(rawObj_nv_link_logical_partition_stats["totalDistinctInstances"])
+				_ = rawObj_nv_link_logical_partition_stats
+				data.NvLinkLogicalPartitionStats = obj_nv_link_logical_partition_stats
+			} else {
+				data.NvLinkLogicalPartitionStats = nil
+			}
+			data.Created = StringFromAPI(result["created"])
+			data.Updated = StringFromAPI(result["updated"])
+			_ = diags
 		}
 	}
 
@@ -327,7 +330,9 @@ func (d *NvlinkLogicalPartitionDataSource) populateModel(ctx context.Context, da
 		items_status_history := make([]NvlinkLogicalPartitionDsStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])

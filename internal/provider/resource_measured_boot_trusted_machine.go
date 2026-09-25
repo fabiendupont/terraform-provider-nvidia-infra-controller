@@ -26,16 +26,15 @@ type MeasuredBootTrustedMachineResource struct {
 }
 
 type MeasuredBootTrustedMachineResourceModel struct {
-	Id types.String `tfsdk:"id"`
-	SiteId types.String `tfsdk:"site_id"`
-	MachineId types.String `tfsdk:"machine_id"`
+	Id           types.String `tfsdk:"id"`
+	SiteId       types.String `tfsdk:"site_id"`
+	MachineId    types.String `tfsdk:"machine_id"`
 	ApprovalType types.String `tfsdk:"approval_type"`
 	PcrRegisters types.String `tfsdk:"pcr_registers"`
-	Comments types.String `tfsdk:"comments"`
-	ApprovalId types.String `tfsdk:"approval_id"`
-	Created types.String `tfsdk:"created"`
+	Comments     types.String `tfsdk:"comments"`
+	ApprovalId   types.String `tfsdk:"approval_id"`
+	Created      types.String `tfsdk:"created"`
 }
-
 
 func (r *MeasuredBootTrustedMachineResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_measured_boot_trusted_machine"

@@ -26,33 +26,32 @@ type InfinibandPartitionResource struct {
 }
 
 type InfinibandPartitionResourceModel struct {
-	Id types.String `tfsdk:"id"`
-	Name types.String `tfsdk:"name"`
-	Description types.String `tfsdk:"description"`
-	SiteId types.String `tfsdk:"site_id"`
-	Labels types.Map `tfsdk:"labels"`
-	TenantId types.String `tfsdk:"tenant_id"`
-	ControllerIbPartitionId types.String `tfsdk:"controller_ib_partition_id"`
-	PartitionKey types.String `tfsdk:"partition_key"`
-	PartitionName types.String `tfsdk:"partition_name"`
-	ServiceLevel types.Int64 `tfsdk:"service_level"`
-	RateLimit types.Float64 `tfsdk:"rate_limit"`
-	Mtu types.Int64 `tfsdk:"mtu"`
-	EnableSharp types.Bool `tfsdk:"enable_sharp"`
-	Status types.String `tfsdk:"status"`
-	StatusHistory []InfinibandPartitionStatusHistoryItem `tfsdk:"status_history"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
-	InfiniBandPartitionId types.String `tfsdk:"infini_band_partition_id"`
+	Id                      types.String                           `tfsdk:"id"`
+	Name                    types.String                           `tfsdk:"name"`
+	Description             types.String                           `tfsdk:"description"`
+	SiteId                  types.String                           `tfsdk:"site_id"`
+	Labels                  types.Map                              `tfsdk:"labels"`
+	TenantId                types.String                           `tfsdk:"tenant_id"`
+	ControllerIbPartitionId types.String                           `tfsdk:"controller_ib_partition_id"`
+	PartitionKey            types.String                           `tfsdk:"partition_key"`
+	PartitionName           types.String                           `tfsdk:"partition_name"`
+	ServiceLevel            types.Int64                            `tfsdk:"service_level"`
+	RateLimit               types.Float64                          `tfsdk:"rate_limit"`
+	Mtu                     types.Int64                            `tfsdk:"mtu"`
+	EnableSharp             types.Bool                             `tfsdk:"enable_sharp"`
+	Status                  types.String                           `tfsdk:"status"`
+	StatusHistory           []InfinibandPartitionStatusHistoryItem `tfsdk:"status_history"`
+	Created                 types.String                           `tfsdk:"created"`
+	Updated                 types.String                           `tfsdk:"updated"`
+	InfiniBandPartitionId   types.String                           `tfsdk:"infini_band_partition_id"`
 }
 
 type InfinibandPartitionStatusHistoryItem struct {
-	Status types.String `tfsdk:"status"`
+	Status  types.String `tfsdk:"status"`
 	Message types.String `tfsdk:"message"`
 	Created types.String `tfsdk:"created"`
 	Updated types.String `tfsdk:"updated"`
 }
-
 
 func (r *InfinibandPartitionResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_infiniband_partition"
@@ -269,7 +268,9 @@ func (r *InfinibandPartitionResource) Create(ctx context.Context, req resource.C
 		items_status_history := make([]InfinibandPartitionStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -329,7 +330,9 @@ func (r *InfinibandPartitionResource) Read(ctx context.Context, req resource.Rea
 		items_status_history := make([]InfinibandPartitionStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -398,7 +401,9 @@ func (r *InfinibandPartitionResource) Update(ctx context.Context, req resource.U
 		items_status_history := make([]InfinibandPartitionStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -453,7 +458,9 @@ func (r *InfinibandPartitionResource) populateModel(ctx context.Context, data *I
 		items_status_history := make([]InfinibandPartitionStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])

@@ -41,7 +41,6 @@ output "expected_switch_name" {
 - `manufacturer` (String) Manufacturer of this component
 - `model` (String) Model of this component
 - `name` (String) Display name for this component
-- `nvos_mac_addresses` (List of String) MAC addresses of the Expected Switch's NvOS management interfaces
 - `rack_id` (String) Optional rack identifier for this component
 - `slot_id` (Number) Slot ID within the rack
 - `switch_serial_number` (String) Serial number of the Expected Switch

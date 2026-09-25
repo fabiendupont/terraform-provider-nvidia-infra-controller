@@ -40,7 +40,7 @@ output "expected_machine_name" {
 - `fallback_dpu_serial_numbers` (List of String) Serial numbers of the Expected Machine's fallback DPUs (Data Processing Units)
 - `host_id` (Number) Host ID within the tray
 - `host_lifecycle_profile` (Attributes) Optional per-host lifecycle profile (see [below for nested schema](#nestedatt--host_lifecycle_profile))
-- `is_dpf_enabled` (Boolean) When true, this host is eligible for DPF-based provisioning. Returns the effective setting: true when no value is configured. An explicitly configured false value is returned as false.
+- `is_dpf_enabled` (Boolean) When true, this host is eligible for DPF-based provisioning.
 - `labels` (Map of String) User-defined key-value pairs for organizing and categorizing Expected Machines
 - `machine` (Attributes) Machine information for this Expected Machine (populated when includeRelation=Machine is specified) (see [below for nested schema](#nestedatt--machine))
 - `machine_id` (String) Optional ID of the Machine associated with this Expected Machine
@@ -84,12 +84,11 @@ Read-Only:
 
 - `associated_machine_ids` (List of String) List of machine IDs associated with this SKU
 - `components` (Attributes) Hardware components of this SKU (see [below for nested schema](#nestedatt--sku--components))
-- `created` (String) ISO 8601 datetime when the SKU was created, using the Site-reported timestamp when available
-- `description` (String) Human-readable SKU description
+- `created` (String) ISO 8601 datetime when the SKU was created
 - `device_type` (String) Optional device type identifier (e.g. "gpu", "cpu", "storage")
 - `id` (String) Unique identifier for the SKU
-- `schema_version` (Number) Core SKU schema version when available
 - `site_id` (String) ID of the Site this SKU belongs to
+- `updated` (String) ISO 8601 datetime when the SKU was last updated
 
 <a id="nestedatt--sku--components"></a>
 ### Nested Schema for `sku.components`
@@ -98,7 +97,7 @@ Read-Only:
 
 - `chassis` (Attributes) Chassis component (see [below for nested schema](#nestedatt--sku--components--chassis))
 - `cpus` (Attributes List) CPU components (see [below for nested schema](#nestedatt--sku--components--cpus))
-- `ethernet_devices` (Attributes List) Read-only Ethernet device components reported by Core. Omit this property from REST mutation requests; null and an empty array are accepted for compatibility, while a non-empty array is rejected with HTTP 400. (see [below for nested schema](#nestedatt--sku--components--ethernet_devices))
+- `ethernet_devices` (Attributes List) Ethernet device components (see [below for nested schema](#nestedatt--sku--components--ethernet_devices))
 - `gpus` (Attributes List) GPU components (see [below for nested schema](#nestedatt--sku--components--gpus))
 - `infiniband_devices` (Attributes List) Infiniband device components (see [below for nested schema](#nestedatt--sku--components--infiniband_devices))
 - `memory` (Attributes List) Memory components (see [below for nested schema](#nestedatt--sku--components--memory))
@@ -110,7 +109,6 @@ Read-Only:
 
 Read-Only:
 
-- `architecture` (String) Architecture of the chassis
 - `model` (String) Model of the chassis
 - `vendor` (String) Vendor of the chassis
 
@@ -132,7 +130,6 @@ Read-Only:
 Read-Only:
 
 - `count_value` (Number) Number of ethernet devices present
-- `is_connected` (Boolean) Whether the ethernet device is connected
 - `model` (String) Model of the ethernet device
 - `vendor` (String) Vendor of the ethernet device
 
@@ -154,7 +151,6 @@ Read-Only:
 Read-Only:
 
 - `count_value` (Number) Number of infiniband devices present
-- `inactive_devices` (List of Number) Zero-based indexes of inactive devices
 - `model` (String) Model of the infiniband device
 - `vendor` (String) Vendor of the infiniband device
 
@@ -174,13 +170,10 @@ Read-Only:
 
 Read-Only:
 
-- `capacity_mb` (Number) Storage capacity in megabytes used for schema version 4 matching. Read-only in REST mutation requests and preserved in responses for legacy SKUs. Schema version 5 uses minSizeMiB and maxSizeMiB instead.
+- `capacity_mb` (Number) Capacity in megabytes
 - `count_value` (Number) Number of storage devices present
-- `max_size_mi_b` (Number) Inclusive maximum size in MiB for each storage device. Null or omission means no upper bound. Used for SKU schema version 5 and later.
-- `min_size_mi_b` (Number) Inclusive minimum size in MiB for each storage device. Null or omission means no lower bound. Used for SKU schema version 5 and later.
-- `model` (String) Informational storage model. Starting with the 2.1 release, NICo does not use this field for storage matching or validation.
-- `pci_patterns` (List of String) Regular expressions matched against each drive's sysfs PCI path. An empty or omitted list disables PCI location matching. Used for SKU schema version 5 and later.  The matched path is the NVMe controller's sysfs DEVPATH with its trailing kernel-assigned `nvmeN` node removed, for example `/devices/pci0000:00/0000:64:00.0/0000:65:00.0/nvme`, because that node changes with probe order. Patterns that anchor on the node (such as `nvme0$`) never match; end them at `/nvme` instead.
-- `vendor` (String) Storage vendor used for schema version 4 matching. Read-only in REST mutation requests and preserved in responses for legacy SKUs. Schema version 5 does not use this field.
+- `model` (String) Model of the storage device
+- `vendor` (String) Vendor of the storage device
 
 
 <a id="nestedatt--sku--components--tpm"></a>

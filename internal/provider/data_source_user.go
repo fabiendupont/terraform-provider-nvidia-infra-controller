@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,14 +26,13 @@ type UserDataSource struct {
 }
 
 type UserDataSourceModel struct {
-	Id types.String `tfsdk:"id"`
-	Email types.String `tfsdk:"email"`
+	Id        types.String `tfsdk:"id"`
+	Email     types.String `tfsdk:"email"`
 	FirstName types.String `tfsdk:"first_name"`
-	LastName types.String `tfsdk:"last_name"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
+	LastName  types.String `tfsdk:"last_name"`
+	Created   types.String `tfsdk:"created"`
+	Updated   types.String `tfsdk:"updated"`
 }
-
 
 func (d *UserDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_user"

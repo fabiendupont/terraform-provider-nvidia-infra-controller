@@ -27,13 +27,12 @@ output "tenant_name" {
 
 ### Optional
 
-- `site_id` (String) ID of the Site where the VPC will be created
+- `site_id` (String) ID of the Site
 
 ### Read-Only
 
-- `capabilities` (Attributes) Deprecated read-only aggregate of tenant-wide feature flags. Source of truth is Tenant Account `siteCapabilities`. (see [below for nested schema](#nestedatt--capabilities))
+- `capabilities` (Attributes) Features that are enabled/disabled for Tenant (see [below for nested schema](#nestedatt--capabilities))
 - `created` (String) Date/time the Tenant was created
-- `deprecations` (Attributes List) Deprecation notices for Tenant fields (see [below for nested schema](#nestedatt--deprecations))
 - `id` (String) The resource ID.
 - `org` (String) Name/external ID of Tenant's organization
 - `org_display_name` (String) Display name of Tenant's organization
@@ -44,17 +43,4 @@ output "tenant_name" {
 
 Read-Only:
 
-- `targeted_instance_creation` (Boolean) Deprecated in favor of TenantAccount.siteCapabilities. On GET `/tenant/current`, the property is present and true only when every Ready Tenant Account enables TargetedInstanceCreation and no Tenant Site explicitly disables it; otherwise it is omitted. It is also omitted from embedded TenantSummary objects.
-
-
-<a id="nestedatt--deprecations"></a>
-### Nested Schema for `deprecations`
-
-Read-Only:
-
-- `attribute` (String) Name of the attribute that is deprecated. Omitted if queryParam or endpoint is being deprecated.
-- `endpoint` (String) API endpoint that is deprecated. Omitted if attribute or queryParam is being deprecated.
-- `notice` (String) Message describing the deprecation
-- `query_param` (String) Query parameter that is deprecated. Omitted if attribute or endpoint is being deprecated.
-- `replaced_by` (String) Name of the attribute, query parameter, or endpoint that replaces the deprecated item. Omitted if no replacement is available.
-- `take_action_by` (String) Date/time by which clients should migrate away from the deprecated API surface
+- `targeted_instance_creation` (Boolean) Indicates whether Tenant can create Instances by specifying Machine ID

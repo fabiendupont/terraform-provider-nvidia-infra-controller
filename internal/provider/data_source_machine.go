@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,169 +26,165 @@ type MachineDataSource struct {
 }
 
 type MachineDataSourceModel struct {
-	Id types.String `tfsdk:"id"`
-	SiteId types.String `tfsdk:"site_id"`
-	HasInstanceType types.String `tfsdk:"has_instance_type"`
-	InstanceTypeId types.String `tfsdk:"instance_type_id"`
-	TenantId types.String `tfsdk:"tenant_id"`
-	HasInstance types.String `tfsdk:"has_instance"`
-	IsMissingOnSite types.String `tfsdk:"is_missing_on_site"`
-	IncludeMetadata types.String `tfsdk:"include_metadata"`
-	Status types.String `tfsdk:"status"`
-	CapabilityType types.String `tfsdk:"capability_type"`
-	CapabilityName types.String `tfsdk:"capability_name"`
-	HwSkuDeviceType types.String `tfsdk:"hw_sku_device_type"`
-	Query types.String `tfsdk:"query"`
-	Type types.String `tfsdk:"type"`
-	Name types.String `tfsdk:"name"`
-	Frequency types.String `tfsdk:"frequency"`
-	Capacity types.String `tfsdk:"capacity"`
-	Vendor types.String `tfsdk:"vendor"`
-	InactiveDevices types.String `tfsdk:"inactive_devices"`
-	CountValue types.String `tfsdk:"count_value"`
-	MachineId types.String `tfsdk:"machine_id"`
-	InfrastructureProviderId types.String `tfsdk:"infrastructure_provider_id"`
-	InstanceId types.String `tfsdk:"instance_id"`
-	ControllerMachineId types.String `tfsdk:"controller_machine_id"`
-	ControllerMachineType types.String `tfsdk:"controller_machine_type"`
-	ProductName types.String `tfsdk:"product_name"`
-	SerialNumber types.String `tfsdk:"serial_number"`
-	MachineCapabilities []MachineDsMachineCapabilitiesItem `tfsdk:"machine_capabilities"`
-	MachineInterfaces []MachineDsMachineInterfacesItem `tfsdk:"machine_interfaces"`
-	AssociatedDpuMachineIds types.List `tfsdk:"associated_dpu_machine_ids"`
-	PlacementInRack *MachineDsPlacementInRack `tfsdk:"placement_in_rack"`
-	MaintenanceMessage types.String `tfsdk:"maintenance_message"`
-	ScoutVersion types.String `tfsdk:"scout_version"`
-	Health *MachineDsHealth `tfsdk:"health"`
-	Metadata *MachineDsMetadata `tfsdk:"metadata"`
-	Labels types.Map `tfsdk:"labels"`
-	IsUsableByTenant types.Bool `tfsdk:"is_usable_by_tenant"`
-	StatusHistory []MachineDsStatusHistoryItem `tfsdk:"status_history"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
+	Id                       types.String                       `tfsdk:"id"`
+	SiteId                   types.String                       `tfsdk:"site_id"`
+	HasInstanceType          types.String                       `tfsdk:"has_instance_type"`
+	InstanceTypeId           types.String                       `tfsdk:"instance_type_id"`
+	TenantId                 types.String                       `tfsdk:"tenant_id"`
+	HasInstance              types.String                       `tfsdk:"has_instance"`
+	IsMissingOnSite          types.String                       `tfsdk:"is_missing_on_site"`
+	IncludeMetadata          types.String                       `tfsdk:"include_metadata"`
+	Status                   types.String                       `tfsdk:"status"`
+	CapabilityType           types.String                       `tfsdk:"capability_type"`
+	CapabilityName           types.String                       `tfsdk:"capability_name"`
+	HwSkuDeviceType          types.String                       `tfsdk:"hw_sku_device_type"`
+	Query                    types.String                       `tfsdk:"query"`
+	Type                     types.String                       `tfsdk:"type"`
+	Name                     types.String                       `tfsdk:"name"`
+	Frequency                types.String                       `tfsdk:"frequency"`
+	Capacity                 types.String                       `tfsdk:"capacity"`
+	Vendor                   types.String                       `tfsdk:"vendor"`
+	InactiveDevices          types.String                       `tfsdk:"inactive_devices"`
+	CountValue               types.String                       `tfsdk:"count_value"`
+	InfrastructureProviderId types.String                       `tfsdk:"infrastructure_provider_id"`
+	InstanceId               types.String                       `tfsdk:"instance_id"`
+	ControllerMachineId      types.String                       `tfsdk:"controller_machine_id"`
+	ControllerMachineType    types.String                       `tfsdk:"controller_machine_type"`
+	ProductName              types.String                       `tfsdk:"product_name"`
+	SerialNumber             types.String                       `tfsdk:"serial_number"`
+	MachineCapabilities      []MachineDsMachineCapabilitiesItem `tfsdk:"machine_capabilities"`
+	MachineInterfaces        []MachineDsMachineInterfacesItem   `tfsdk:"machine_interfaces"`
+	AssociatedDpuMachineIds  types.List                         `tfsdk:"associated_dpu_machine_ids"`
+	PlacementInRack          *MachineDsPlacementInRack          `tfsdk:"placement_in_rack"`
+	MaintenanceMessage       types.String                       `tfsdk:"maintenance_message"`
+	Health                   *MachineDsHealth                   `tfsdk:"health"`
+	Metadata                 *MachineDsMetadata                 `tfsdk:"metadata"`
+	Labels                   types.Map                          `tfsdk:"labels"`
+	IsUsableByTenant         types.Bool                         `tfsdk:"is_usable_by_tenant"`
+	StatusHistory            []MachineDsStatusHistoryItem       `tfsdk:"status_history"`
+	Created                  types.String                       `tfsdk:"created"`
+	Updated                  types.String                       `tfsdk:"updated"`
 }
 
 type MachineDsMachineCapabilitiesItem struct {
-	Type types.String `tfsdk:"type"`
-	Name types.String `tfsdk:"name"`
-	Frequency types.String `tfsdk:"frequency"`
-	Cores types.Int64 `tfsdk:"cores"`
-	Threads types.Int64 `tfsdk:"threads"`
-	Capacity types.String `tfsdk:"capacity"`
-	Vendor types.String `tfsdk:"vendor"`
+	Type             types.String `tfsdk:"type"`
+	Name             types.String `tfsdk:"name"`
+	Frequency        types.String `tfsdk:"frequency"`
+	Cores            types.Int64  `tfsdk:"cores"`
+	Threads          types.Int64  `tfsdk:"threads"`
+	Capacity         types.String `tfsdk:"capacity"`
+	Vendor           types.String `tfsdk:"vendor"`
 	HardwareRevision types.String `tfsdk:"hardware_revision"`
-	InactiveDevices types.List `tfsdk:"inactive_devices"`
-	CountValue types.Int64 `tfsdk:"count_value"`
-	DeviceType types.String `tfsdk:"device_type"`
+	InactiveDevices  types.List   `tfsdk:"inactive_devices"`
+	CountValue       types.Int64  `tfsdk:"count_value"`
+	DeviceType       types.String `tfsdk:"device_type"`
 }
 
 type MachineDsMachineInterfacesItem struct {
-	Id types.String `tfsdk:"id"`
-	MachineId types.String `tfsdk:"machine_id"`
+	Id                    types.String `tfsdk:"id"`
+	MachineId             types.String `tfsdk:"machine_id"`
 	ControllerInterfaceId types.String `tfsdk:"controller_interface_id"`
-	ControllerSegmentId types.String `tfsdk:"controller_segment_id"`
-	AttachedDpuMachineId types.String `tfsdk:"attached_dpu_machine_id"`
-	SubnetId types.String `tfsdk:"subnet_id"`
-	Hostname types.String `tfsdk:"hostname"`
-	IsPrimary types.Bool `tfsdk:"is_primary"`
-	MacAddress types.String `tfsdk:"mac_address"`
-	IpAddresses types.List `tfsdk:"ip_addresses"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
+	ControllerSegmentId   types.String `tfsdk:"controller_segment_id"`
+	AttachedDpuMachineId  types.String `tfsdk:"attached_dpu_machine_id"`
+	SubnetId              types.String `tfsdk:"subnet_id"`
+	Hostname              types.String `tfsdk:"hostname"`
+	IsPrimary             types.Bool   `tfsdk:"is_primary"`
+	MacAddress            types.String `tfsdk:"mac_address"`
+	IpAddresses           types.List   `tfsdk:"ip_addresses"`
+	Created               types.String `tfsdk:"created"`
+	Updated               types.String `tfsdk:"updated"`
 }
 
 type MachineDsPlacementInRack struct {
 	SlotNumber types.Int64 `tfsdk:"slot_number"`
-	TrayIndex types.Int64 `tfsdk:"tray_index"`
+	TrayIndex  types.Int64 `tfsdk:"tray_index"`
 }
 
 type MachineDsHealth struct {
-	Source types.String `tfsdk:"source"`
-	ObservedAt types.String `tfsdk:"observed_at"`
-	Successes []MachineDsHealthSuccessesItem `tfsdk:"successes"`
-	Alerts []MachineDsHealthAlertsItem `tfsdk:"alerts"`
+	Source     types.String                   `tfsdk:"source"`
+	ObservedAt types.String                   `tfsdk:"observed_at"`
+	Successes  []MachineDsHealthSuccessesItem `tfsdk:"successes"`
+	Alerts     []MachineDsHealthAlertsItem    `tfsdk:"alerts"`
 }
 
 type MachineDsHealthSuccessesItem struct {
-	Id types.String `tfsdk:"id"`
+	Id     types.String `tfsdk:"id"`
 	Target types.String `tfsdk:"target"`
 }
 
 type MachineDsHealthAlertsItem struct {
-	Id types.String `tfsdk:"id"`
-	Target types.String `tfsdk:"target"`
-	InAlertSince types.String `tfsdk:"in_alert_since"`
-	Message types.String `tfsdk:"message"`
-	TenantMessage types.String `tfsdk:"tenant_message"`
-	Classifications types.List `tfsdk:"classifications"`
+	Id              types.String `tfsdk:"id"`
+	Target          types.String `tfsdk:"target"`
+	InAlertSince    types.String `tfsdk:"in_alert_since"`
+	Message         types.String `tfsdk:"message"`
+	TenantMessage   types.String `tfsdk:"tenant_message"`
+	Classifications types.List   `tfsdk:"classifications"`
 }
 
 type MachineDsMetadata struct {
-	DmiData *MachineDsMetadataDmiData `tfsdk:"dmi_data"`
-	BmcInfo *MachineDsMetadataBmcInfo `tfsdk:"bmc_info"`
-	Gpus []MachineDsMetadataGpusItem `tfsdk:"gpus"`
-	NetworkInterfaces []MachineDsMetadataNetworkInterfacesItem `tfsdk:"network_interfaces"`
+	DmiData              *MachineDsMetadataDmiData                   `tfsdk:"dmi_data"`
+	BmcInfo              *MachineDsMetadataBmcInfo                   `tfsdk:"bmc_info"`
+	Gpus                 []MachineDsMetadataGpusItem                 `tfsdk:"gpus"`
+	NetworkInterfaces    []MachineDsMetadataNetworkInterfacesItem    `tfsdk:"network_interfaces"`
 	InfinibandInterfaces []MachineDsMetadataInfinibandInterfacesItem `tfsdk:"infiniband_interfaces"`
-	LifecycleState types.String `tfsdk:"lifecycle_state"`
 }
 
 type MachineDsMetadataDmiData struct {
-	BoardName types.String `tfsdk:"board_name"`
-	BoardSerial types.String `tfsdk:"board_serial"`
-	BoardVersion types.String `tfsdk:"board_version"`
-	BiosDate types.String `tfsdk:"bios_date"`
-	BiosVersion types.String `tfsdk:"bios_version"`
-	ProductName types.String `tfsdk:"product_name"`
+	BoardName     types.String `tfsdk:"board_name"`
+	BoardSerial   types.String `tfsdk:"board_serial"`
+	BoardVersion  types.String `tfsdk:"board_version"`
+	BiosDate      types.String `tfsdk:"bios_date"`
+	BiosVersion   types.String `tfsdk:"bios_version"`
+	ProductName   types.String `tfsdk:"product_name"`
 	ProductSerial types.String `tfsdk:"product_serial"`
 	ChassisSerial types.String `tfsdk:"chassis_serial"`
-	SysVendor types.String `tfsdk:"sys_vendor"`
+	SysVendor     types.String `tfsdk:"sys_vendor"`
 }
 
 type MachineDsMetadataBmcInfo struct {
-	Ip types.String `tfsdk:"ip"`
-	Mac types.String `tfsdk:"mac"`
-	Version types.String `tfsdk:"version"`
+	Ip               types.String `tfsdk:"ip"`
+	Mac              types.String `tfsdk:"mac"`
+	Version          types.String `tfsdk:"version"`
 	FirmwareRevision types.String `tfsdk:"firmware_revision"`
 }
 
 type MachineDsMetadataGpusItem struct {
-	Name types.String `tfsdk:"name"`
-	Serial types.String `tfsdk:"serial"`
-	DriverVersion types.String `tfsdk:"driver_version"`
-	VbiosVersion types.String `tfsdk:"vbios_version"`
+	Name           types.String `tfsdk:"name"`
+	Serial         types.String `tfsdk:"serial"`
+	DriverVersion  types.String `tfsdk:"driver_version"`
+	VbiosVersion   types.String `tfsdk:"vbios_version"`
 	InforomVersion types.String `tfsdk:"inforom_version"`
-	TotalMemory types.String `tfsdk:"total_memory"`
-	Frequency types.String `tfsdk:"frequency"`
-	PciBusId types.String `tfsdk:"pci_bus_id"`
+	TotalMemory    types.String `tfsdk:"total_memory"`
+	Frequency      types.String `tfsdk:"frequency"`
+	PciBusId       types.String `tfsdk:"pci_bus_id"`
 }
 
 type MachineDsMetadataNetworkInterfacesItem struct {
-	MacAddress types.String `tfsdk:"mac_address"`
-	Vendor types.String `tfsdk:"vendor"`
-	Device types.String `tfsdk:"device"`
-	Path types.String `tfsdk:"path"`
-	NumaNode types.Int64 `tfsdk:"numa_node"`
+	MacAddress  types.String `tfsdk:"mac_address"`
+	Vendor      types.String `tfsdk:"vendor"`
+	Device      types.String `tfsdk:"device"`
+	Path        types.String `tfsdk:"path"`
+	NumaNode    types.Int64  `tfsdk:"numa_node"`
 	Description types.String `tfsdk:"description"`
-	Slot types.String `tfsdk:"slot"`
+	Slot        types.String `tfsdk:"slot"`
 }
 
 type MachineDsMetadataInfinibandInterfacesItem struct {
-	Guid types.String `tfsdk:"guid"`
-	Vendor types.String `tfsdk:"vendor"`
-	Device types.String `tfsdk:"device"`
-	Path types.String `tfsdk:"path"`
-	NumaNode types.Int64 `tfsdk:"numa_node"`
+	Guid        types.String `tfsdk:"guid"`
+	Vendor      types.String `tfsdk:"vendor"`
+	Device      types.String `tfsdk:"device"`
+	Path        types.String `tfsdk:"path"`
+	NumaNode    types.Int64  `tfsdk:"numa_node"`
 	Description types.String `tfsdk:"description"`
-	Slot types.String `tfsdk:"slot"`
+	Slot        types.String `tfsdk:"slot"`
 }
 
 type MachineDsStatusHistoryItem struct {
-	Status types.String `tfsdk:"status"`
+	Status  types.String `tfsdk:"status"`
 	Message types.String `tfsdk:"message"`
 	Created types.String `tfsdk:"created"`
 	Updated types.String `tfsdk:"updated"`
 }
-
 
 func (d *MachineDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_machine"
@@ -312,12 +308,6 @@ func (d *MachineDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 				Optional:    true,
 				Computed:    true,
 				Description: "Filter Capabilities by Count",
-			},
-			"machine_id": schema.StringAttribute{
-				Required:    false,
-				Optional:    true,
-				Computed:    true,
-				Description: "Path parameter: machine_id.",
 			},
 			"infrastructure_provider_id": schema.StringAttribute{
 				Required:    false,
@@ -548,12 +538,6 @@ func (d *MachineDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 				Computed:    true,
 				Description: "If the Machine is in maintenance mode, this message will typically describe the reason and how long it is expected to be in maintenance",
 			},
-			"scout_version": schema.StringAttribute{
-				Required:    false,
-				Optional:    false,
-				Computed:    true,
-				Description: "Scout version reported by the Machine, if known",
-			},
 			"health": schema.SingleNestedAttribute{
 				Required:    false,
 				Optional:    false,
@@ -721,7 +705,7 @@ func (d *MachineDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 								Required:    false,
 								Optional:    false,
 								Computed:    true,
-								Description: "IPv4 or IPv6 address of the Machine BMC",
+								Description: "IP address of the Machine BMC",
 							},
 							"mac": schema.StringAttribute{
 								Required:    false,
@@ -905,12 +889,6 @@ func (d *MachineDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 							},
 						},
 					},
-					"lifecycle_state": schema.StringAttribute{
-						Required:    false,
-						Optional:    false,
-						Computed:    true,
-						Description: "Lifecycle state details for the Machine",
-					},
 				},
 			},
 			"labels": schema.MapAttribute{
@@ -924,7 +902,7 @@ func (d *MachineDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
-				Description: "Indicates whether the machine is usable by or currently in use by a tenant. It does not indicate that a Machine is available for Instance creation.",
+				Description: "Indicates whether the machine is usable by or currently in use by a tenant.",
 			},
 			"status_history": schema.ListNestedAttribute{
 				Required:    false,
@@ -999,7 +977,7 @@ func (d *MachineDataSource) Read(ctx context.Context, req datasource.ReadRequest
 	}
 
 	if !data.Id.IsNull() && !data.Id.IsUnknown() && data.Id.ValueString() != "" {
-		url := d.client.ResolvePath("/v2/org/{org}/nico/machine/{machineId}/health-report/{source}", map[string]string{"machineId": data.MachineId.ValueString(), "source": data.Id.ValueString()})
+		url := d.client.ResolvePath("/v2/org/{org}/nico/machine/{machineId}", map[string]string{"machineId": data.Id.ValueString()})
 		result, err := d.client.Get(ctx, url)
 		if err != nil {
 			resp.Diagnostics.AddError("Error reading Machine", err.Error())
@@ -1021,7 +999,9 @@ func (d *MachineDataSource) Read(ctx context.Context, req datasource.ReadRequest
 			items_machine_capabilities := make([]MachineDsMachineCapabilitiesItem, len(rawItems_machine_capabilities))
 			for i_machine_capabilities, raw_machine_capabilities := range rawItems_machine_capabilities {
 				m_machine_capabilities, _ := raw_machine_capabilities.(map[string]interface{})
-				if m_machine_capabilities == nil { m_machine_capabilities = map[string]interface{}{} }
+				if m_machine_capabilities == nil {
+					m_machine_capabilities = map[string]interface{}{}
+				}
 				items_machine_capabilities[i_machine_capabilities].Type = StringFromAPI(m_machine_capabilities["type"])
 				items_machine_capabilities[i_machine_capabilities].Name = StringFromAPI(m_machine_capabilities["name"])
 				items_machine_capabilities[i_machine_capabilities].Frequency = StringFromAPI(m_machine_capabilities["frequency"])
@@ -1042,7 +1022,9 @@ func (d *MachineDataSource) Read(ctx context.Context, req datasource.ReadRequest
 			items_machine_interfaces := make([]MachineDsMachineInterfacesItem, len(rawItems_machine_interfaces))
 			for i_machine_interfaces, raw_machine_interfaces := range rawItems_machine_interfaces {
 				m_machine_interfaces, _ := raw_machine_interfaces.(map[string]interface{})
-				if m_machine_interfaces == nil { m_machine_interfaces = map[string]interface{}{} }
+				if m_machine_interfaces == nil {
+					m_machine_interfaces = map[string]interface{}{}
+				}
 				items_machine_interfaces[i_machine_interfaces].Id = StringFromAPI(m_machine_interfaces["id"])
 				items_machine_interfaces[i_machine_interfaces].MachineId = StringFromAPI(m_machine_interfaces["machineId"])
 				items_machine_interfaces[i_machine_interfaces].ControllerInterfaceId = StringFromAPI(m_machine_interfaces["controllerInterfaceId"])
@@ -1077,7 +1059,6 @@ func (d *MachineDataSource) Read(ctx context.Context, req datasource.ReadRequest
 			data.PlacementInRack = nil
 		}
 		data.MaintenanceMessage = StringFromAPI(result["maintenanceMessage"])
-		data.ScoutVersion = StringFromAPI(result["scoutVersion"])
 		if rawObj_health, ok := result["health"].(map[string]interface{}); ok {
 			obj_health := &MachineDsHealth{}
 			obj_health.Source = StringFromAPI(rawObj_health["source"])
@@ -1096,7 +1077,6 @@ func (d *MachineDataSource) Read(ctx context.Context, req datasource.ReadRequest
 			// gpus: nested field — expand manually if needed
 			// networkInterfaces: nested field — expand manually if needed
 			// infinibandInterfaces: nested field — expand manually if needed
-			obj_metadata.LifecycleState = StringFromAPI(rawObj_metadata["lifecycleState"])
 			_ = rawObj_metadata
 			data.Metadata = obj_metadata
 		} else {
@@ -1114,7 +1094,9 @@ func (d *MachineDataSource) Read(ctx context.Context, req datasource.ReadRequest
 			items_status_history := make([]MachineDsStatusHistoryItem, len(rawItems_status_history))
 			for i_status_history, raw_status_history := range rawItems_status_history {
 				m_status_history, _ := raw_status_history.(map[string]interface{})
-				if m_status_history == nil { m_status_history = map[string]interface{}{} }
+				if m_status_history == nil {
+					m_status_history = map[string]interface{}{}
+				}
 				items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 				items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 				items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -1139,121 +1121,125 @@ func (d *MachineDataSource) Read(ctx context.Context, req datasource.ReadRequest
 			data.Id = StringFromAPI(result["id"])
 			diags := resp.Diagnostics
 			data.InfrastructureProviderId = StringFromAPI(result["infrastructureProviderId"])
-		data.InstanceId = StringFromAPI(result["instanceId"])
-		data.ControllerMachineId = StringFromAPI(result["controllerMachineId"])
-		data.ControllerMachineType = StringFromAPI(result["controllerMachineType"])
-		data.ProductName = StringFromAPI(result["productName"])
-		data.SerialNumber = StringFromAPI(result["serialNumber"])
-		if rawItems_machine_capabilities, ok := result["machineCapabilities"].([]interface{}); ok && rawItems_machine_capabilities != nil {
-			items_machine_capabilities := make([]MachineDsMachineCapabilitiesItem, len(rawItems_machine_capabilities))
-			for i_machine_capabilities, raw_machine_capabilities := range rawItems_machine_capabilities {
-				m_machine_capabilities, _ := raw_machine_capabilities.(map[string]interface{})
-				if m_machine_capabilities == nil { m_machine_capabilities = map[string]interface{}{} }
-				items_machine_capabilities[i_machine_capabilities].Type = StringFromAPI(m_machine_capabilities["type"])
-				items_machine_capabilities[i_machine_capabilities].Name = StringFromAPI(m_machine_capabilities["name"])
-				items_machine_capabilities[i_machine_capabilities].Frequency = StringFromAPI(m_machine_capabilities["frequency"])
-				items_machine_capabilities[i_machine_capabilities].Cores = Int64FromAPI(m_machine_capabilities["cores"])
-				items_machine_capabilities[i_machine_capabilities].Threads = Int64FromAPI(m_machine_capabilities["threads"])
-				items_machine_capabilities[i_machine_capabilities].Capacity = StringFromAPI(m_machine_capabilities["capacity"])
-				items_machine_capabilities[i_machine_capabilities].Vendor = StringFromAPI(m_machine_capabilities["vendor"])
-				items_machine_capabilities[i_machine_capabilities].HardwareRevision = StringFromAPI(m_machine_capabilities["hardwareRevision"])
-				// inactiveDevices: nested field — expand manually if needed
-				items_machine_capabilities[i_machine_capabilities].CountValue = Int64FromAPI(m_machine_capabilities["count"])
-				items_machine_capabilities[i_machine_capabilities].DeviceType = StringFromAPI(m_machine_capabilities["deviceType"])
+			data.InstanceId = StringFromAPI(result["instanceId"])
+			data.ControllerMachineId = StringFromAPI(result["controllerMachineId"])
+			data.ControllerMachineType = StringFromAPI(result["controllerMachineType"])
+			data.ProductName = StringFromAPI(result["productName"])
+			data.SerialNumber = StringFromAPI(result["serialNumber"])
+			if rawItems_machine_capabilities, ok := result["machineCapabilities"].([]interface{}); ok && rawItems_machine_capabilities != nil {
+				items_machine_capabilities := make([]MachineDsMachineCapabilitiesItem, len(rawItems_machine_capabilities))
+				for i_machine_capabilities, raw_machine_capabilities := range rawItems_machine_capabilities {
+					m_machine_capabilities, _ := raw_machine_capabilities.(map[string]interface{})
+					if m_machine_capabilities == nil {
+						m_machine_capabilities = map[string]interface{}{}
+					}
+					items_machine_capabilities[i_machine_capabilities].Type = StringFromAPI(m_machine_capabilities["type"])
+					items_machine_capabilities[i_machine_capabilities].Name = StringFromAPI(m_machine_capabilities["name"])
+					items_machine_capabilities[i_machine_capabilities].Frequency = StringFromAPI(m_machine_capabilities["frequency"])
+					items_machine_capabilities[i_machine_capabilities].Cores = Int64FromAPI(m_machine_capabilities["cores"])
+					items_machine_capabilities[i_machine_capabilities].Threads = Int64FromAPI(m_machine_capabilities["threads"])
+					items_machine_capabilities[i_machine_capabilities].Capacity = StringFromAPI(m_machine_capabilities["capacity"])
+					items_machine_capabilities[i_machine_capabilities].Vendor = StringFromAPI(m_machine_capabilities["vendor"])
+					items_machine_capabilities[i_machine_capabilities].HardwareRevision = StringFromAPI(m_machine_capabilities["hardwareRevision"])
+					// inactiveDevices: nested field — expand manually if needed
+					items_machine_capabilities[i_machine_capabilities].CountValue = Int64FromAPI(m_machine_capabilities["count"])
+					items_machine_capabilities[i_machine_capabilities].DeviceType = StringFromAPI(m_machine_capabilities["deviceType"])
+				}
+				data.MachineCapabilities = items_machine_capabilities
+			} else {
+				data.MachineCapabilities = nil
 			}
-			data.MachineCapabilities = items_machine_capabilities
-		} else {
-			data.MachineCapabilities = nil
-		}
-		if rawItems_machine_interfaces, ok := result["machineInterfaces"].([]interface{}); ok && rawItems_machine_interfaces != nil {
-			items_machine_interfaces := make([]MachineDsMachineInterfacesItem, len(rawItems_machine_interfaces))
-			for i_machine_interfaces, raw_machine_interfaces := range rawItems_machine_interfaces {
-				m_machine_interfaces, _ := raw_machine_interfaces.(map[string]interface{})
-				if m_machine_interfaces == nil { m_machine_interfaces = map[string]interface{}{} }
-				items_machine_interfaces[i_machine_interfaces].Id = StringFromAPI(m_machine_interfaces["id"])
-				items_machine_interfaces[i_machine_interfaces].MachineId = StringFromAPI(m_machine_interfaces["machineId"])
-				items_machine_interfaces[i_machine_interfaces].ControllerInterfaceId = StringFromAPI(m_machine_interfaces["controllerInterfaceId"])
-				items_machine_interfaces[i_machine_interfaces].ControllerSegmentId = StringFromAPI(m_machine_interfaces["controllerSegmentId"])
-				items_machine_interfaces[i_machine_interfaces].AttachedDpuMachineId = StringFromAPI(m_machine_interfaces["attachedDpuMachineID"])
-				items_machine_interfaces[i_machine_interfaces].SubnetId = StringFromAPI(m_machine_interfaces["subnetId"])
-				items_machine_interfaces[i_machine_interfaces].Hostname = StringFromAPI(m_machine_interfaces["hostname"])
-				items_machine_interfaces[i_machine_interfaces].IsPrimary = BoolFromAPI(m_machine_interfaces["isPrimary"])
-				items_machine_interfaces[i_machine_interfaces].MacAddress = StringFromAPI(m_machine_interfaces["macAddress"])
-				// ipAddresses: nested field — expand manually if needed
-				items_machine_interfaces[i_machine_interfaces].Created = StringFromAPI(m_machine_interfaces["created"])
-				items_machine_interfaces[i_machine_interfaces].Updated = StringFromAPI(m_machine_interfaces["updated"])
+			if rawItems_machine_interfaces, ok := result["machineInterfaces"].([]interface{}); ok && rawItems_machine_interfaces != nil {
+				items_machine_interfaces := make([]MachineDsMachineInterfacesItem, len(rawItems_machine_interfaces))
+				for i_machine_interfaces, raw_machine_interfaces := range rawItems_machine_interfaces {
+					m_machine_interfaces, _ := raw_machine_interfaces.(map[string]interface{})
+					if m_machine_interfaces == nil {
+						m_machine_interfaces = map[string]interface{}{}
+					}
+					items_machine_interfaces[i_machine_interfaces].Id = StringFromAPI(m_machine_interfaces["id"])
+					items_machine_interfaces[i_machine_interfaces].MachineId = StringFromAPI(m_machine_interfaces["machineId"])
+					items_machine_interfaces[i_machine_interfaces].ControllerInterfaceId = StringFromAPI(m_machine_interfaces["controllerInterfaceId"])
+					items_machine_interfaces[i_machine_interfaces].ControllerSegmentId = StringFromAPI(m_machine_interfaces["controllerSegmentId"])
+					items_machine_interfaces[i_machine_interfaces].AttachedDpuMachineId = StringFromAPI(m_machine_interfaces["attachedDpuMachineID"])
+					items_machine_interfaces[i_machine_interfaces].SubnetId = StringFromAPI(m_machine_interfaces["subnetId"])
+					items_machine_interfaces[i_machine_interfaces].Hostname = StringFromAPI(m_machine_interfaces["hostname"])
+					items_machine_interfaces[i_machine_interfaces].IsPrimary = BoolFromAPI(m_machine_interfaces["isPrimary"])
+					items_machine_interfaces[i_machine_interfaces].MacAddress = StringFromAPI(m_machine_interfaces["macAddress"])
+					// ipAddresses: nested field — expand manually if needed
+					items_machine_interfaces[i_machine_interfaces].Created = StringFromAPI(m_machine_interfaces["created"])
+					items_machine_interfaces[i_machine_interfaces].Updated = StringFromAPI(m_machine_interfaces["updated"])
+				}
+				data.MachineInterfaces = items_machine_interfaces
+			} else {
+				data.MachineInterfaces = nil
 			}
-			data.MachineInterfaces = items_machine_interfaces
-		} else {
-			data.MachineInterfaces = nil
-		}
-		if rawSlice_associated_dpu_machine_ids := StringSliceFromAPI(result["associatedDpuMachineIds"]); rawSlice_associated_dpu_machine_ids != nil {
-			lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_associated_dpu_machine_ids)
-			diags.Append(d...)
-			data.AssociatedDpuMachineIds = lv
-		} else {
-			data.AssociatedDpuMachineIds = types.ListNull(types.StringType)
-		}
-		if rawObj_placement_in_rack, ok := result["placementInRack"].(map[string]interface{}); ok {
-			obj_placement_in_rack := &MachineDsPlacementInRack{}
-			obj_placement_in_rack.SlotNumber = Int64FromAPI(rawObj_placement_in_rack["slotNumber"])
-			obj_placement_in_rack.TrayIndex = Int64FromAPI(rawObj_placement_in_rack["trayIndex"])
-			_ = rawObj_placement_in_rack
-			data.PlacementInRack = obj_placement_in_rack
-		} else {
-			data.PlacementInRack = nil
-		}
-		data.MaintenanceMessage = StringFromAPI(result["maintenanceMessage"])
-		data.ScoutVersion = StringFromAPI(result["scoutVersion"])
-		if rawObj_health, ok := result["health"].(map[string]interface{}); ok {
-			obj_health := &MachineDsHealth{}
-			obj_health.Source = StringFromAPI(rawObj_health["source"])
-			obj_health.ObservedAt = StringFromAPI(rawObj_health["observedAt"])
-			// successes: nested field — expand manually if needed
-			// alerts: nested field — expand manually if needed
-			_ = rawObj_health
-			data.Health = obj_health
-		} else {
-			data.Health = nil
-		}
-		if rawObj_metadata, ok := result["metadata"].(map[string]interface{}); ok {
-			obj_metadata := &MachineDsMetadata{}
-			// dmiData: nested field — expand manually if needed
-			// bmcInfo: nested field — expand manually if needed
-			// gpus: nested field — expand manually if needed
-			// networkInterfaces: nested field — expand manually if needed
-			// infinibandInterfaces: nested field — expand manually if needed
-			obj_metadata.LifecycleState = StringFromAPI(rawObj_metadata["lifecycleState"])
-			_ = rawObj_metadata
-			data.Metadata = obj_metadata
-		} else {
-			data.Metadata = nil
-		}
-		if rawMap_labels := StringMapFromAPI(result["labels"]); rawMap_labels != nil {
-			mv, d := types.MapValueFrom(ctx, types.StringType, rawMap_labels)
-			diags.Append(d...)
-			data.Labels = mv
-		} else {
-			data.Labels = types.MapNull(types.StringType)
-		}
-		data.IsUsableByTenant = BoolFromAPI(result["isUsableByTenant"])
-		if rawItems_status_history, ok := result["statusHistory"].([]interface{}); ok && rawItems_status_history != nil {
-			items_status_history := make([]MachineDsStatusHistoryItem, len(rawItems_status_history))
-			for i_status_history, raw_status_history := range rawItems_status_history {
-				m_status_history, _ := raw_status_history.(map[string]interface{})
-				if m_status_history == nil { m_status_history = map[string]interface{}{} }
-				items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
-				items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
-				items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
-				items_status_history[i_status_history].Updated = StringFromAPI(m_status_history["updated"])
+			if rawSlice_associated_dpu_machine_ids := StringSliceFromAPI(result["associatedDpuMachineIds"]); rawSlice_associated_dpu_machine_ids != nil {
+				lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_associated_dpu_machine_ids)
+				diags.Append(d...)
+				data.AssociatedDpuMachineIds = lv
+			} else {
+				data.AssociatedDpuMachineIds = types.ListNull(types.StringType)
 			}
-			data.StatusHistory = items_status_history
-		} else {
-			data.StatusHistory = nil
-		}
-		data.Created = StringFromAPI(result["created"])
-		data.Updated = StringFromAPI(result["updated"])
-		_ = diags
+			if rawObj_placement_in_rack, ok := result["placementInRack"].(map[string]interface{}); ok {
+				obj_placement_in_rack := &MachineDsPlacementInRack{}
+				obj_placement_in_rack.SlotNumber = Int64FromAPI(rawObj_placement_in_rack["slotNumber"])
+				obj_placement_in_rack.TrayIndex = Int64FromAPI(rawObj_placement_in_rack["trayIndex"])
+				_ = rawObj_placement_in_rack
+				data.PlacementInRack = obj_placement_in_rack
+			} else {
+				data.PlacementInRack = nil
+			}
+			data.MaintenanceMessage = StringFromAPI(result["maintenanceMessage"])
+			if rawObj_health, ok := result["health"].(map[string]interface{}); ok {
+				obj_health := &MachineDsHealth{}
+				obj_health.Source = StringFromAPI(rawObj_health["source"])
+				obj_health.ObservedAt = StringFromAPI(rawObj_health["observedAt"])
+				// successes: nested field — expand manually if needed
+				// alerts: nested field — expand manually if needed
+				_ = rawObj_health
+				data.Health = obj_health
+			} else {
+				data.Health = nil
+			}
+			if rawObj_metadata, ok := result["metadata"].(map[string]interface{}); ok {
+				obj_metadata := &MachineDsMetadata{}
+				// dmiData: nested field — expand manually if needed
+				// bmcInfo: nested field — expand manually if needed
+				// gpus: nested field — expand manually if needed
+				// networkInterfaces: nested field — expand manually if needed
+				// infinibandInterfaces: nested field — expand manually if needed
+				_ = rawObj_metadata
+				data.Metadata = obj_metadata
+			} else {
+				data.Metadata = nil
+			}
+			if rawMap_labels := StringMapFromAPI(result["labels"]); rawMap_labels != nil {
+				mv, d := types.MapValueFrom(ctx, types.StringType, rawMap_labels)
+				diags.Append(d...)
+				data.Labels = mv
+			} else {
+				data.Labels = types.MapNull(types.StringType)
+			}
+			data.IsUsableByTenant = BoolFromAPI(result["isUsableByTenant"])
+			if rawItems_status_history, ok := result["statusHistory"].([]interface{}); ok && rawItems_status_history != nil {
+				items_status_history := make([]MachineDsStatusHistoryItem, len(rawItems_status_history))
+				for i_status_history, raw_status_history := range rawItems_status_history {
+					m_status_history, _ := raw_status_history.(map[string]interface{})
+					if m_status_history == nil {
+						m_status_history = map[string]interface{}{}
+					}
+					items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
+					items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
+					items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
+					items_status_history[i_status_history].Updated = StringFromAPI(m_status_history["updated"])
+				}
+				data.StatusHistory = items_status_history
+			} else {
+				data.StatusHistory = nil
+			}
+			data.Created = StringFromAPI(result["created"])
+			data.Updated = StringFromAPI(result["updated"])
+			_ = diags
 		}
 	}
 
@@ -1271,7 +1257,9 @@ func (d *MachineDataSource) populateModel(ctx context.Context, data *MachineData
 		items_machine_capabilities := make([]MachineDsMachineCapabilitiesItem, len(rawItems_machine_capabilities))
 		for i_machine_capabilities, raw_machine_capabilities := range rawItems_machine_capabilities {
 			m_machine_capabilities, _ := raw_machine_capabilities.(map[string]interface{})
-			if m_machine_capabilities == nil { m_machine_capabilities = map[string]interface{}{} }
+			if m_machine_capabilities == nil {
+				m_machine_capabilities = map[string]interface{}{}
+			}
 			items_machine_capabilities[i_machine_capabilities].Type = StringFromAPI(m_machine_capabilities["type"])
 			items_machine_capabilities[i_machine_capabilities].Name = StringFromAPI(m_machine_capabilities["name"])
 			items_machine_capabilities[i_machine_capabilities].Frequency = StringFromAPI(m_machine_capabilities["frequency"])
@@ -1292,7 +1280,9 @@ func (d *MachineDataSource) populateModel(ctx context.Context, data *MachineData
 		items_machine_interfaces := make([]MachineDsMachineInterfacesItem, len(rawItems_machine_interfaces))
 		for i_machine_interfaces, raw_machine_interfaces := range rawItems_machine_interfaces {
 			m_machine_interfaces, _ := raw_machine_interfaces.(map[string]interface{})
-			if m_machine_interfaces == nil { m_machine_interfaces = map[string]interface{}{} }
+			if m_machine_interfaces == nil {
+				m_machine_interfaces = map[string]interface{}{}
+			}
 			items_machine_interfaces[i_machine_interfaces].Id = StringFromAPI(m_machine_interfaces["id"])
 			items_machine_interfaces[i_machine_interfaces].MachineId = StringFromAPI(m_machine_interfaces["machineId"])
 			items_machine_interfaces[i_machine_interfaces].ControllerInterfaceId = StringFromAPI(m_machine_interfaces["controllerInterfaceId"])
@@ -1327,7 +1317,6 @@ func (d *MachineDataSource) populateModel(ctx context.Context, data *MachineData
 		data.PlacementInRack = nil
 	}
 	data.MaintenanceMessage = StringFromAPI(result["maintenanceMessage"])
-	data.ScoutVersion = StringFromAPI(result["scoutVersion"])
 	if rawObj_health, ok := result["health"].(map[string]interface{}); ok {
 		obj_health := &MachineDsHealth{}
 		obj_health.Source = StringFromAPI(rawObj_health["source"])
@@ -1346,7 +1335,6 @@ func (d *MachineDataSource) populateModel(ctx context.Context, data *MachineData
 		// gpus: nested field — expand manually if needed
 		// networkInterfaces: nested field — expand manually if needed
 		// infinibandInterfaces: nested field — expand manually if needed
-		obj_metadata.LifecycleState = StringFromAPI(rawObj_metadata["lifecycleState"])
 		_ = rawObj_metadata
 		data.Metadata = obj_metadata
 	} else {
@@ -1364,7 +1352,9 @@ func (d *MachineDataSource) populateModel(ctx context.Context, data *MachineData
 		items_status_history := make([]MachineDsStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])

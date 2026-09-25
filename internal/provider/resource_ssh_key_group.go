@@ -26,68 +26,65 @@ type SshKeyGroupResource struct {
 }
 
 type SshKeyGroupResourceModel struct {
-	Id types.String `tfsdk:"id"`
-	Name types.String `tfsdk:"name"`
-	Description types.String `tfsdk:"description"`
-	SiteIds types.List `tfsdk:"site_ids"`
-	SshKeyIds types.List `tfsdk:"ssh_key_ids"`
-	Version types.String `tfsdk:"version"`
-	Org types.String `tfsdk:"org"`
-	TenantId types.String `tfsdk:"tenant_id"`
-	SshKeys []SshKeyGroupSshKeysItem `tfsdk:"ssh_keys"`
+	Id               types.String                      `tfsdk:"id"`
+	Name             types.String                      `tfsdk:"name"`
+	Description      types.String                      `tfsdk:"description"`
+	SiteIds          types.List                        `tfsdk:"site_ids"`
+	SshKeyIds        types.List                        `tfsdk:"ssh_key_ids"`
+	Version          types.String                      `tfsdk:"version"`
+	Org              types.String                      `tfsdk:"org"`
+	TenantId         types.String                      `tfsdk:"tenant_id"`
+	SshKeys          []SshKeyGroupSshKeysItem          `tfsdk:"ssh_keys"`
 	SiteAssociations []SshKeyGroupSiteAssociationsItem `tfsdk:"site_associations"`
-	Status types.String `tfsdk:"status"`
-	StatusHistory []SshKeyGroupStatusHistoryItem `tfsdk:"status_history"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
-	SshKeyGroupId types.String `tfsdk:"ssh_key_group_id"`
+	Status           types.String                      `tfsdk:"status"`
+	StatusHistory    []SshKeyGroupStatusHistoryItem    `tfsdk:"status_history"`
+	Created          types.String                      `tfsdk:"created"`
+	Updated          types.String                      `tfsdk:"updated"`
+	SshKeyGroupId    types.String                      `tfsdk:"ssh_key_group_id"`
 }
 
 type SshKeyGroupSshKeysItem struct {
-	Id types.String `tfsdk:"id"`
-	Name types.String `tfsdk:"name"`
-	Org types.String `tfsdk:"org"`
-	TenantId types.String `tfsdk:"tenant_id"`
+	Id          types.String `tfsdk:"id"`
+	Name        types.String `tfsdk:"name"`
+	Org         types.String `tfsdk:"org"`
+	TenantId    types.String `tfsdk:"tenant_id"`
 	Fingerprint types.String `tfsdk:"fingerprint"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
+	Created     types.String `tfsdk:"created"`
+	Updated     types.String `tfsdk:"updated"`
 }
 
 type SshKeyGroupSiteAssociationsItem struct {
-	Site *SshKeyGroupSiteAssociationsItemSite `tfsdk:"site"`
-	Status types.String `tfsdk:"status"`
-	Version types.String `tfsdk:"version"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
+	Site    *SshKeyGroupSiteAssociationsItemSite `tfsdk:"site"`
+	Status  types.String                         `tfsdk:"status"`
+	Version types.String                         `tfsdk:"version"`
+	Created types.String                         `tfsdk:"created"`
+	Updated types.String                         `tfsdk:"updated"`
 }
 
 type SshKeyGroupSiteAssociationsItemSite struct {
-	Id types.String `tfsdk:"id"`
-	Name types.String `tfsdk:"name"`
-	InfrastructureProviderId types.String `tfsdk:"infrastructure_provider_id"`
-	IsSerialConsoleEnabled types.Bool `tfsdk:"is_serial_console_enabled"`
-	IsOnline types.Bool `tfsdk:"is_online"`
-	Capabilities *SshKeyGroupSiteAssociationsItemSiteCapabilities `tfsdk:"capabilities"`
-	Status types.String `tfsdk:"status"`
+	Id                       types.String                                     `tfsdk:"id"`
+	Name                     types.String                                     `tfsdk:"name"`
+	InfrastructureProviderId types.String                                     `tfsdk:"infrastructure_provider_id"`
+	IsSerialConsoleEnabled   types.Bool                                       `tfsdk:"is_serial_console_enabled"`
+	IsOnline                 types.Bool                                       `tfsdk:"is_online"`
+	Capabilities             *SshKeyGroupSiteAssociationsItemSiteCapabilities `tfsdk:"capabilities"`
+	Status                   types.String                                     `tfsdk:"status"`
 }
 
 type SshKeyGroupSiteAssociationsItemSiteCapabilities struct {
-	NativeNetworking types.Bool `tfsdk:"native_networking"`
-	NetworkSecurityGroup types.Bool `tfsdk:"network_security_group"`
-	NvLinkPartition types.Bool `tfsdk:"nv_link_partition"`
-	Flow types.Bool `tfsdk:"flow"`
+	NativeNetworking          types.Bool `tfsdk:"native_networking"`
+	NetworkSecurityGroup      types.Bool `tfsdk:"network_security_group"`
+	NvLinkPartition           types.Bool `tfsdk:"nv_link_partition"`
+	Flow                      types.Bool `tfsdk:"flow"`
 	ImageBasedOperatingSystem types.Bool `tfsdk:"image_based_operating_system"`
-	VpcSlaac types.Bool `tfsdk:"vpc_slaac"`
-	DpsPowerManagement types.Bool `tfsdk:"dps_power_management"`
 }
 
 type SshKeyGroupStatusHistoryItem struct {
-	Status types.String `tfsdk:"status"`
+	Status  types.String `tfsdk:"status"`
 	Message types.String `tfsdk:"message"`
 	Created types.String `tfsdk:"created"`
 	Updated types.String `tfsdk:"updated"`
 }
-
 
 func (r *SshKeyGroupResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_ssh_key_group"
@@ -274,18 +271,6 @@ func (r *SshKeyGroupResource) Schema(_ context.Context, _ resource.SchemaRequest
 											Computed:    true,
 											Description: "Whether the Site supports image-based operating system provisioning",
 										},
-										"vpc_slaac": schema.BoolAttribute{
-											Required:    false,
-											Optional:    false,
-											Computed:    true,
-											Description: "Whether the latest successfully stored Site configuration inventory reports that Core supports VPCs with SLAAC enabled. False also represents a missing Site configuration or an inventory report that omits the capability. This value is managed by Site configuration inventory and cannot be updated through the Site API.",
-										},
-										"dps_power_management": schema.BoolAttribute{
-											Required:    false,
-											Optional:    false,
-											Computed:    true,
-											Description: "Whether this Site accepts non-empty power resource groups and power profiles for DPS power management. When false, omission and explicit clearing remain allowed.",
-										},
 									},
 								},
 								"status": schema.StringAttribute{
@@ -457,7 +442,9 @@ func (r *SshKeyGroupResource) Create(ctx context.Context, req resource.CreateReq
 		items_ssh_keys := make([]SshKeyGroupSshKeysItem, len(rawItems_ssh_keys))
 		for i_ssh_keys, raw_ssh_keys := range rawItems_ssh_keys {
 			m_ssh_keys, _ := raw_ssh_keys.(map[string]interface{})
-			if m_ssh_keys == nil { m_ssh_keys = map[string]interface{}{} }
+			if m_ssh_keys == nil {
+				m_ssh_keys = map[string]interface{}{}
+			}
 			items_ssh_keys[i_ssh_keys].Id = StringFromAPI(m_ssh_keys["id"])
 			items_ssh_keys[i_ssh_keys].Name = StringFromAPI(m_ssh_keys["name"])
 			items_ssh_keys[i_ssh_keys].Org = StringFromAPI(m_ssh_keys["org"])
@@ -474,7 +461,9 @@ func (r *SshKeyGroupResource) Create(ctx context.Context, req resource.CreateReq
 		items_site_associations := make([]SshKeyGroupSiteAssociationsItem, len(rawItems_site_associations))
 		for i_site_associations, raw_site_associations := range rawItems_site_associations {
 			m_site_associations, _ := raw_site_associations.(map[string]interface{})
-			if m_site_associations == nil { m_site_associations = map[string]interface{}{} }
+			if m_site_associations == nil {
+				m_site_associations = map[string]interface{}{}
+			}
 			// site: nested field — expand manually if needed
 			items_site_associations[i_site_associations].Status = StringFromAPI(m_site_associations["status"])
 			items_site_associations[i_site_associations].Version = StringFromAPI(m_site_associations["version"])
@@ -490,7 +479,9 @@ func (r *SshKeyGroupResource) Create(ctx context.Context, req resource.CreateReq
 		items_status_history := make([]SshKeyGroupStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -550,7 +541,9 @@ func (r *SshKeyGroupResource) Read(ctx context.Context, req resource.ReadRequest
 		items_ssh_keys := make([]SshKeyGroupSshKeysItem, len(rawItems_ssh_keys))
 		for i_ssh_keys, raw_ssh_keys := range rawItems_ssh_keys {
 			m_ssh_keys, _ := raw_ssh_keys.(map[string]interface{})
-			if m_ssh_keys == nil { m_ssh_keys = map[string]interface{}{} }
+			if m_ssh_keys == nil {
+				m_ssh_keys = map[string]interface{}{}
+			}
 			items_ssh_keys[i_ssh_keys].Id = StringFromAPI(m_ssh_keys["id"])
 			items_ssh_keys[i_ssh_keys].Name = StringFromAPI(m_ssh_keys["name"])
 			items_ssh_keys[i_ssh_keys].Org = StringFromAPI(m_ssh_keys["org"])
@@ -567,7 +560,9 @@ func (r *SshKeyGroupResource) Read(ctx context.Context, req resource.ReadRequest
 		items_site_associations := make([]SshKeyGroupSiteAssociationsItem, len(rawItems_site_associations))
 		for i_site_associations, raw_site_associations := range rawItems_site_associations {
 			m_site_associations, _ := raw_site_associations.(map[string]interface{})
-			if m_site_associations == nil { m_site_associations = map[string]interface{}{} }
+			if m_site_associations == nil {
+				m_site_associations = map[string]interface{}{}
+			}
 			// site: nested field — expand manually if needed
 			items_site_associations[i_site_associations].Status = StringFromAPI(m_site_associations["status"])
 			items_site_associations[i_site_associations].Version = StringFromAPI(m_site_associations["version"])
@@ -583,7 +578,9 @@ func (r *SshKeyGroupResource) Read(ctx context.Context, req resource.ReadRequest
 		items_status_history := make([]SshKeyGroupStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -660,7 +657,9 @@ func (r *SshKeyGroupResource) Update(ctx context.Context, req resource.UpdateReq
 		items_ssh_keys := make([]SshKeyGroupSshKeysItem, len(rawItems_ssh_keys))
 		for i_ssh_keys, raw_ssh_keys := range rawItems_ssh_keys {
 			m_ssh_keys, _ := raw_ssh_keys.(map[string]interface{})
-			if m_ssh_keys == nil { m_ssh_keys = map[string]interface{}{} }
+			if m_ssh_keys == nil {
+				m_ssh_keys = map[string]interface{}{}
+			}
 			items_ssh_keys[i_ssh_keys].Id = StringFromAPI(m_ssh_keys["id"])
 			items_ssh_keys[i_ssh_keys].Name = StringFromAPI(m_ssh_keys["name"])
 			items_ssh_keys[i_ssh_keys].Org = StringFromAPI(m_ssh_keys["org"])
@@ -677,7 +676,9 @@ func (r *SshKeyGroupResource) Update(ctx context.Context, req resource.UpdateReq
 		items_site_associations := make([]SshKeyGroupSiteAssociationsItem, len(rawItems_site_associations))
 		for i_site_associations, raw_site_associations := range rawItems_site_associations {
 			m_site_associations, _ := raw_site_associations.(map[string]interface{})
-			if m_site_associations == nil { m_site_associations = map[string]interface{}{} }
+			if m_site_associations == nil {
+				m_site_associations = map[string]interface{}{}
+			}
 			// site: nested field — expand manually if needed
 			items_site_associations[i_site_associations].Status = StringFromAPI(m_site_associations["status"])
 			items_site_associations[i_site_associations].Version = StringFromAPI(m_site_associations["version"])
@@ -693,7 +694,9 @@ func (r *SshKeyGroupResource) Update(ctx context.Context, req resource.UpdateReq
 		items_status_history := make([]SshKeyGroupStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -748,7 +751,9 @@ func (r *SshKeyGroupResource) populateModel(ctx context.Context, data *SshKeyGro
 		items_ssh_keys := make([]SshKeyGroupSshKeysItem, len(rawItems_ssh_keys))
 		for i_ssh_keys, raw_ssh_keys := range rawItems_ssh_keys {
 			m_ssh_keys, _ := raw_ssh_keys.(map[string]interface{})
-			if m_ssh_keys == nil { m_ssh_keys = map[string]interface{}{} }
+			if m_ssh_keys == nil {
+				m_ssh_keys = map[string]interface{}{}
+			}
 			items_ssh_keys[i_ssh_keys].Id = StringFromAPI(m_ssh_keys["id"])
 			items_ssh_keys[i_ssh_keys].Name = StringFromAPI(m_ssh_keys["name"])
 			items_ssh_keys[i_ssh_keys].Org = StringFromAPI(m_ssh_keys["org"])
@@ -765,7 +770,9 @@ func (r *SshKeyGroupResource) populateModel(ctx context.Context, data *SshKeyGro
 		items_site_associations := make([]SshKeyGroupSiteAssociationsItem, len(rawItems_site_associations))
 		for i_site_associations, raw_site_associations := range rawItems_site_associations {
 			m_site_associations, _ := raw_site_associations.(map[string]interface{})
-			if m_site_associations == nil { m_site_associations = map[string]interface{}{} }
+			if m_site_associations == nil {
+				m_site_associations = map[string]interface{}{}
+			}
 			// site: nested field — expand manually if needed
 			items_site_associations[i_site_associations].Status = StringFromAPI(m_site_associations["status"])
 			items_site_associations[i_site_associations].Version = StringFromAPI(m_site_associations["version"])
@@ -781,7 +788,9 @@ func (r *SshKeyGroupResource) populateModel(ctx context.Context, data *SshKeyGro
 		items_status_history := make([]SshKeyGroupStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])

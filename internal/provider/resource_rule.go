@@ -26,63 +26,62 @@ type RuleResource struct {
 }
 
 type RuleResourceModel struct {
-	Id types.String `tfsdk:"id"`
-	SiteId types.String `tfsdk:"site_id"`
-	Name types.String `tfsdk:"name"`
-	Description types.String `tfsdk:"description"`
-	OperationType types.String `tfsdk:"operation_type"`
-	OperationCode types.String `tfsdk:"operation_code"`
+	Id             types.String        `tfsdk:"id"`
+	SiteId         types.String        `tfsdk:"site_id"`
+	Name           types.String        `tfsdk:"name"`
+	Description    types.String        `tfsdk:"description"`
+	OperationType  types.String        `tfsdk:"operation_type"`
+	OperationCode  types.String        `tfsdk:"operation_code"`
 	RuleDefinition *RuleRuleDefinition `tfsdk:"rule_definition"`
-	IsDefault types.Bool `tfsdk:"is_default"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
+	IsDefault      types.Bool          `tfsdk:"is_default"`
+	Created        types.String        `tfsdk:"created"`
+	Updated        types.String        `tfsdk:"updated"`
 }
 
 type RuleRuleDefinition struct {
-	Version types.String `tfsdk:"version"`
-	Steps []RuleRuleDefinitionStepsItem `tfsdk:"steps"`
+	Version types.String                  `tfsdk:"version"`
+	Steps   []RuleRuleDefinitionStepsItem `tfsdk:"steps"`
 }
 
 type RuleRuleDefinitionStepsItem struct {
-	ComponentType types.String `tfsdk:"component_type"`
-	Stage types.Int64 `tfsdk:"stage"`
-	MaxParallel types.Int64 `tfsdk:"max_parallel"`
-	Timeout types.String `tfsdk:"timeout"`
-	Retry *RuleRuleDefinitionStepsItemRetry `tfsdk:"retry"`
-	PreOperation []RuleRuleDefinitionStepsItemPreOperationItem `tfsdk:"pre_operation"`
-	MainOperation *RuleRuleDefinitionStepsItemMainOperation `tfsdk:"main_operation"`
+	ComponentType types.String                                   `tfsdk:"component_type"`
+	Stage         types.Int64                                    `tfsdk:"stage"`
+	MaxParallel   types.Int64                                    `tfsdk:"max_parallel"`
+	Timeout       types.String                                   `tfsdk:"timeout"`
+	Retry         *RuleRuleDefinitionStepsItemRetry              `tfsdk:"retry"`
+	PreOperation  []RuleRuleDefinitionStepsItemPreOperationItem  `tfsdk:"pre_operation"`
+	MainOperation *RuleRuleDefinitionStepsItemMainOperation      `tfsdk:"main_operation"`
 	PostOperation []RuleRuleDefinitionStepsItemPostOperationItem `tfsdk:"post_operation"`
-	DelayAfter types.String `tfsdk:"delay_after"`
+	DelayAfter    types.String                                   `tfsdk:"delay_after"`
 }
 
 type RuleRuleDefinitionStepsItemRetry struct {
-	MaxAttempts types.Int64 `tfsdk:"max_attempts"`
-	InitialInterval types.String `tfsdk:"initial_interval"`
+	MaxAttempts        types.Int64   `tfsdk:"max_attempts"`
+	InitialInterval    types.String  `tfsdk:"initial_interval"`
 	BackoffCoefficient types.Float64 `tfsdk:"backoff_coefficient"`
-	MaxInterval types.String `tfsdk:"max_interval"`
+	MaxInterval        types.String  `tfsdk:"max_interval"`
 }
 
 type RuleRuleDefinitionStepsItemPreOperationItem struct {
-	Name types.String `tfsdk:"name"`
-	Timeout types.String `tfsdk:"timeout"`
+	Name         types.String `tfsdk:"name"`
+	Timeout      types.String `tfsdk:"timeout"`
 	PollInterval types.String `tfsdk:"poll_interval"`
-	Parameters types.Map `tfsdk:"parameters"`
+	Parameters   types.Map    `tfsdk:"parameters"`
 }
 
 type RuleRuleDefinitionStepsItemMainOperation struct {
-	Name types.String `tfsdk:"name"`
-	Timeout types.String `tfsdk:"timeout"`
+	Name         types.String `tfsdk:"name"`
+	Timeout      types.String `tfsdk:"timeout"`
 	PollInterval types.String `tfsdk:"poll_interval"`
-	Parameters types.Map `tfsdk:"parameters"`
+	Parameters   types.Map    `tfsdk:"parameters"`
 }
 
 type RuleRuleDefinitionStepsItemPostOperationItem struct {
-	Name types.String `tfsdk:"name"`
-	Timeout types.String `tfsdk:"timeout"`
+	Name         types.String `tfsdk:"name"`
+	Timeout      types.String `tfsdk:"timeout"`
 	PollInterval types.String `tfsdk:"poll_interval"`
-	Parameters types.Map `tfsdk:"parameters"`
+	Parameters   types.Map    `tfsdk:"parameters"`
 }
-
 
 func (r *RuleResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_rule"
@@ -122,13 +121,13 @@ func (r *RuleResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 				Required:    true,
 				Optional:    false,
 				Computed:    false,
-				Description: "Operation code within the operation type. For `PowerControl`, accepted values are `power_on`, `force_power_on`, `power_off`, `force_power_off`, `restart`, `force_restart`, `warm_reset`, and `cold_reset`. For `FirmwareControl`, accepted values are `upgrade`, `downgrade`, and `rollback`. The server validates the code against the selected type.",
+				Description: "Operation code within the operation type (e.g. `power_on`).",
 			},
 			"rule_definition": schema.SingleNestedAttribute{
 				Required:    true,
 				Optional:    false,
 				Computed:    false,
-				Description: "Executable definition of a rule. Structurally identical to Flow's own rule schema, so an existing YAML rule file maps across field for field. The fields declared here use `camelCase` (`componentType`, `mainOperation`, `pollInterval`) rather than the `snake_case` of Flow's YAML; keys inside the free-form `parameters` map pass through unchanged and stay `snake_case` (`expected_status`, `component_types`).",
+				Description: "Executable definition of a rule. Mirrors Flow's wire schema 1:1 so existing YAML rule files can be converted to JSON without any key renaming (nested fields use `snake_case`).",
 				Attributes: map[string]schema.Attribute{
 					"version": schema.StringAttribute{
 						Required:    true,
@@ -147,7 +146,7 @@ func (r *RuleResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 									Required:    false,
 									Optional:    false,
 									Computed:    true,
-									Description: "Component type this step targets. Validated against Flow's component-type set: `Compute`, `NVSwitch`, `PowerShelf`, `ToRSwitch`, `UMS`, `CDU`. Matched case-insensitively.",
+									Description: "Component type this step targets (e.g. `Compute`, `NVLSwitch`, `PowerShelf`). Validated against Flow's component-type set.",
 								},
 								"stage": schema.Int64Attribute{
 									Required:    false,
@@ -229,7 +228,7 @@ func (r *RuleResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 												Required:    false,
 												Optional:    false,
 												Computed:    true,
-												Description: "Action-specific parameters. Validated server-side against the action's schema. Examples:   - `Sleep`: `{ duration: \"30s\" }`   - `PowerControl`: `{ operation: \"power_on\" }` — an operation code,     not a power state; optional within a `PowerControl` rule, where     the operation is taken from the Task   - `VerifyPowerStatus`: `{ expected_status: \"on\" }`   - `VerifyReachability`: `{ component_types: [\"Compute\"], require_all: true }`   - `FirmwareControl`: `{ poll_interval: \"10s\", poll_timeout: \"30m\" }`",
+												Description: "Action-specific parameters. Validated server-side against the action's schema. Examples:   - `Sleep`: `{ duration: \"30s\" }`   - `PowerControl`: `{ operation: \"on\" }`   - `VerifyPowerStatus`: `{ expected_status: \"on\" }`   - `VerifyReachability`: `{ component_types: [\"Compute\"], require_all: true }`   - `FirmwareControl`: `{ poll_interval: \"10s\", poll_timeout: \"30m\" }`",
 											},
 										},
 									},
@@ -263,7 +262,7 @@ func (r *RuleResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 											Required:    false,
 											Optional:    false,
 											Computed:    true,
-											Description: "Action-specific parameters. Validated server-side against the action's schema. Examples:   - `Sleep`: `{ duration: \"30s\" }`   - `PowerControl`: `{ operation: \"power_on\" }` — an operation code,     not a power state; optional within a `PowerControl` rule, where     the operation is taken from the Task   - `VerifyPowerStatus`: `{ expected_status: \"on\" }`   - `VerifyReachability`: `{ component_types: [\"Compute\"], require_all: true }`   - `FirmwareControl`: `{ poll_interval: \"10s\", poll_timeout: \"30m\" }`",
+											Description: "Action-specific parameters. Validated server-side against the action's schema. Examples:   - `Sleep`: `{ duration: \"30s\" }`   - `PowerControl`: `{ operation: \"on\" }`   - `VerifyPowerStatus`: `{ expected_status: \"on\" }`   - `VerifyReachability`: `{ component_types: [\"Compute\"], require_all: true }`   - `FirmwareControl`: `{ poll_interval: \"10s\", poll_timeout: \"30m\" }`",
 										},
 									},
 								},
@@ -297,7 +296,7 @@ func (r *RuleResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 												Required:    false,
 												Optional:    false,
 												Computed:    true,
-												Description: "Action-specific parameters. Validated server-side against the action's schema. Examples:   - `Sleep`: `{ duration: \"30s\" }`   - `PowerControl`: `{ operation: \"power_on\" }` — an operation code,     not a power state; optional within a `PowerControl` rule, where     the operation is taken from the Task   - `VerifyPowerStatus`: `{ expected_status: \"on\" }`   - `VerifyReachability`: `{ component_types: [\"Compute\"], require_all: true }`   - `FirmwareControl`: `{ poll_interval: \"10s\", poll_timeout: \"30m\" }`",
+												Description: "Action-specific parameters. Validated server-side against the action's schema. Examples:   - `Sleep`: `{ duration: \"30s\" }`   - `PowerControl`: `{ operation: \"on\" }`   - `VerifyPowerStatus`: `{ expected_status: \"on\" }`   - `VerifyReachability`: `{ component_types: [\"Compute\"], require_all: true }`   - `FirmwareControl`: `{ poll_interval: \"10s\", poll_timeout: \"30m\" }`",
 											},
 										},
 									},
@@ -375,7 +374,9 @@ func (r *RuleResource) Create(ctx context.Context, req resource.CreateRequest, r
 	}
 	if data.RuleDefinition != nil {
 		m_rule_definition := map[string]interface{}{}
-		if !data.RuleDefinition.Version.IsNull() { m_rule_definition["version"] = data.RuleDefinition.Version.ValueString() }
+		if !data.RuleDefinition.Version.IsNull() {
+			m_rule_definition["version"] = data.RuleDefinition.Version.ValueString()
+		}
 		// steps: complex nested field — expand manually if needed
 		body["ruleDefinition"] = m_rule_definition
 	}
@@ -470,7 +471,9 @@ func (r *RuleResource) Update(ctx context.Context, req resource.UpdateRequest, r
 	}
 	if data.RuleDefinition != nil {
 		m_rule_definition := map[string]interface{}{}
-		if !data.RuleDefinition.Version.IsNull() { m_rule_definition["version"] = data.RuleDefinition.Version.ValueString() }
+		if !data.RuleDefinition.Version.IsNull() {
+			m_rule_definition["version"] = data.RuleDefinition.Version.ValueString()
+		}
 		// steps: complex nested field — expand manually if needed
 		body["ruleDefinition"] = m_rule_definition
 	}

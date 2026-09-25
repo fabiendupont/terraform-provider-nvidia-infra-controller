@@ -26,17 +26,16 @@ type ExpectedRackResource struct {
 }
 
 type ExpectedRackResourceModel struct {
-	Id types.String `tfsdk:"id"`
-	SiteId types.String `tfsdk:"site_id"`
-	RackId types.String `tfsdk:"rack_id"`
+	Id            types.String `tfsdk:"id"`
+	SiteId        types.String `tfsdk:"site_id"`
+	RackId        types.String `tfsdk:"rack_id"`
 	RackProfileId types.String `tfsdk:"rack_profile_id"`
-	Name types.String `tfsdk:"name"`
-	Description types.String `tfsdk:"description"`
-	Labels types.Map `tfsdk:"labels"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
+	Name          types.String `tfsdk:"name"`
+	Description   types.String `tfsdk:"description"`
+	Labels        types.Map    `tfsdk:"labels"`
+	Created       types.String `tfsdk:"created"`
+	Updated       types.String `tfsdk:"updated"`
 }
-
 
 func (r *ExpectedRackResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_expected_rack"

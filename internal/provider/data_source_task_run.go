@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -26,24 +26,23 @@ type TaskRunDataSource struct {
 }
 
 type TaskRunDataSourceModel struct {
-	Id types.String `tfsdk:"id"`
-	SiteId types.String `tfsdk:"site_id"`
-	Status types.String `tfsdk:"status"`
+	Id            types.String `tfsdk:"id"`
+	SiteId        types.String `tfsdk:"site_id"`
+	Status        types.String `tfsdk:"status"`
 	OperationType types.String `tfsdk:"operation_type"`
-	PhaseScope types.String `tfsdk:"phase_scope"`
-	Name types.String `tfsdk:"name"`
-	Description types.String `tfsdk:"description"`
+	PhaseScope    types.String `tfsdk:"phase_scope"`
+	Name          types.String `tfsdk:"name"`
+	Description   types.String `tfsdk:"description"`
 	OperationCode types.String `tfsdk:"operation_code"`
-	StatusReason types.String `tfsdk:"status_reason"`
+	StatusReason  types.String `tfsdk:"status_reason"`
 	StatusMessage types.String `tfsdk:"status_message"`
-	TotalPhases types.Int64 `tfsdk:"total_phases"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
-	Started types.String `tfsdk:"started"`
-	Finished types.String `tfsdk:"finished"`
-	Stats types.String `tfsdk:"stats"`
+	TotalPhases   types.Int64  `tfsdk:"total_phases"`
+	Created       types.String `tfsdk:"created"`
+	Updated       types.String `tfsdk:"updated"`
+	Started       types.String `tfsdk:"started"`
+	Finished      types.String `tfsdk:"finished"`
+	Stats         types.String `tfsdk:"stats"`
 }
-
 
 func (d *TaskRunDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_task_run"
@@ -207,17 +206,17 @@ func (d *TaskRunDataSource) Read(ctx context.Context, req datasource.ReadRequest
 			data.Id = StringFromAPI(result["id"])
 			diags := resp.Diagnostics
 			data.Name = StringFromAPI(result["name"])
-		data.Description = StringFromAPI(result["description"])
-		data.OperationCode = StringFromAPI(result["operationCode"])
-		data.StatusReason = StringFromAPI(result["statusReason"])
-		data.StatusMessage = StringFromAPI(result["statusMessage"])
-		data.TotalPhases = Int64FromAPI(result["totalPhases"])
-		data.Created = StringFromAPI(result["created"])
-		data.Updated = StringFromAPI(result["updated"])
-		data.Started = StringFromAPI(result["started"])
-		data.Finished = StringFromAPI(result["finished"])
-		data.Stats = StringFromAPI(result["stats"])
-		_ = diags
+			data.Description = StringFromAPI(result["description"])
+			data.OperationCode = StringFromAPI(result["operationCode"])
+			data.StatusReason = StringFromAPI(result["statusReason"])
+			data.StatusMessage = StringFromAPI(result["statusMessage"])
+			data.TotalPhases = Int64FromAPI(result["totalPhases"])
+			data.Created = StringFromAPI(result["created"])
+			data.Updated = StringFromAPI(result["updated"])
+			data.Started = StringFromAPI(result["started"])
+			data.Finished = StringFromAPI(result["finished"])
+			data.Stats = StringFromAPI(result["stats"])
+			_ = diags
 		}
 	}
 

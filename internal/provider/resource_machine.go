@@ -26,43 +26,41 @@ type MachineResource struct {
 }
 
 type MachineResourceModel struct {
-	Id types.String `tfsdk:"id"`
-	InstanceTypeId types.String `tfsdk:"instance_type_id"`
-	ClearInstanceType types.Bool `tfsdk:"clear_instance_type"`
-	SetMaintenanceMode types.Bool `tfsdk:"set_maintenance_mode"`
-	MaintenanceMessage types.String `tfsdk:"maintenance_message"`
-	Labels types.Map `tfsdk:"labels"`
-	OnlineRepair *MachineOnlineRepair `tfsdk:"online_repair"`
-	HealthIssue *MachineHealthIssue `tfsdk:"health_issue"`
-	InfrastructureProviderId types.String `tfsdk:"infrastructure_provider_id"`
-	SiteId types.String `tfsdk:"site_id"`
-	InstanceId types.String `tfsdk:"instance_id"`
-	TenantId types.String `tfsdk:"tenant_id"`
-	ControllerMachineId types.String `tfsdk:"controller_machine_id"`
-	ControllerMachineType types.String `tfsdk:"controller_machine_type"`
-	HwSkuDeviceType types.String `tfsdk:"hw_sku_device_type"`
-	Vendor types.String `tfsdk:"vendor"`
-	ProductName types.String `tfsdk:"product_name"`
-	SerialNumber types.String `tfsdk:"serial_number"`
-	MachineCapabilities []MachineMachineCapabilitiesItem `tfsdk:"machine_capabilities"`
-	MachineInterfaces []MachineMachineInterfacesItem `tfsdk:"machine_interfaces"`
-	AssociatedDpuMachineIds types.List `tfsdk:"associated_dpu_machine_ids"`
-	PlacementInRack *MachinePlacementInRack `tfsdk:"placement_in_rack"`
-	ScoutVersion types.String `tfsdk:"scout_version"`
-	Health *MachineHealth `tfsdk:"health"`
-	Metadata *MachineMetadata `tfsdk:"metadata"`
-	Status types.String `tfsdk:"status"`
-	IsUsableByTenant types.Bool `tfsdk:"is_usable_by_tenant"`
-	StatusHistory []MachineStatusHistoryItem `tfsdk:"status_history"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
-	MachineId types.String `tfsdk:"machine_id"`
-	Source types.String `tfsdk:"source"`
+	Id                       types.String                     `tfsdk:"id"`
+	InstanceTypeId           types.String                     `tfsdk:"instance_type_id"`
+	ClearInstanceType        types.Bool                       `tfsdk:"clear_instance_type"`
+	SetMaintenanceMode       types.Bool                       `tfsdk:"set_maintenance_mode"`
+	MaintenanceMessage       types.String                     `tfsdk:"maintenance_message"`
+	Labels                   types.Map                        `tfsdk:"labels"`
+	OnlineRepair             *MachineOnlineRepair             `tfsdk:"online_repair"`
+	HealthIssue              *MachineHealthIssue              `tfsdk:"health_issue"`
+	InfrastructureProviderId types.String                     `tfsdk:"infrastructure_provider_id"`
+	SiteId                   types.String                     `tfsdk:"site_id"`
+	InstanceId               types.String                     `tfsdk:"instance_id"`
+	TenantId                 types.String                     `tfsdk:"tenant_id"`
+	ControllerMachineId      types.String                     `tfsdk:"controller_machine_id"`
+	ControllerMachineType    types.String                     `tfsdk:"controller_machine_type"`
+	HwSkuDeviceType          types.String                     `tfsdk:"hw_sku_device_type"`
+	Vendor                   types.String                     `tfsdk:"vendor"`
+	ProductName              types.String                     `tfsdk:"product_name"`
+	SerialNumber             types.String                     `tfsdk:"serial_number"`
+	MachineCapabilities      []MachineMachineCapabilitiesItem `tfsdk:"machine_capabilities"`
+	MachineInterfaces        []MachineMachineInterfacesItem   `tfsdk:"machine_interfaces"`
+	AssociatedDpuMachineIds  types.List                       `tfsdk:"associated_dpu_machine_ids"`
+	PlacementInRack          *MachinePlacementInRack          `tfsdk:"placement_in_rack"`
+	Health                   *MachineHealth                   `tfsdk:"health"`
+	Metadata                 *MachineMetadata                 `tfsdk:"metadata"`
+	Status                   types.String                     `tfsdk:"status"`
+	IsUsableByTenant         types.Bool                       `tfsdk:"is_usable_by_tenant"`
+	StatusHistory            []MachineStatusHistoryItem       `tfsdk:"status_history"`
+	Created                  types.String                     `tfsdk:"created"`
+	Updated                  types.String                     `tfsdk:"updated"`
+	MachineId                types.String                     `tfsdk:"machine_id"`
 }
 
 type MachineOnlineRepair struct {
-	Enabled types.Bool `tfsdk:"enabled"`
-	Policy *MachineOnlineRepairPolicy `tfsdk:"policy"`
+	Enabled         types.Bool                          `tfsdk:"enabled"`
+	Policy          *MachineOnlineRepairPolicy          `tfsdk:"policy"`
 	Acknowledgments *MachineOnlineRepairAcknowledgments `tfsdk:"acknowledgments"`
 }
 
@@ -71,138 +69,136 @@ type MachineOnlineRepairPolicy struct {
 }
 
 type MachineOnlineRepairAcknowledgments struct {
-	AcceptDataCorruptionRisk types.Bool `tfsdk:"accept_data_corruption_risk"`
-	AcceptRepairTeamAccess types.Bool `tfsdk:"accept_repair_team_access"`
+	AcceptDataCorruptionRisk   types.Bool `tfsdk:"accept_data_corruption_risk"`
+	AcceptRepairTeamAccess     types.Bool `tfsdk:"accept_repair_team_access"`
 	AcceptInstanceDeletionRisk types.Bool `tfsdk:"accept_instance_deletion_risk"`
 }
 
 type MachineHealthIssue struct {
 	Category types.String `tfsdk:"category"`
-	Summary types.String `tfsdk:"summary"`
-	Details types.String `tfsdk:"details"`
+	Summary  types.String `tfsdk:"summary"`
+	Details  types.String `tfsdk:"details"`
 }
 
 type MachineMachineCapabilitiesItem struct {
-	Type types.String `tfsdk:"type"`
-	Name types.String `tfsdk:"name"`
-	Frequency types.String `tfsdk:"frequency"`
-	Cores types.Int64 `tfsdk:"cores"`
-	Threads types.Int64 `tfsdk:"threads"`
-	Capacity types.String `tfsdk:"capacity"`
-	Vendor types.String `tfsdk:"vendor"`
+	Type             types.String `tfsdk:"type"`
+	Name             types.String `tfsdk:"name"`
+	Frequency        types.String `tfsdk:"frequency"`
+	Cores            types.Int64  `tfsdk:"cores"`
+	Threads          types.Int64  `tfsdk:"threads"`
+	Capacity         types.String `tfsdk:"capacity"`
+	Vendor           types.String `tfsdk:"vendor"`
 	HardwareRevision types.String `tfsdk:"hardware_revision"`
-	InactiveDevices types.List `tfsdk:"inactive_devices"`
-	CountValue types.Int64 `tfsdk:"count_value"`
-	DeviceType types.String `tfsdk:"device_type"`
+	InactiveDevices  types.List   `tfsdk:"inactive_devices"`
+	CountValue       types.Int64  `tfsdk:"count_value"`
+	DeviceType       types.String `tfsdk:"device_type"`
 }
 
 type MachineMachineInterfacesItem struct {
-	Id types.String `tfsdk:"id"`
-	MachineId types.String `tfsdk:"machine_id"`
+	Id                    types.String `tfsdk:"id"`
+	MachineId             types.String `tfsdk:"machine_id"`
 	ControllerInterfaceId types.String `tfsdk:"controller_interface_id"`
-	ControllerSegmentId types.String `tfsdk:"controller_segment_id"`
-	AttachedDpuMachineId types.String `tfsdk:"attached_dpu_machine_id"`
-	SubnetId types.String `tfsdk:"subnet_id"`
-	Hostname types.String `tfsdk:"hostname"`
-	IsPrimary types.Bool `tfsdk:"is_primary"`
-	MacAddress types.String `tfsdk:"mac_address"`
-	IpAddresses types.List `tfsdk:"ip_addresses"`
-	Created types.String `tfsdk:"created"`
-	Updated types.String `tfsdk:"updated"`
+	ControllerSegmentId   types.String `tfsdk:"controller_segment_id"`
+	AttachedDpuMachineId  types.String `tfsdk:"attached_dpu_machine_id"`
+	SubnetId              types.String `tfsdk:"subnet_id"`
+	Hostname              types.String `tfsdk:"hostname"`
+	IsPrimary             types.Bool   `tfsdk:"is_primary"`
+	MacAddress            types.String `tfsdk:"mac_address"`
+	IpAddresses           types.List   `tfsdk:"ip_addresses"`
+	Created               types.String `tfsdk:"created"`
+	Updated               types.String `tfsdk:"updated"`
 }
 
 type MachinePlacementInRack struct {
 	SlotNumber types.Int64 `tfsdk:"slot_number"`
-	TrayIndex types.Int64 `tfsdk:"tray_index"`
+	TrayIndex  types.Int64 `tfsdk:"tray_index"`
 }
 
 type MachineHealth struct {
-	Source types.String `tfsdk:"source"`
-	ObservedAt types.String `tfsdk:"observed_at"`
-	Successes []MachineHealthSuccessesItem `tfsdk:"successes"`
-	Alerts []MachineHealthAlertsItem `tfsdk:"alerts"`
+	Source     types.String                 `tfsdk:"source"`
+	ObservedAt types.String                 `tfsdk:"observed_at"`
+	Successes  []MachineHealthSuccessesItem `tfsdk:"successes"`
+	Alerts     []MachineHealthAlertsItem    `tfsdk:"alerts"`
 }
 
 type MachineHealthSuccessesItem struct {
-	Id types.String `tfsdk:"id"`
+	Id     types.String `tfsdk:"id"`
 	Target types.String `tfsdk:"target"`
 }
 
 type MachineHealthAlertsItem struct {
-	Id types.String `tfsdk:"id"`
-	Target types.String `tfsdk:"target"`
-	InAlertSince types.String `tfsdk:"in_alert_since"`
-	Message types.String `tfsdk:"message"`
-	TenantMessage types.String `tfsdk:"tenant_message"`
-	Classifications types.List `tfsdk:"classifications"`
+	Id              types.String `tfsdk:"id"`
+	Target          types.String `tfsdk:"target"`
+	InAlertSince    types.String `tfsdk:"in_alert_since"`
+	Message         types.String `tfsdk:"message"`
+	TenantMessage   types.String `tfsdk:"tenant_message"`
+	Classifications types.List   `tfsdk:"classifications"`
 }
 
 type MachineMetadata struct {
-	DmiData *MachineMetadataDmiData `tfsdk:"dmi_data"`
-	BmcInfo *MachineMetadataBmcInfo `tfsdk:"bmc_info"`
-	Gpus []MachineMetadataGpusItem `tfsdk:"gpus"`
-	NetworkInterfaces []MachineMetadataNetworkInterfacesItem `tfsdk:"network_interfaces"`
+	DmiData              *MachineMetadataDmiData                   `tfsdk:"dmi_data"`
+	BmcInfo              *MachineMetadataBmcInfo                   `tfsdk:"bmc_info"`
+	Gpus                 []MachineMetadataGpusItem                 `tfsdk:"gpus"`
+	NetworkInterfaces    []MachineMetadataNetworkInterfacesItem    `tfsdk:"network_interfaces"`
 	InfinibandInterfaces []MachineMetadataInfinibandInterfacesItem `tfsdk:"infiniband_interfaces"`
-	LifecycleState types.String `tfsdk:"lifecycle_state"`
 }
 
 type MachineMetadataDmiData struct {
-	BoardName types.String `tfsdk:"board_name"`
-	BoardSerial types.String `tfsdk:"board_serial"`
-	BoardVersion types.String `tfsdk:"board_version"`
-	BiosDate types.String `tfsdk:"bios_date"`
-	BiosVersion types.String `tfsdk:"bios_version"`
-	ProductName types.String `tfsdk:"product_name"`
+	BoardName     types.String `tfsdk:"board_name"`
+	BoardSerial   types.String `tfsdk:"board_serial"`
+	BoardVersion  types.String `tfsdk:"board_version"`
+	BiosDate      types.String `tfsdk:"bios_date"`
+	BiosVersion   types.String `tfsdk:"bios_version"`
+	ProductName   types.String `tfsdk:"product_name"`
 	ProductSerial types.String `tfsdk:"product_serial"`
 	ChassisSerial types.String `tfsdk:"chassis_serial"`
-	SysVendor types.String `tfsdk:"sys_vendor"`
+	SysVendor     types.String `tfsdk:"sys_vendor"`
 }
 
 type MachineMetadataBmcInfo struct {
-	Ip types.String `tfsdk:"ip"`
-	Mac types.String `tfsdk:"mac"`
-	Version types.String `tfsdk:"version"`
+	Ip               types.String `tfsdk:"ip"`
+	Mac              types.String `tfsdk:"mac"`
+	Version          types.String `tfsdk:"version"`
 	FirmwareRevision types.String `tfsdk:"firmware_revision"`
 }
 
 type MachineMetadataGpusItem struct {
-	Name types.String `tfsdk:"name"`
-	Serial types.String `tfsdk:"serial"`
-	DriverVersion types.String `tfsdk:"driver_version"`
-	VbiosVersion types.String `tfsdk:"vbios_version"`
+	Name           types.String `tfsdk:"name"`
+	Serial         types.String `tfsdk:"serial"`
+	DriverVersion  types.String `tfsdk:"driver_version"`
+	VbiosVersion   types.String `tfsdk:"vbios_version"`
 	InforomVersion types.String `tfsdk:"inforom_version"`
-	TotalMemory types.String `tfsdk:"total_memory"`
-	Frequency types.String `tfsdk:"frequency"`
-	PciBusId types.String `tfsdk:"pci_bus_id"`
+	TotalMemory    types.String `tfsdk:"total_memory"`
+	Frequency      types.String `tfsdk:"frequency"`
+	PciBusId       types.String `tfsdk:"pci_bus_id"`
 }
 
 type MachineMetadataNetworkInterfacesItem struct {
-	MacAddress types.String `tfsdk:"mac_address"`
-	Vendor types.String `tfsdk:"vendor"`
-	Device types.String `tfsdk:"device"`
-	Path types.String `tfsdk:"path"`
-	NumaNode types.Int64 `tfsdk:"numa_node"`
+	MacAddress  types.String `tfsdk:"mac_address"`
+	Vendor      types.String `tfsdk:"vendor"`
+	Device      types.String `tfsdk:"device"`
+	Path        types.String `tfsdk:"path"`
+	NumaNode    types.Int64  `tfsdk:"numa_node"`
 	Description types.String `tfsdk:"description"`
-	Slot types.String `tfsdk:"slot"`
+	Slot        types.String `tfsdk:"slot"`
 }
 
 type MachineMetadataInfinibandInterfacesItem struct {
-	Guid types.String `tfsdk:"guid"`
-	Vendor types.String `tfsdk:"vendor"`
-	Device types.String `tfsdk:"device"`
-	Path types.String `tfsdk:"path"`
-	NumaNode types.Int64 `tfsdk:"numa_node"`
+	Guid        types.String `tfsdk:"guid"`
+	Vendor      types.String `tfsdk:"vendor"`
+	Device      types.String `tfsdk:"device"`
+	Path        types.String `tfsdk:"path"`
+	NumaNode    types.Int64  `tfsdk:"numa_node"`
 	Description types.String `tfsdk:"description"`
-	Slot types.String `tfsdk:"slot"`
+	Slot        types.String `tfsdk:"slot"`
 }
 
 type MachineStatusHistoryItem struct {
-	Status types.String `tfsdk:"status"`
+	Status  types.String `tfsdk:"status"`
 	Message types.String `tfsdk:"message"`
 	Created types.String `tfsdk:"created"`
 	Updated types.String `tfsdk:"updated"`
 }
-
 
 func (r *MachineResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_machine"
@@ -572,12 +568,6 @@ func (r *MachineResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 					},
 				},
 			},
-			"scout_version": schema.StringAttribute{
-				Required:    false,
-				Optional:    false,
-				Computed:    true,
-				Description: "Scout version reported by the Machine, if known",
-			},
 			"health": schema.SingleNestedAttribute{
 				Required:    false,
 				Optional:    false,
@@ -745,7 +735,7 @@ func (r *MachineResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 								Required:    false,
 								Optional:    false,
 								Computed:    true,
-								Description: "IPv4 or IPv6 address of the Machine BMC",
+								Description: "IP address of the Machine BMC",
 							},
 							"mac": schema.StringAttribute{
 								Required:    false,
@@ -929,12 +919,6 @@ func (r *MachineResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 							},
 						},
 					},
-					"lifecycle_state": schema.StringAttribute{
-						Required:    false,
-						Optional:    false,
-						Computed:    true,
-						Description: "Lifecycle state details for the Machine",
-					},
 				},
 			},
 			"status": schema.StringAttribute{
@@ -947,7 +931,7 @@ func (r *MachineResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
-				Description: "Indicates whether the machine is usable by or currently in use by a tenant. It does not indicate that a Machine is available for Instance creation.",
+				Description: "Indicates whether the machine is usable by or currently in use by a tenant.",
 			},
 			"status_history": schema.ListNestedAttribute{
 				Required:    false,
@@ -1001,12 +985,6 @@ func (r *MachineResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 				Computed:    true,
 				Description: "Path parameter: machine_id.",
 			},
-			"source": schema.StringAttribute{
-				Required:    false,
-				Optional:    true,
-				Computed:    true,
-				Description: "Path parameter: source.",
-			},
 		},
 	}
 }
@@ -1037,7 +1015,7 @@ func (r *MachineResource) Read(ctx context.Context, req resource.ReadRequest, re
 		return
 	}
 
-	url := r.client.ResolvePath("/v2/org/{org}/nico/machine/{machineId}/health-report/{source}", map[string]string{"machineId": data.MachineId.ValueString(), "source": data.Id.ValueString()})
+	url := r.client.ResolvePath("/v2/org/{org}/nico/machine/{machineId}", map[string]string{"machineId": data.Id.ValueString()})
 	result, err := r.client.Get(ctx, url)
 	if err != nil {
 		resp.Diagnostics.AddError("Error reading Machine", err.Error())
@@ -1095,7 +1073,9 @@ func (r *MachineResource) Read(ctx context.Context, req resource.ReadRequest, re
 		items_machine_capabilities := make([]MachineMachineCapabilitiesItem, len(rawItems_machine_capabilities))
 		for i_machine_capabilities, raw_machine_capabilities := range rawItems_machine_capabilities {
 			m_machine_capabilities, _ := raw_machine_capabilities.(map[string]interface{})
-			if m_machine_capabilities == nil { m_machine_capabilities = map[string]interface{}{} }
+			if m_machine_capabilities == nil {
+				m_machine_capabilities = map[string]interface{}{}
+			}
 			items_machine_capabilities[i_machine_capabilities].Type = StringFromAPI(m_machine_capabilities["type"])
 			items_machine_capabilities[i_machine_capabilities].Name = StringFromAPI(m_machine_capabilities["name"])
 			items_machine_capabilities[i_machine_capabilities].Frequency = StringFromAPI(m_machine_capabilities["frequency"])
@@ -1116,7 +1096,9 @@ func (r *MachineResource) Read(ctx context.Context, req resource.ReadRequest, re
 		items_machine_interfaces := make([]MachineMachineInterfacesItem, len(rawItems_machine_interfaces))
 		for i_machine_interfaces, raw_machine_interfaces := range rawItems_machine_interfaces {
 			m_machine_interfaces, _ := raw_machine_interfaces.(map[string]interface{})
-			if m_machine_interfaces == nil { m_machine_interfaces = map[string]interface{}{} }
+			if m_machine_interfaces == nil {
+				m_machine_interfaces = map[string]interface{}{}
+			}
 			items_machine_interfaces[i_machine_interfaces].Id = StringFromAPI(m_machine_interfaces["id"])
 			items_machine_interfaces[i_machine_interfaces].MachineId = StringFromAPI(m_machine_interfaces["machineId"])
 			items_machine_interfaces[i_machine_interfaces].ControllerInterfaceId = StringFromAPI(m_machine_interfaces["controllerInterfaceId"])
@@ -1150,7 +1132,6 @@ func (r *MachineResource) Read(ctx context.Context, req resource.ReadRequest, re
 	} else {
 		data.PlacementInRack = nil
 	}
-	data.ScoutVersion = StringFromAPI(result["scoutVersion"])
 	if rawObj_health, ok := result["health"].(map[string]interface{}); ok {
 		obj_health := &MachineHealth{}
 		obj_health.Source = StringFromAPI(rawObj_health["source"])
@@ -1169,7 +1150,6 @@ func (r *MachineResource) Read(ctx context.Context, req resource.ReadRequest, re
 		// gpus: nested field — expand manually if needed
 		// networkInterfaces: nested field — expand manually if needed
 		// infinibandInterfaces: nested field — expand manually if needed
-		obj_metadata.LifecycleState = StringFromAPI(rawObj_metadata["lifecycleState"])
 		_ = rawObj_metadata
 		data.Metadata = obj_metadata
 	} else {
@@ -1181,7 +1161,9 @@ func (r *MachineResource) Read(ctx context.Context, req resource.ReadRequest, re
 		items_status_history := make([]MachineStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -1194,7 +1176,6 @@ func (r *MachineResource) Read(ctx context.Context, req resource.ReadRequest, re
 	data.Created = StringFromAPI(result["created"])
 	data.Updated = StringFromAPI(result["updated"])
 	data.MachineId = StringFromAPI(result["machine_id"])
-	data.Source = StringFromAPI(result["source"])
 	_ = diags
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -1226,20 +1207,28 @@ func (r *MachineResource) Update(ctx context.Context, req resource.UpdateRequest
 	}
 	if data.OnlineRepair != nil {
 		m_online_repair := map[string]interface{}{}
-		if !data.OnlineRepair.Enabled.IsNull() { m_online_repair["enabled"] = data.OnlineRepair.Enabled.ValueBool() }
+		if !data.OnlineRepair.Enabled.IsNull() {
+			m_online_repair["enabled"] = data.OnlineRepair.Enabled.ValueBool()
+		}
 		// policy: complex nested field — expand manually if needed
 		// acknowledgments: complex nested field — expand manually if needed
 		body["onlineRepair"] = m_online_repair
 	}
 	if data.HealthIssue != nil {
 		m_health_issue := map[string]interface{}{}
-		if !data.HealthIssue.Category.IsNull() { m_health_issue["category"] = data.HealthIssue.Category.ValueString() }
-		if !data.HealthIssue.Summary.IsNull() { m_health_issue["summary"] = data.HealthIssue.Summary.ValueString() }
-		if !data.HealthIssue.Details.IsNull() { m_health_issue["details"] = data.HealthIssue.Details.ValueString() }
+		if !data.HealthIssue.Category.IsNull() {
+			m_health_issue["category"] = data.HealthIssue.Category.ValueString()
+		}
+		if !data.HealthIssue.Summary.IsNull() {
+			m_health_issue["summary"] = data.HealthIssue.Summary.ValueString()
+		}
+		if !data.HealthIssue.Details.IsNull() {
+			m_health_issue["details"] = data.HealthIssue.Details.ValueString()
+		}
 		body["healthIssue"] = m_health_issue
 	}
 
-	url := r.client.ResolvePath("/v2/org/{org}/nico/machine/{machineId}/health-report/{source}", map[string]string{"machineId": data.MachineId.ValueString(), "source": data.Id.ValueString()})
+	url := r.client.ResolvePath("/v2/org/{org}/nico/machine/{machineId}", map[string]string{"machineId": data.Id.ValueString()})
 	result, err := r.client.Patch(ctx, url, body)
 	if err != nil {
 		resp.Diagnostics.AddError("Error updating Machine", err.Error())
@@ -1293,7 +1282,9 @@ func (r *MachineResource) Update(ctx context.Context, req resource.UpdateRequest
 		items_machine_capabilities := make([]MachineMachineCapabilitiesItem, len(rawItems_machine_capabilities))
 		for i_machine_capabilities, raw_machine_capabilities := range rawItems_machine_capabilities {
 			m_machine_capabilities, _ := raw_machine_capabilities.(map[string]interface{})
-			if m_machine_capabilities == nil { m_machine_capabilities = map[string]interface{}{} }
+			if m_machine_capabilities == nil {
+				m_machine_capabilities = map[string]interface{}{}
+			}
 			items_machine_capabilities[i_machine_capabilities].Type = StringFromAPI(m_machine_capabilities["type"])
 			items_machine_capabilities[i_machine_capabilities].Name = StringFromAPI(m_machine_capabilities["name"])
 			items_machine_capabilities[i_machine_capabilities].Frequency = StringFromAPI(m_machine_capabilities["frequency"])
@@ -1314,7 +1305,9 @@ func (r *MachineResource) Update(ctx context.Context, req resource.UpdateRequest
 		items_machine_interfaces := make([]MachineMachineInterfacesItem, len(rawItems_machine_interfaces))
 		for i_machine_interfaces, raw_machine_interfaces := range rawItems_machine_interfaces {
 			m_machine_interfaces, _ := raw_machine_interfaces.(map[string]interface{})
-			if m_machine_interfaces == nil { m_machine_interfaces = map[string]interface{}{} }
+			if m_machine_interfaces == nil {
+				m_machine_interfaces = map[string]interface{}{}
+			}
 			items_machine_interfaces[i_machine_interfaces].Id = StringFromAPI(m_machine_interfaces["id"])
 			items_machine_interfaces[i_machine_interfaces].MachineId = StringFromAPI(m_machine_interfaces["machineId"])
 			items_machine_interfaces[i_machine_interfaces].ControllerInterfaceId = StringFromAPI(m_machine_interfaces["controllerInterfaceId"])
@@ -1348,7 +1341,6 @@ func (r *MachineResource) Update(ctx context.Context, req resource.UpdateRequest
 	} else {
 		data.PlacementInRack = nil
 	}
-	data.ScoutVersion = StringFromAPI(result["scoutVersion"])
 	if rawObj_health, ok := result["health"].(map[string]interface{}); ok {
 		obj_health := &MachineHealth{}
 		obj_health.Source = StringFromAPI(rawObj_health["source"])
@@ -1367,7 +1359,6 @@ func (r *MachineResource) Update(ctx context.Context, req resource.UpdateRequest
 		// gpus: nested field — expand manually if needed
 		// networkInterfaces: nested field — expand manually if needed
 		// infinibandInterfaces: nested field — expand manually if needed
-		obj_metadata.LifecycleState = StringFromAPI(rawObj_metadata["lifecycleState"])
 		_ = rawObj_metadata
 		data.Metadata = obj_metadata
 	} else {
@@ -1379,7 +1370,9 @@ func (r *MachineResource) Update(ctx context.Context, req resource.UpdateRequest
 		items_status_history := make([]MachineStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -1392,7 +1385,6 @@ func (r *MachineResource) Update(ctx context.Context, req resource.UpdateRequest
 	data.Created = StringFromAPI(result["created"])
 	data.Updated = StringFromAPI(result["updated"])
 	data.MachineId = StringFromAPI(result["machine_id"])
-	data.Source = StringFromAPI(result["source"])
 	_ = diags
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -1404,7 +1396,7 @@ func (r *MachineResource) Delete(ctx context.Context, req resource.DeleteRequest
 		return
 	}
 
-	url := r.client.ResolvePath("/v2/org/{org}/nico/machine/{machineId}/health-report/{source}", map[string]string{"machineId": data.MachineId.ValueString(), "source": data.Id.ValueString()})
+	url := r.client.ResolvePath("/v2/org/{org}/nico/machine/{machineId}", map[string]string{"machineId": data.Id.ValueString()})
 	err := r.client.Delete(ctx, url, nil)
 	if err != nil {
 		resp.Diagnostics.AddError("Error deleting Machine", err.Error())
@@ -1457,7 +1449,9 @@ func (r *MachineResource) populateModel(ctx context.Context, data *MachineResour
 		items_machine_capabilities := make([]MachineMachineCapabilitiesItem, len(rawItems_machine_capabilities))
 		for i_machine_capabilities, raw_machine_capabilities := range rawItems_machine_capabilities {
 			m_machine_capabilities, _ := raw_machine_capabilities.(map[string]interface{})
-			if m_machine_capabilities == nil { m_machine_capabilities = map[string]interface{}{} }
+			if m_machine_capabilities == nil {
+				m_machine_capabilities = map[string]interface{}{}
+			}
 			items_machine_capabilities[i_machine_capabilities].Type = StringFromAPI(m_machine_capabilities["type"])
 			items_machine_capabilities[i_machine_capabilities].Name = StringFromAPI(m_machine_capabilities["name"])
 			items_machine_capabilities[i_machine_capabilities].Frequency = StringFromAPI(m_machine_capabilities["frequency"])
@@ -1478,7 +1472,9 @@ func (r *MachineResource) populateModel(ctx context.Context, data *MachineResour
 		items_machine_interfaces := make([]MachineMachineInterfacesItem, len(rawItems_machine_interfaces))
 		for i_machine_interfaces, raw_machine_interfaces := range rawItems_machine_interfaces {
 			m_machine_interfaces, _ := raw_machine_interfaces.(map[string]interface{})
-			if m_machine_interfaces == nil { m_machine_interfaces = map[string]interface{}{} }
+			if m_machine_interfaces == nil {
+				m_machine_interfaces = map[string]interface{}{}
+			}
 			items_machine_interfaces[i_machine_interfaces].Id = StringFromAPI(m_machine_interfaces["id"])
 			items_machine_interfaces[i_machine_interfaces].MachineId = StringFromAPI(m_machine_interfaces["machineId"])
 			items_machine_interfaces[i_machine_interfaces].ControllerInterfaceId = StringFromAPI(m_machine_interfaces["controllerInterfaceId"])
@@ -1512,7 +1508,6 @@ func (r *MachineResource) populateModel(ctx context.Context, data *MachineResour
 	} else {
 		data.PlacementInRack = nil
 	}
-	data.ScoutVersion = StringFromAPI(result["scoutVersion"])
 	if rawObj_health, ok := result["health"].(map[string]interface{}); ok {
 		obj_health := &MachineHealth{}
 		obj_health.Source = StringFromAPI(rawObj_health["source"])
@@ -1531,7 +1526,6 @@ func (r *MachineResource) populateModel(ctx context.Context, data *MachineResour
 		// gpus: nested field — expand manually if needed
 		// networkInterfaces: nested field — expand manually if needed
 		// infinibandInterfaces: nested field — expand manually if needed
-		obj_metadata.LifecycleState = StringFromAPI(rawObj_metadata["lifecycleState"])
 		_ = rawObj_metadata
 		data.Metadata = obj_metadata
 	} else {
@@ -1543,7 +1537,9 @@ func (r *MachineResource) populateModel(ctx context.Context, data *MachineResour
 		items_status_history := make([]MachineStatusHistoryItem, len(rawItems_status_history))
 		for i_status_history, raw_status_history := range rawItems_status_history {
 			m_status_history, _ := raw_status_history.(map[string]interface{})
-			if m_status_history == nil { m_status_history = map[string]interface{}{} }
+			if m_status_history == nil {
+				m_status_history = map[string]interface{}{}
+			}
 			items_status_history[i_status_history].Status = StringFromAPI(m_status_history["status"])
 			items_status_history[i_status_history].Message = StringFromAPI(m_status_history["message"])
 			items_status_history[i_status_history].Created = StringFromAPI(m_status_history["created"])
@@ -1556,6 +1552,5 @@ func (r *MachineResource) populateModel(ctx context.Context, data *MachineResour
 	data.Created = StringFromAPI(result["created"])
 	data.Updated = StringFromAPI(result["updated"])
 	data.MachineId = StringFromAPI(result["machine_id"])
-	data.Source = StringFromAPI(result["source"])
 	_ = diags
 }
