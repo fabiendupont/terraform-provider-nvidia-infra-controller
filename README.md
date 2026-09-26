@@ -1,7 +1,7 @@
 # Terraform Provider for NVIDIA Infra Controller
 
-![Provider version](https://img.shields.io/badge/version-2.0.3-blue)
-![Spec version](https://img.shields.io/badge/spec-2.0.3-blue)
+![Provider version](https://img.shields.io/badge/version-2.0.4-blue)
+![Spec version](https://img.shields.io/badge/spec-2.0.4-blue)
 ![License](https://img.shields.io/badge/license-Apache--2.0-green)
 ![Terraform](https://img.shields.io/badge/terraform-%3E%3D1.0-purple)
 
