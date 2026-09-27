@@ -34,9 +34,10 @@ output "sku_name" {
 
 - `associated_machine_ids` (List of String) List of machine IDs associated with this SKU
 - `components` (Attributes) Hardware components of this SKU (see [below for nested schema](#nestedatt--components))
-- `created` (String) ISO 8601 datetime when the SKU was created
+- `created` (String) ISO 8601 datetime when the SKU was created, using the Site-reported timestamp when available
+- `description` (String) Human-readable SKU description
 - `device_type` (String) Optional device type identifier (e.g. "gpu", "cpu", "storage")
-- `updated` (String) ISO 8601 datetime when the SKU was last updated
+- `schema_version` (Number) Core SKU schema version when available
 
 <a id="nestedatt--components"></a>
 ### Nested Schema for `components`
@@ -45,7 +46,7 @@ Read-Only:
 
 - `chassis` (Attributes) Chassis component (see [below for nested schema](#nestedatt--components--chassis))
 - `cpus` (Attributes List) CPU components (see [below for nested schema](#nestedatt--components--cpus))
-- `ethernet_devices` (Attributes List) Ethernet device components (see [below for nested schema](#nestedatt--components--ethernet_devices))
+- `ethernet_devices` (Attributes List) Read-only Ethernet device components reported by Core. Omit this property from REST mutation requests; null and an empty array are accepted for compatibility, while a non-empty array is rejected with HTTP 400. (see [below for nested schema](#nestedatt--components--ethernet_devices))
 - `gpus` (Attributes List) GPU components (see [below for nested schema](#nestedatt--components--gpus))
 - `infiniband_devices` (Attributes List) Infiniband device components (see [below for nested schema](#nestedatt--components--infiniband_devices))
 - `memory` (Attributes List) Memory components (see [below for nested schema](#nestedatt--components--memory))
@@ -57,6 +58,7 @@ Read-Only:
 
 Read-Only:
 
+- `architecture` (String) Architecture of the chassis
 - `model` (String) Model of the chassis
 - `vendor` (String) Vendor of the chassis
 
@@ -78,6 +80,7 @@ Read-Only:
 Read-Only:
 
 - `count_value` (Number) Number of ethernet devices present
+- `is_connected` (Boolean) Whether the ethernet device is connected
 - `model` (String) Model of the ethernet device
 - `vendor` (String) Vendor of the ethernet device
 
@@ -99,6 +102,7 @@ Read-Only:
 Read-Only:
 
 - `count_value` (Number) Number of infiniband devices present
+- `inactive_devices` (List of Number) Zero-based indexes of inactive devices
 - `model` (String) Model of the infiniband device
 - `vendor` (String) Vendor of the infiniband device
 
@@ -118,10 +122,13 @@ Read-Only:
 
 Read-Only:
 
-- `capacity_mb` (Number) Capacity in megabytes
+- `capacity_mb` (Number) Storage capacity in megabytes used for schema version 4 matching. Read-only in REST mutation requests and preserved in responses for legacy SKUs. Schema version 5 uses minSizeMiB and maxSizeMiB instead.
 - `count_value` (Number) Number of storage devices present
-- `model` (String) Model of the storage device
-- `vendor` (String) Vendor of the storage device
+- `max_size_mi_b` (Number) Inclusive maximum size in MiB for each storage device. Null or omission means no upper bound. Used for SKU schema version 5 and later.
+- `min_size_mi_b` (Number) Inclusive minimum size in MiB for each storage device. Null or omission means no lower bound. Used for SKU schema version 5 and later.
+- `model` (String) Informational storage model. Starting with the 2.1 release, NICo does not use this field for storage matching or validation.
+- `pci_patterns` (List of String) Regular expressions matched against storage sysfs PCI paths. An empty or omitted list disables PCI location matching. Used for SKU schema version 5 and later.
+- `vendor` (String) Storage vendor used for schema version 4 matching. Read-only in REST mutation requests and preserved in responses for legacy SKUs. Schema version 5 does not use this field.
 
 
 <a id="nestedatt--components--tpm"></a>

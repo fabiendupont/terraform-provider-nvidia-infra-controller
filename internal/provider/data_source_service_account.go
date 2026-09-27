@@ -37,7 +37,7 @@ func (d *ServiceAccountDataSource) Metadata(_ context.Context, req datasource.Me
 
 func (d *ServiceAccountDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "When the API service is configured in Service Account mode, API users can act as both Provider and Tenant. For service accounts, the Tenant entity is initialized as a privileged Tenant with `targetedInstanceCreation` capability enabled.",
+		Description: "When the API service is configured in Service Account mode, API users can act as both Provider and Tenant. Privileged Tenant behavior (for example, creating Instances by Machine ID) is determined by `siteCapabilities` on a Ready Tenant Account, not by tenant-level configuration.",
 		Attributes: map[string]schema.Attribute{
 			"enabled": schema.BoolAttribute{
 				Required:    false,

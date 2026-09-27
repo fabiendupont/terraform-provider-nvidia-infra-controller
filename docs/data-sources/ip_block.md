@@ -29,11 +29,11 @@ output "ip_block_name" {
 
 - `id` (String) ID of the resource to retrieve. When set, returns a single resource.
 - `include_usage_stats` (String) Include IP Block usage stats in response
-- `infrastructure_provider_id` (String) Filter IP Blocks by Infrastructure Provider ID
+- `infrastructure_provider_id` (String) Filter IP Blocks by Infrastructure Provider ID. Deprecated: Infrastructure Provider is now inferred from the org's membership.
 - `query` (String) Search for matches across all IP Blocks. Input will be matched against name, description, and status fields
 - `site_id` (String) Filter IP Blocks by Site ID
 - `status` (String) Filter IP Blocks by Status
-- `tenant_id` (String) Filter IP Blocks by Tenant ID
+- `tenant_id` (String) Filter IP Blocks by Tenant ID. Deprecated: Tenant is now inferred from the org's membership.
 
 ### Read-Only
 

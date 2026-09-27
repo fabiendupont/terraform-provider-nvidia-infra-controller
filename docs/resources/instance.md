@@ -47,7 +47,7 @@ resource "nico_instance" "example" {
 - `dpu_extension_service_deployments` (Attributes List) DPU Extension Services to deploy to all instances in the batch (see [below for nested schema](#nestedatt--dpu_extension_service_deployments))
 - `infiniband_interfaces` (Attributes List) InfiniBand interface configuration shared across all instances (see [below for nested schema](#nestedatt--infiniband_interfaces))
 - `instance_id` (String) Path parameter: instance_id.
-- `interfaces` (Attributes List) Interface configuration shared across all instances. At least one interface must be specified unless `autoNetwork` is true. Either Subnet or VPC Prefix interfaces allowed, only one of the Subnets or VPC Prefixes can be attached over Physical interface. Interface `ipAddress` is not supported for batch instance creation requests. Mutually exclusive with `autoNetwork`: when `autoNetwork` is true this list MUST be empty. (see [below for nested schema](#nestedatt--interfaces))
+- `interfaces` (Attributes List) Interface configuration shared across all instances. At least one interface must be specified unless `autoNetwork` is true. Interfaces must all be Subnet-backed or all be VPC-backed; VPC-backed interfaces may use an explicit `vpcPrefixId` or ask the Controller to select a prefix using `vpcId` and `ipFamilies`. Each batch member is resolved independently and may use a different prefix. Only one network can be attached over a physical interface. Interface `ipAddress` is not supported for batch instance creation requests. Mutually exclusive with `autoNetwork`: when `autoNetwork` is true this list MUST be empty. (see [below for nested schema](#nestedatt--interfaces))
 - `ipxe_script` (String) Override iPXE script specified in OS, must be specified if Operating System is not specified
 - `labels` (Map of String) Key-value objects to be applied to all instances (shared across all instances)
 - `name` (String) Updated name for the Instance
@@ -56,7 +56,7 @@ resource "nico_instance" "example" {
 - `operating_system_id` (String) Must be specified if iPXE Script field is empty
 - `phone_home_enabled` (Boolean) When set to true, the Instances will be enabled with the Phone Home service.
 - `reboot_with_custom_ipxe` (Boolean) When specified along with triggerReboot, the Instance will boot using the custom iPXE specified by OS. If Instance has alwaysBootWithCustomIpxe flag set then this value will be ignored.
-- `secondary_vpc_ids` (List of String) IDs of additional VPCs the Instances should attach to through non-primary interfaces. This field may only be specified when every entry in `interfaces` uses `vpcPrefixId`. IDs must be unique, must be valid UUIDs, and must not include the primary `vpcId`.
+- `secondary_vpc_ids` (List of String) IDs of additional VPCs the Instances should attach to through non-primary interfaces. This field may only be specified when every entry in `interfaces` uses `vpcPrefixId` or `vpcId`. IDs must be unique, must be valid UUIDs, and must not include the primary `vpcId`.
 - `ssh_key_group_ids` (List of String) SSH Key Group IDs that will provide Serial over LAN access to all instances
 - `topology_optimized` (Boolean) When true (default), all instances must be allocated on machines within the same NVLink domain. When false, instances can be spread across different NVLink domains.
 - `trigger_reboot` (Boolean) Trigger power cycle for Instance
@@ -111,10 +111,12 @@ Read-Only:
 - `device` (String) Name of the device to use
 - `device_instance` (Number) Index of the device, used to identify which interface card to attache the Partition to
 - `inline_routing_profile` (String) Inline interface-local routing profile options. It cannot be specified for Subnet-based interfaces.
-- `ip_address` (String) Explicitly requested IP address for the interface. It cannot be specified for Subnet-based interfaces. The least-significant host bit must be 1.
-- `is_physical` (Boolean) Specifies whether this Subnet or VPC Prefix should be attached to the Instance over physical interface.
+- `ip_address` (String) Explicitly requested IP address for the interface. It can only be specified with an explicit `vpcPrefixId`. The least-significant host bit must be 1.
+- `ip_families` (List of String) Address families requested for Controller prefix selection. Required with `vpcId` and prohibited otherwise. Only `IPv4` is currently accepted.
+- `is_physical` (Boolean) Specifies whether this network should be attached to the Instance over a physical interface.
 - `subnet_id` (String) ID of the Subnet to attach to the Interface
 - `virtual_function_id` (Number) Index of the virtual function to use, must be specified if isPhysical is false
+- `vpc_id` (String) ID of the VPC from which the Controller should select a prefix. `ipFamilies` must also be specified, and `ipAddress` cannot be specified.
 - `vpc_prefix_id` (String) ID of the VPC Prefix to attach to the Interface
 
 

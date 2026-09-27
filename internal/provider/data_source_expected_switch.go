@@ -30,6 +30,7 @@ type ExpectedSwitchDataSourceModel struct {
 	SiteId             types.String `tfsdk:"site_id"`
 	BmcMacAddress      types.String `tfsdk:"bmc_mac_address"`
 	SwitchSerialNumber types.String `tfsdk:"switch_serial_number"`
+	NvosMacAddresses   types.List   `tfsdk:"nvos_mac_addresses"`
 	RackId             types.String `tfsdk:"rack_id"`
 	BmcIpAddress       types.String `tfsdk:"bmc_ip_address"`
 	Name               types.String `tfsdk:"name"`
@@ -70,6 +71,13 @@ func (d *ExpectedSwitchDataSource) Schema(_ context.Context, _ datasource.Schema
 				Optional:    false,
 				Computed:    true,
 				Description: "Serial number of the Expected Switch",
+			},
+			"nvos_mac_addresses": schema.ListAttribute{
+				ElementType: types.StringType,
+				Required:    false,
+				Optional:    false,
+				Computed:    true,
+				Description: "MAC addresses of the Expected Switch's NvOS management interfaces",
 			},
 			"rack_id": schema.StringAttribute{
 				Required:    false,
@@ -185,6 +193,13 @@ func (d *ExpectedSwitchDataSource) Read(ctx context.Context, req datasource.Read
 		diags := resp.Diagnostics
 		data.BmcMacAddress = StringFromAPI(result["bmcMacAddress"])
 		data.SwitchSerialNumber = StringFromAPI(result["switchSerialNumber"])
+		if rawSlice_nvos_mac_addresses := StringSliceFromAPI(result["nvosMacAddresses"]); rawSlice_nvos_mac_addresses != nil {
+			lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_nvos_mac_addresses)
+			diags.Append(d...)
+			data.NvosMacAddresses = lv
+		} else {
+			data.NvosMacAddresses = types.ListNull(types.StringType)
+		}
 		data.RackId = StringFromAPI(result["rackId"])
 		data.BmcIpAddress = StringFromAPI(result["bmcIpAddress"])
 		data.Name = StringFromAPI(result["name"])
@@ -217,6 +232,13 @@ func (d *ExpectedSwitchDataSource) Read(ctx context.Context, req datasource.Read
 			diags := resp.Diagnostics
 			data.BmcMacAddress = StringFromAPI(result["bmcMacAddress"])
 			data.SwitchSerialNumber = StringFromAPI(result["switchSerialNumber"])
+			if rawSlice_nvos_mac_addresses := StringSliceFromAPI(result["nvosMacAddresses"]); rawSlice_nvos_mac_addresses != nil {
+				lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_nvos_mac_addresses)
+				diags.Append(d...)
+				data.NvosMacAddresses = lv
+			} else {
+				data.NvosMacAddresses = types.ListNull(types.StringType)
+			}
 			data.RackId = StringFromAPI(result["rackId"])
 			data.BmcIpAddress = StringFromAPI(result["bmcIpAddress"])
 			data.Name = StringFromAPI(result["name"])
@@ -245,6 +267,13 @@ func (d *ExpectedSwitchDataSource) Read(ctx context.Context, req datasource.Read
 func (d *ExpectedSwitchDataSource) populateModel(ctx context.Context, data *ExpectedSwitchDataSourceModel, result map[string]interface{}, diags diag.Diagnostics) {
 	data.BmcMacAddress = StringFromAPI(result["bmcMacAddress"])
 	data.SwitchSerialNumber = StringFromAPI(result["switchSerialNumber"])
+	if rawSlice_nvos_mac_addresses := StringSliceFromAPI(result["nvosMacAddresses"]); rawSlice_nvos_mac_addresses != nil {
+		lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_nvos_mac_addresses)
+		diags.Append(d...)
+		data.NvosMacAddresses = lv
+	} else {
+		data.NvosMacAddresses = types.ListNull(types.StringType)
+	}
 	data.RackId = StringFromAPI(result["rackId"])
 	data.BmcIpAddress = StringFromAPI(result["bmcIpAddress"])
 	data.Name = StringFromAPI(result["name"])
