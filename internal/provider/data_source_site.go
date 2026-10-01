@@ -35,7 +35,6 @@ type SiteDataSourceModel struct {
 	IsNvLinkPartitionEnabled      types.String              `tfsdk:"is_nv_link_partition_enabled"`
 	IsFlowEnabled                 types.String              `tfsdk:"is_flow_enabled"`
 	IncludeMachineStats           types.String              `tfsdk:"include_machine_stats"`
-	IncludeGpuStats               types.String              `tfsdk:"include_gpu_stats"`
 	Query                         types.String              `tfsdk:"query"`
 	Name                          types.String              `tfsdk:"name"`
 	Description                   types.String              `tfsdk:"description"`
@@ -57,7 +56,6 @@ type SiteDataSourceModel struct {
 	Contact                       *SiteDsContact            `tfsdk:"contact"`
 	Capabilities                  *SiteDsCapabilities       `tfsdk:"capabilities"`
 	MachineStats                  *SiteDsMachineStats       `tfsdk:"machine_stats"`
-	GpuStats                      []SiteDsGpuStatsItem      `tfsdk:"gpu_stats"`
 }
 
 type SiteDsStatusHistoryItem struct {
@@ -166,12 +164,6 @@ type SiteDsMachineStatsTotalByAllocation struct {
 	Unallocated       types.Int64 `tfsdk:"unallocated"`
 }
 
-type SiteDsGpuStatsItem struct {
-	Name     types.String `tfsdk:"name"`
-	Gpus     types.Int64  `tfsdk:"gpus"`
-	Machines types.Int64  `tfsdk:"machines"`
-}
-
 func (d *SiteDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_site"
 }
@@ -185,13 +177,13 @@ func (d *SiteDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "Filter Sites by Infrastructure Provider ID. Deprecated: Infrastructure Provider is now inferred from the org's membership.",
+				Description: "Filter Sites by Infrastructure Provider ID",
 			},
 			"tenant_id": schema.StringAttribute{
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "Filter Sites by Tenant ID. Deprecated: Tenant is now inferred from the org's membership.",
+				Description: "Filter Sites by Tenant ID",
 			},
 			"status": schema.StringAttribute{
 				Required:    false,
@@ -228,12 +220,6 @@ func (d *SiteDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 				Optional:    true,
 				Computed:    true,
 				Description: "Include a breakdown of Machine counts by lifecycle status and health. Requires Provider Admin role.",
-			},
-			"include_gpu_stats": schema.StringAttribute{
-				Required:    false,
-				Optional:    true,
-				Computed:    true,
-				Description: "Include a per-Site breakdown of GPU counts grouped by GPU type. Requires Provider Admin role.",
 			},
 			"query": schema.StringAttribute{
 				Required:    false,
@@ -727,34 +713,6 @@ func (d *SiteDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 					},
 				},
 			},
-			"gpu_stats": schema.ListNestedAttribute{
-				Required:    false,
-				Optional:    false,
-				Computed:    true,
-				Description: "GPU counts grouped by GPU type for the Site. Populated when includeGpuStats is set",
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"name": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "GPU name from the MachineCapability record",
-						},
-						"gpus": schema.Int64Attribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Total number of GPUs (summation of all Machine GPU capability counts)",
-						},
-						"machines": schema.Int64Attribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Number of machines that have this GPU capability",
-						},
-					},
-				},
-			},
 		},
 	}
 }
@@ -867,21 +825,6 @@ func (d *SiteDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 		} else {
 			data.MachineStats = nil
 		}
-		if rawItems_gpu_stats, ok := result["gpuStats"].([]interface{}); ok && rawItems_gpu_stats != nil {
-			items_gpu_stats := make([]SiteDsGpuStatsItem, len(rawItems_gpu_stats))
-			for i_gpu_stats, raw_gpu_stats := range rawItems_gpu_stats {
-				m_gpu_stats, _ := raw_gpu_stats.(map[string]interface{})
-				if m_gpu_stats == nil {
-					m_gpu_stats = map[string]interface{}{}
-				}
-				items_gpu_stats[i_gpu_stats].Name = StringFromAPI(m_gpu_stats["name"])
-				items_gpu_stats[i_gpu_stats].Gpus = Int64FromAPI(m_gpu_stats["gpus"])
-				items_gpu_stats[i_gpu_stats].Machines = Int64FromAPI(m_gpu_stats["machines"])
-			}
-			data.GpuStats = items_gpu_stats
-		} else {
-			data.GpuStats = nil
-		}
 		_ = diags
 	} else if true {
 		url := d.client.ResolvePath("/v2/org/{org}/nico/site/{siteId}/status-history", map[string]string{"siteId": data.Id.ValueString()})
@@ -967,21 +910,6 @@ func (d *SiteDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 			} else {
 				data.MachineStats = nil
 			}
-			if rawItems_gpu_stats, ok := result["gpuStats"].([]interface{}); ok && rawItems_gpu_stats != nil {
-				items_gpu_stats := make([]SiteDsGpuStatsItem, len(rawItems_gpu_stats))
-				for i_gpu_stats, raw_gpu_stats := range rawItems_gpu_stats {
-					m_gpu_stats, _ := raw_gpu_stats.(map[string]interface{})
-					if m_gpu_stats == nil {
-						m_gpu_stats = map[string]interface{}{}
-					}
-					items_gpu_stats[i_gpu_stats].Name = StringFromAPI(m_gpu_stats["name"])
-					items_gpu_stats[i_gpu_stats].Gpus = Int64FromAPI(m_gpu_stats["gpus"])
-					items_gpu_stats[i_gpu_stats].Machines = Int64FromAPI(m_gpu_stats["machines"])
-				}
-				data.GpuStats = items_gpu_stats
-			} else {
-				data.GpuStats = nil
-			}
 			_ = diags
 		}
 	}
@@ -1062,21 +990,6 @@ func (d *SiteDataSource) populateModel(ctx context.Context, data *SiteDataSource
 		data.MachineStats = obj_machine_stats
 	} else {
 		data.MachineStats = nil
-	}
-	if rawItems_gpu_stats, ok := result["gpuStats"].([]interface{}); ok && rawItems_gpu_stats != nil {
-		items_gpu_stats := make([]SiteDsGpuStatsItem, len(rawItems_gpu_stats))
-		for i_gpu_stats, raw_gpu_stats := range rawItems_gpu_stats {
-			m_gpu_stats, _ := raw_gpu_stats.(map[string]interface{})
-			if m_gpu_stats == nil {
-				m_gpu_stats = map[string]interface{}{}
-			}
-			items_gpu_stats[i_gpu_stats].Name = StringFromAPI(m_gpu_stats["name"])
-			items_gpu_stats[i_gpu_stats].Gpus = Int64FromAPI(m_gpu_stats["gpus"])
-			items_gpu_stats[i_gpu_stats].Machines = Int64FromAPI(m_gpu_stats["machines"])
-		}
-		data.GpuStats = items_gpu_stats
-	} else {
-		data.GpuStats = nil
 	}
 	_ = diags
 }

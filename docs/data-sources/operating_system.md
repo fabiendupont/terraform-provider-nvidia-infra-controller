@@ -46,11 +46,8 @@ output "operating_system_name" {
 - `image_url` (String) Original URL from which the Operating System image can be retrieved
 - `infrastructure_provider_id` (String) Specified if a Provider owns the Operating System
 - `ipxe_script` (String) iPXE script or URL, only applicable for iPXE-based Operating System
-- `ipxe_template_artifacts` (Attributes List) Artifacts for the iPXE OS definition (Templated iPXE only). authToken is redacted. (see [below for nested schema](#nestedatt--ipxe_template_artifacts))
-- `ipxe_template_id` (String) ID of the iPXE template used, only present for Templated iPXE Operating System
-- `ipxe_template_parameters` (Attributes List) Parameters passed to the iPXE template (Templated iPXE only) (see [below for nested schema](#nestedatt--ipxe_template_parameters))
 - `is_active` (Boolean) Indicates if the Operating System is active
-- `is_cloud_init` (Boolean) Whether the Operating System is cloud-init based; true if there is non-empty `userData`, false otherwise.
+- `is_cloud_init` (Boolean) Specified when the Operating System is cloud-init based
 - `name` (String) Name of the Operating System
 - `phone_home_enabled` (Boolean) Indicates whether the Phone Home service should be enabled or disabled for Operating System
 - `root_fs_id` (String) Root filesystem UUID, only applicable for image-based Operating System
@@ -60,28 +57,6 @@ output "operating_system_name" {
 - `tenant_id` (String) Specified if a Tenant owns the Operating System
 - `updated` (String) Date/time when the Operating System was updated
 - `user_data` (String) User data for the Operating System
-
-<a id="nestedatt--ipxe_template_artifacts"></a>
-### Nested Schema for `ipxe_template_artifacts`
-
-Read-Only:
-
-- `auth_token` (String) Optional auth token. Redacted in API responses.
-- `auth_type` (String) Optional auth type: Basic or Bearer
-- `cache_strategy` (String) How to handle caching for this artifact
-- `name` (String) Artifact name
-- `sha` (String) Optional SHA256 checksum
-- `url` (String) Original URL for the artifact
-
-
-<a id="nestedatt--ipxe_template_parameters"></a>
-### Nested Schema for `ipxe_template_parameters`
-
-Read-Only:
-
-- `name` (String) Parameter name (used as a variable in the template)
-- `value` (String) Parameter value
-
 
 <a id="nestedatt--site_associations"></a>
 ### Nested Schema for `site_associations`

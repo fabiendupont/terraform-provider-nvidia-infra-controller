@@ -89,8 +89,6 @@ type InstanceDsInterfacesItem struct {
 	InstanceId           types.String `tfsdk:"instance_id"`
 	SubnetId             types.String `tfsdk:"subnet_id"`
 	VpcPrefixId          types.String `tfsdk:"vpc_prefix_id"`
-	VpcId                types.String `tfsdk:"vpc_id"`
-	IpFamilies           types.List   `tfsdk:"ip_families"`
 	IsPhysical           types.Bool   `tfsdk:"is_physical"`
 	Device               types.String `tfsdk:"device"`
 	DeviceInstance       types.Int64  `tfsdk:"device_instance"`
@@ -245,7 +243,7 @@ func (d *InstanceDataSource) Schema(_ context.Context, _ datasource.SchemaReques
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "Filter by Infrastructure Provider ID. Deprecated: Instances will no longer be filtered by Infrastructure Provider; results are scoped to the org's Tenant. Use the siteId parameter to scope results to a specific Infrastructure Provider's Sites.",
+				Description: "Filter by Infrastructure Provider ID",
 			},
 			"site_id": schema.StringAttribute{
 				Required:    false,
@@ -508,26 +506,13 @@ func (d *InstanceDataSource) Schema(_ context.Context, _ datasource.SchemaReques
 							Required:    false,
 							Optional:    false,
 							Computed:    true,
-							Description: "ID of the VPC Prefix explicitly selected by the caller",
-						},
-						"vpc_id": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "ID of the VPC from which the Controller selects a prefix",
-						},
-						"ip_families": schema.ListAttribute{
-							ElementType: types.StringType,
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Address families requested for Controller prefix selection",
+							Description: "ID of the associated VPCPrefix",
 						},
 						"is_physical": schema.BoolAttribute{
 							Required:    false,
 							Optional:    false,
 							Computed:    true,
-							Description: "Indicates whether the network is bound on a physical Interface",
+							Description: "IsPhysical indicates whether the Subnet is bound on a physical Interface",
 						},
 						"device": schema.StringAttribute{
 							Required:    false,
@@ -564,13 +549,13 @@ func (d *InstanceDataSource) Schema(_ context.Context, _ datasource.SchemaReques
 							Required:    false,
 							Optional:    false,
 							Computed:    true,
-							Description: "Explicitly requested IP address for the interface. This is only used with an explicit `vpcPrefixId` and is not valid with `subnetId` or VPC-selected interfaces. The least-significant host bit must be 1.",
+							Description: "Explicitly requested IP address for the interface. This is only used for VPC Prefix-based interfaces and is not valid for Subnet-based interfaces. The least-significant host bit must be 1.",
 						},
 						"inline_routing_profile": schema.StringAttribute{
 							Required:    false,
 							Optional:    false,
 							Computed:    true,
-							Description: "Inline interface-local routing profile options. Only valid for VPC-backed interfaces.",
+							Description: "Inline interface-local routing profile options. Only valid for VPC Prefix-based interfaces.",
 						},
 						"status": schema.StringAttribute{
 							Required:    false,
@@ -1323,8 +1308,6 @@ func (d *InstanceDataSource) Read(ctx context.Context, req datasource.ReadReques
 				items_interfaces[i_interfaces].InstanceId = StringFromAPI(m_interfaces["instanceId"])
 				items_interfaces[i_interfaces].SubnetId = StringFromAPI(m_interfaces["subnetId"])
 				items_interfaces[i_interfaces].VpcPrefixId = StringFromAPI(m_interfaces["vpcPrefixId"])
-				items_interfaces[i_interfaces].VpcId = StringFromAPI(m_interfaces["vpcId"])
-				// ipFamilies: nested field — expand manually if needed
 				items_interfaces[i_interfaces].IsPhysical = BoolFromAPI(m_interfaces["isPhysical"])
 				items_interfaces[i_interfaces].Device = StringFromAPI(m_interfaces["device"])
 				items_interfaces[i_interfaces].DeviceInstance = Int64FromAPI(m_interfaces["deviceInstance"])
@@ -1535,8 +1518,6 @@ func (d *InstanceDataSource) Read(ctx context.Context, req datasource.ReadReques
 					items_interfaces[i_interfaces].InstanceId = StringFromAPI(m_interfaces["instanceId"])
 					items_interfaces[i_interfaces].SubnetId = StringFromAPI(m_interfaces["subnetId"])
 					items_interfaces[i_interfaces].VpcPrefixId = StringFromAPI(m_interfaces["vpcPrefixId"])
-					items_interfaces[i_interfaces].VpcId = StringFromAPI(m_interfaces["vpcId"])
-					// ipFamilies: nested field — expand manually if needed
 					items_interfaces[i_interfaces].IsPhysical = BoolFromAPI(m_interfaces["isPhysical"])
 					items_interfaces[i_interfaces].Device = StringFromAPI(m_interfaces["device"])
 					items_interfaces[i_interfaces].DeviceInstance = Int64FromAPI(m_interfaces["deviceInstance"])
@@ -1743,8 +1724,6 @@ func (d *InstanceDataSource) populateModel(ctx context.Context, data *InstanceDa
 			items_interfaces[i_interfaces].InstanceId = StringFromAPI(m_interfaces["instanceId"])
 			items_interfaces[i_interfaces].SubnetId = StringFromAPI(m_interfaces["subnetId"])
 			items_interfaces[i_interfaces].VpcPrefixId = StringFromAPI(m_interfaces["vpcPrefixId"])
-			items_interfaces[i_interfaces].VpcId = StringFromAPI(m_interfaces["vpcId"])
-			// ipFamilies: nested field — expand manually if needed
 			items_interfaces[i_interfaces].IsPhysical = BoolFromAPI(m_interfaces["isPhysical"])
 			items_interfaces[i_interfaces].Device = StringFromAPI(m_interfaces["device"])
 			items_interfaces[i_interfaces].DeviceInstance = Int64FromAPI(m_interfaces["deviceInstance"])

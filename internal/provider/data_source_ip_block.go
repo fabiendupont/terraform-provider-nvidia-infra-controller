@@ -73,13 +73,13 @@ func (d *IpBlockDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "Filter IP Blocks by Infrastructure Provider ID. Deprecated: Infrastructure Provider is now inferred from the org's membership.",
+				Description: "Filter IP Blocks by Infrastructure Provider ID",
 			},
 			"tenant_id": schema.StringAttribute{
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "Filter IP Blocks by Tenant ID. Deprecated: Tenant is now inferred from the org's membership.",
+				Description: "Filter IP Blocks by Tenant ID",
 			},
 			"site_id": schema.StringAttribute{
 				Required:    false,

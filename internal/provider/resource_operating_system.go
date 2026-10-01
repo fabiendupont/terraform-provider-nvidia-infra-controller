@@ -26,50 +26,33 @@ type OperatingSystemResource struct {
 }
 
 type OperatingSystemResourceModel struct {
-	Id                       types.String                                `tfsdk:"id"`
-	Name                     types.String                                `tfsdk:"name"`
-	Description              types.String                                `tfsdk:"description"`
-	InfrastructureProviderId types.String                                `tfsdk:"infrastructure_provider_id"`
-	TenantId                 types.String                                `tfsdk:"tenant_id"`
-	SiteIds                  types.List                                  `tfsdk:"site_ids"`
-	IpxeScript               types.String                                `tfsdk:"ipxe_script"`
-	ImageUrl                 types.String                                `tfsdk:"image_url"`
-	ImageSha                 types.String                                `tfsdk:"image_sha"`
-	ImageAuthType            types.String                                `tfsdk:"image_auth_type"`
-	ImageAuthToken           types.String                                `tfsdk:"image_auth_token"`
-	ImageDisk                types.String                                `tfsdk:"image_disk"`
-	RootFsId                 types.String                                `tfsdk:"root_fs_id"`
-	RootFsLabel              types.String                                `tfsdk:"root_fs_label"`
-	PhoneHomeEnabled         types.Bool                                  `tfsdk:"phone_home_enabled"`
-	UserData                 types.String                                `tfsdk:"user_data"`
-	IsCloudInit              types.Bool                                  `tfsdk:"is_cloud_init"`
-	AllowOverride            types.Bool                                  `tfsdk:"allow_override"`
-	IpxeTemplateId           types.String                                `tfsdk:"ipxe_template_id"`
-	IpxeTemplateParameters   []OperatingSystemIpxeTemplateParametersItem `tfsdk:"ipxe_template_parameters"`
-	IpxeTemplateArtifacts    []OperatingSystemIpxeTemplateArtifactsItem  `tfsdk:"ipxe_template_artifacts"`
-	IsActive                 types.Bool                                  `tfsdk:"is_active"`
-	DeactivationNote         types.String                                `tfsdk:"deactivation_note"`
-	Type                     types.String                                `tfsdk:"type"`
-	SiteAssociations         []OperatingSystemSiteAssociationsItem       `tfsdk:"site_associations"`
-	Status                   types.String                                `tfsdk:"status"`
-	StatusHistory            []OperatingSystemStatusHistoryItem          `tfsdk:"status_history"`
-	Created                  types.String                                `tfsdk:"created"`
-	Updated                  types.String                                `tfsdk:"updated"`
-	OperatingSystemId        types.String                                `tfsdk:"operating_system_id"`
-}
-
-type OperatingSystemIpxeTemplateParametersItem struct {
-	Name  types.String `tfsdk:"name"`
-	Value types.String `tfsdk:"value"`
-}
-
-type OperatingSystemIpxeTemplateArtifactsItem struct {
-	Name          types.String `tfsdk:"name"`
-	Url           types.String `tfsdk:"url"`
-	Sha           types.String `tfsdk:"sha"`
-	AuthType      types.String `tfsdk:"auth_type"`
-	AuthToken     types.String `tfsdk:"auth_token"`
-	CacheStrategy types.String `tfsdk:"cache_strategy"`
+	Id                       types.String                          `tfsdk:"id"`
+	Name                     types.String                          `tfsdk:"name"`
+	Description              types.String                          `tfsdk:"description"`
+	InfrastructureProviderId types.String                          `tfsdk:"infrastructure_provider_id"`
+	TenantId                 types.String                          `tfsdk:"tenant_id"`
+	SiteIds                  types.List                            `tfsdk:"site_ids"`
+	IpxeScript               types.String                          `tfsdk:"ipxe_script"`
+	ImageUrl                 types.String                          `tfsdk:"image_url"`
+	ImageSha                 types.String                          `tfsdk:"image_sha"`
+	ImageAuthType            types.String                          `tfsdk:"image_auth_type"`
+	ImageAuthToken           types.String                          `tfsdk:"image_auth_token"`
+	ImageDisk                types.String                          `tfsdk:"image_disk"`
+	RootFsId                 types.String                          `tfsdk:"root_fs_id"`
+	RootFsLabel              types.String                          `tfsdk:"root_fs_label"`
+	PhoneHomeEnabled         types.Bool                            `tfsdk:"phone_home_enabled"`
+	UserData                 types.String                          `tfsdk:"user_data"`
+	IsCloudInit              types.Bool                            `tfsdk:"is_cloud_init"`
+	AllowOverride            types.Bool                            `tfsdk:"allow_override"`
+	IsActive                 types.Bool                            `tfsdk:"is_active"`
+	DeactivationNote         types.String                          `tfsdk:"deactivation_note"`
+	Type                     types.String                          `tfsdk:"type"`
+	SiteAssociations         []OperatingSystemSiteAssociationsItem `tfsdk:"site_associations"`
+	Status                   types.String                          `tfsdk:"status"`
+	StatusHistory            []OperatingSystemStatusHistoryItem    `tfsdk:"status_history"`
+	Created                  types.String                          `tfsdk:"created"`
+	Updated                  types.String                          `tfsdk:"updated"`
+	OperatingSystemId        types.String                          `tfsdk:"operating_system_id"`
 }
 
 type OperatingSystemSiteAssociationsItem struct {
@@ -144,13 +127,13 @@ func (r *OperatingSystemResource) Schema(_ context.Context, _ resource.SchemaReq
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "Target Site for the Operating System. For image-based and Templated iPXE Operating Systems exactly one Site is required, even though this field is an array. The list is fixed at creation and cannot be changed on update. Not applicable to raw iPXE OS.",
+				Description: "Specify only one Site if an Operating System is image-based; more than one Site is not supported.",
 			},
 			"ipxe_script": schema.StringAttribute{
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "Deprecated: raw iPXE Operating Systems are superseded by Templated iPXE (ipxeTemplateId). iPXE script or URL, only applicable for iPXE-based OS. Cannot be specified if imageUrl is specified.",
+				Description: "iPXE script or URL, only applicable for iPXE-based OS. Cannot be specified if imageUrl is specified",
 			},
 			"image_url": schema.StringAttribute{
 				Required:    false,
@@ -210,87 +193,13 @@ func (r *OperatingSystemResource) Schema(_ context.Context, _ resource.SchemaReq
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "Deprecated and ignored: whether the Operating System is cloud-init based. Value now derived from `userData`.",
+				Description: "Specified when the Operating System is cloud-init based",
 			},
 			"allow_override": schema.BoolAttribute{
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
 				Description: "Indicates if the user data can be overridden at Instance creation time",
-			},
-			"ipxe_template_id": schema.StringAttribute{
-				Required:    false,
-				Optional:    true,
-				Computed:    true,
-				Description: "ID of the iPXE template to use; identifies a Templated iPXE Operating System. Mutually exclusive with ipxeScript and imageUrl.",
-			},
-			"ipxe_template_parameters": schema.ListNestedAttribute{
-				Required:    false,
-				Optional:    true,
-				Computed:    true,
-				Description: "Parameters passed to the iPXE template (Templated iPXE only).",
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"name": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Parameter name (used as a variable in the template)",
-						},
-						"value": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Parameter value",
-						},
-					},
-				},
-			},
-			"ipxe_template_artifacts": schema.ListNestedAttribute{
-				Required:    false,
-				Optional:    true,
-				Computed:    true,
-				Description: "Artifacts (kernel, initrd, ISO, ...) for the iPXE OS definition (Templated iPXE only).",
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"name": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Artifact name",
-						},
-						"url": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Original URL for the artifact",
-						},
-						"sha": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Optional SHA256 checksum",
-						},
-						"auth_type": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Optional auth type: Basic or Bearer",
-						},
-						"auth_token": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Optional auth token. Redacted in API responses.",
-						},
-						"cache_strategy": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "How to handle caching for this artifact",
-						},
-					},
-				},
 			},
 			"is_active": schema.BoolAttribute{
 				Required:    false,
@@ -564,49 +473,6 @@ func (r *OperatingSystemResource) Create(ctx context.Context, req resource.Creat
 	if !data.AllowOverride.IsNull() && !data.AllowOverride.IsUnknown() {
 		body["allowOverride"] = data.AllowOverride.ValueBool()
 	}
-	if !data.IpxeTemplateId.IsNull() && !data.IpxeTemplateId.IsUnknown() {
-		body["ipxeTemplateId"] = data.IpxeTemplateId.ValueString()
-	}
-	if len(data.IpxeTemplateParameters) > 0 {
-		items_ipxe_template_parameters := make([]map[string]interface{}, len(data.IpxeTemplateParameters))
-		for i_ipxe_template_parameters, item_ipxe_template_parameters := range data.IpxeTemplateParameters {
-			m_ipxe_template_parameters := map[string]interface{}{}
-			if !item_ipxe_template_parameters.Name.IsNull() {
-				m_ipxe_template_parameters["name"] = item_ipxe_template_parameters.Name.ValueString()
-			}
-			if !item_ipxe_template_parameters.Value.IsNull() {
-				m_ipxe_template_parameters["value"] = item_ipxe_template_parameters.Value.ValueString()
-			}
-			items_ipxe_template_parameters[i_ipxe_template_parameters] = m_ipxe_template_parameters
-		}
-		body["ipxeTemplateParameters"] = items_ipxe_template_parameters
-	}
-	if len(data.IpxeTemplateArtifacts) > 0 {
-		items_ipxe_template_artifacts := make([]map[string]interface{}, len(data.IpxeTemplateArtifacts))
-		for i_ipxe_template_artifacts, item_ipxe_template_artifacts := range data.IpxeTemplateArtifacts {
-			m_ipxe_template_artifacts := map[string]interface{}{}
-			if !item_ipxe_template_artifacts.Name.IsNull() {
-				m_ipxe_template_artifacts["name"] = item_ipxe_template_artifacts.Name.ValueString()
-			}
-			if !item_ipxe_template_artifacts.Url.IsNull() {
-				m_ipxe_template_artifacts["url"] = item_ipxe_template_artifacts.Url.ValueString()
-			}
-			if !item_ipxe_template_artifacts.Sha.IsNull() {
-				m_ipxe_template_artifacts["sha"] = item_ipxe_template_artifacts.Sha.ValueString()
-			}
-			if !item_ipxe_template_artifacts.AuthType.IsNull() {
-				m_ipxe_template_artifacts["authType"] = item_ipxe_template_artifacts.AuthType.ValueString()
-			}
-			if !item_ipxe_template_artifacts.AuthToken.IsNull() {
-				m_ipxe_template_artifacts["authToken"] = item_ipxe_template_artifacts.AuthToken.ValueString()
-			}
-			if !item_ipxe_template_artifacts.CacheStrategy.IsNull() {
-				m_ipxe_template_artifacts["cacheStrategy"] = item_ipxe_template_artifacts.CacheStrategy.ValueString()
-			}
-			items_ipxe_template_artifacts[i_ipxe_template_artifacts] = m_ipxe_template_artifacts
-		}
-		body["ipxeTemplateArtifacts"] = items_ipxe_template_artifacts
-	}
 
 	url := r.client.ResolvePath("/v2/org/{org}/nico/operating-system", map[string]string{})
 	result, err := r.client.Post(ctx, url, body)
@@ -640,39 +506,6 @@ func (r *OperatingSystemResource) Create(ctx context.Context, req resource.Creat
 	data.UserData = StringFromAPI(result["userData"])
 	data.IsCloudInit = BoolFromAPI(result["isCloudInit"])
 	data.AllowOverride = BoolFromAPI(result["allowOverride"])
-	data.IpxeTemplateId = StringFromAPI(result["ipxeTemplateId"])
-	if rawItems_ipxe_template_parameters, ok := result["ipxeTemplateParameters"].([]interface{}); ok && rawItems_ipxe_template_parameters != nil {
-		items_ipxe_template_parameters := make([]OperatingSystemIpxeTemplateParametersItem, len(rawItems_ipxe_template_parameters))
-		for i_ipxe_template_parameters, raw_ipxe_template_parameters := range rawItems_ipxe_template_parameters {
-			m_ipxe_template_parameters, _ := raw_ipxe_template_parameters.(map[string]interface{})
-			if m_ipxe_template_parameters == nil {
-				m_ipxe_template_parameters = map[string]interface{}{}
-			}
-			items_ipxe_template_parameters[i_ipxe_template_parameters].Name = StringFromAPI(m_ipxe_template_parameters["name"])
-			items_ipxe_template_parameters[i_ipxe_template_parameters].Value = StringFromAPI(m_ipxe_template_parameters["value"])
-		}
-		data.IpxeTemplateParameters = items_ipxe_template_parameters
-	} else {
-		data.IpxeTemplateParameters = nil
-	}
-	if rawItems_ipxe_template_artifacts, ok := result["ipxeTemplateArtifacts"].([]interface{}); ok && rawItems_ipxe_template_artifacts != nil {
-		items_ipxe_template_artifacts := make([]OperatingSystemIpxeTemplateArtifactsItem, len(rawItems_ipxe_template_artifacts))
-		for i_ipxe_template_artifacts, raw_ipxe_template_artifacts := range rawItems_ipxe_template_artifacts {
-			m_ipxe_template_artifacts, _ := raw_ipxe_template_artifacts.(map[string]interface{})
-			if m_ipxe_template_artifacts == nil {
-				m_ipxe_template_artifacts = map[string]interface{}{}
-			}
-			items_ipxe_template_artifacts[i_ipxe_template_artifacts].Name = StringFromAPI(m_ipxe_template_artifacts["name"])
-			items_ipxe_template_artifacts[i_ipxe_template_artifacts].Url = StringFromAPI(m_ipxe_template_artifacts["url"])
-			items_ipxe_template_artifacts[i_ipxe_template_artifacts].Sha = StringFromAPI(m_ipxe_template_artifacts["sha"])
-			items_ipxe_template_artifacts[i_ipxe_template_artifacts].AuthType = StringFromAPI(m_ipxe_template_artifacts["authType"])
-			items_ipxe_template_artifacts[i_ipxe_template_artifacts].AuthToken = StringFromAPI(m_ipxe_template_artifacts["authToken"])
-			items_ipxe_template_artifacts[i_ipxe_template_artifacts].CacheStrategy = StringFromAPI(m_ipxe_template_artifacts["cacheStrategy"])
-		}
-		data.IpxeTemplateArtifacts = items_ipxe_template_artifacts
-	} else {
-		data.IpxeTemplateArtifacts = nil
-	}
 	data.IsActive = BoolFromAPI(result["isActive"])
 	data.DeactivationNote = StringFromAPI(result["deactivationNote"])
 	data.Type = StringFromAPI(result["type"])
@@ -760,39 +593,6 @@ func (r *OperatingSystemResource) Read(ctx context.Context, req resource.ReadReq
 	data.UserData = StringFromAPI(result["userData"])
 	data.IsCloudInit = BoolFromAPI(result["isCloudInit"])
 	data.AllowOverride = BoolFromAPI(result["allowOverride"])
-	data.IpxeTemplateId = StringFromAPI(result["ipxeTemplateId"])
-	if rawItems_ipxe_template_parameters, ok := result["ipxeTemplateParameters"].([]interface{}); ok && rawItems_ipxe_template_parameters != nil {
-		items_ipxe_template_parameters := make([]OperatingSystemIpxeTemplateParametersItem, len(rawItems_ipxe_template_parameters))
-		for i_ipxe_template_parameters, raw_ipxe_template_parameters := range rawItems_ipxe_template_parameters {
-			m_ipxe_template_parameters, _ := raw_ipxe_template_parameters.(map[string]interface{})
-			if m_ipxe_template_parameters == nil {
-				m_ipxe_template_parameters = map[string]interface{}{}
-			}
-			items_ipxe_template_parameters[i_ipxe_template_parameters].Name = StringFromAPI(m_ipxe_template_parameters["name"])
-			items_ipxe_template_parameters[i_ipxe_template_parameters].Value = StringFromAPI(m_ipxe_template_parameters["value"])
-		}
-		data.IpxeTemplateParameters = items_ipxe_template_parameters
-	} else {
-		data.IpxeTemplateParameters = nil
-	}
-	if rawItems_ipxe_template_artifacts, ok := result["ipxeTemplateArtifacts"].([]interface{}); ok && rawItems_ipxe_template_artifacts != nil {
-		items_ipxe_template_artifacts := make([]OperatingSystemIpxeTemplateArtifactsItem, len(rawItems_ipxe_template_artifacts))
-		for i_ipxe_template_artifacts, raw_ipxe_template_artifacts := range rawItems_ipxe_template_artifacts {
-			m_ipxe_template_artifacts, _ := raw_ipxe_template_artifacts.(map[string]interface{})
-			if m_ipxe_template_artifacts == nil {
-				m_ipxe_template_artifacts = map[string]interface{}{}
-			}
-			items_ipxe_template_artifacts[i_ipxe_template_artifacts].Name = StringFromAPI(m_ipxe_template_artifacts["name"])
-			items_ipxe_template_artifacts[i_ipxe_template_artifacts].Url = StringFromAPI(m_ipxe_template_artifacts["url"])
-			items_ipxe_template_artifacts[i_ipxe_template_artifacts].Sha = StringFromAPI(m_ipxe_template_artifacts["sha"])
-			items_ipxe_template_artifacts[i_ipxe_template_artifacts].AuthType = StringFromAPI(m_ipxe_template_artifacts["authType"])
-			items_ipxe_template_artifacts[i_ipxe_template_artifacts].AuthToken = StringFromAPI(m_ipxe_template_artifacts["authToken"])
-			items_ipxe_template_artifacts[i_ipxe_template_artifacts].CacheStrategy = StringFromAPI(m_ipxe_template_artifacts["cacheStrategy"])
-		}
-		data.IpxeTemplateArtifacts = items_ipxe_template_artifacts
-	} else {
-		data.IpxeTemplateArtifacts = nil
-	}
 	data.IsActive = BoolFromAPI(result["isActive"])
 	data.DeactivationNote = StringFromAPI(result["deactivationNote"])
 	data.Type = StringFromAPI(result["type"])
@@ -887,49 +687,6 @@ func (r *OperatingSystemResource) Update(ctx context.Context, req resource.Updat
 	if !data.AllowOverride.IsNull() && !data.AllowOverride.IsUnknown() {
 		body["allowOverride"] = data.AllowOverride.ValueBool()
 	}
-	if !data.IpxeTemplateId.IsNull() && !data.IpxeTemplateId.IsUnknown() {
-		body["ipxeTemplateId"] = data.IpxeTemplateId.ValueString()
-	}
-	if len(data.IpxeTemplateParameters) > 0 {
-		items_ipxe_template_parameters := make([]map[string]interface{}, len(data.IpxeTemplateParameters))
-		for i_ipxe_template_parameters, item_ipxe_template_parameters := range data.IpxeTemplateParameters {
-			m_ipxe_template_parameters := map[string]interface{}{}
-			if !item_ipxe_template_parameters.Name.IsNull() {
-				m_ipxe_template_parameters["name"] = item_ipxe_template_parameters.Name.ValueString()
-			}
-			if !item_ipxe_template_parameters.Value.IsNull() {
-				m_ipxe_template_parameters["value"] = item_ipxe_template_parameters.Value.ValueString()
-			}
-			items_ipxe_template_parameters[i_ipxe_template_parameters] = m_ipxe_template_parameters
-		}
-		body["ipxeTemplateParameters"] = items_ipxe_template_parameters
-	}
-	if len(data.IpxeTemplateArtifacts) > 0 {
-		items_ipxe_template_artifacts := make([]map[string]interface{}, len(data.IpxeTemplateArtifacts))
-		for i_ipxe_template_artifacts, item_ipxe_template_artifacts := range data.IpxeTemplateArtifacts {
-			m_ipxe_template_artifacts := map[string]interface{}{}
-			if !item_ipxe_template_artifacts.Name.IsNull() {
-				m_ipxe_template_artifacts["name"] = item_ipxe_template_artifacts.Name.ValueString()
-			}
-			if !item_ipxe_template_artifacts.Url.IsNull() {
-				m_ipxe_template_artifacts["url"] = item_ipxe_template_artifacts.Url.ValueString()
-			}
-			if !item_ipxe_template_artifacts.Sha.IsNull() {
-				m_ipxe_template_artifacts["sha"] = item_ipxe_template_artifacts.Sha.ValueString()
-			}
-			if !item_ipxe_template_artifacts.AuthType.IsNull() {
-				m_ipxe_template_artifacts["authType"] = item_ipxe_template_artifacts.AuthType.ValueString()
-			}
-			if !item_ipxe_template_artifacts.AuthToken.IsNull() {
-				m_ipxe_template_artifacts["authToken"] = item_ipxe_template_artifacts.AuthToken.ValueString()
-			}
-			if !item_ipxe_template_artifacts.CacheStrategy.IsNull() {
-				m_ipxe_template_artifacts["cacheStrategy"] = item_ipxe_template_artifacts.CacheStrategy.ValueString()
-			}
-			items_ipxe_template_artifacts[i_ipxe_template_artifacts] = m_ipxe_template_artifacts
-		}
-		body["ipxeTemplateArtifacts"] = items_ipxe_template_artifacts
-	}
 	if !data.IsActive.IsNull() && !data.IsActive.IsUnknown() {
 		body["isActive"] = data.IsActive.ValueBool()
 	}
@@ -969,39 +726,6 @@ func (r *OperatingSystemResource) Update(ctx context.Context, req resource.Updat
 	data.UserData = StringFromAPI(result["userData"])
 	data.IsCloudInit = BoolFromAPI(result["isCloudInit"])
 	data.AllowOverride = BoolFromAPI(result["allowOverride"])
-	data.IpxeTemplateId = StringFromAPI(result["ipxeTemplateId"])
-	if rawItems_ipxe_template_parameters, ok := result["ipxeTemplateParameters"].([]interface{}); ok && rawItems_ipxe_template_parameters != nil {
-		items_ipxe_template_parameters := make([]OperatingSystemIpxeTemplateParametersItem, len(rawItems_ipxe_template_parameters))
-		for i_ipxe_template_parameters, raw_ipxe_template_parameters := range rawItems_ipxe_template_parameters {
-			m_ipxe_template_parameters, _ := raw_ipxe_template_parameters.(map[string]interface{})
-			if m_ipxe_template_parameters == nil {
-				m_ipxe_template_parameters = map[string]interface{}{}
-			}
-			items_ipxe_template_parameters[i_ipxe_template_parameters].Name = StringFromAPI(m_ipxe_template_parameters["name"])
-			items_ipxe_template_parameters[i_ipxe_template_parameters].Value = StringFromAPI(m_ipxe_template_parameters["value"])
-		}
-		data.IpxeTemplateParameters = items_ipxe_template_parameters
-	} else {
-		data.IpxeTemplateParameters = nil
-	}
-	if rawItems_ipxe_template_artifacts, ok := result["ipxeTemplateArtifacts"].([]interface{}); ok && rawItems_ipxe_template_artifacts != nil {
-		items_ipxe_template_artifacts := make([]OperatingSystemIpxeTemplateArtifactsItem, len(rawItems_ipxe_template_artifacts))
-		for i_ipxe_template_artifacts, raw_ipxe_template_artifacts := range rawItems_ipxe_template_artifacts {
-			m_ipxe_template_artifacts, _ := raw_ipxe_template_artifacts.(map[string]interface{})
-			if m_ipxe_template_artifacts == nil {
-				m_ipxe_template_artifacts = map[string]interface{}{}
-			}
-			items_ipxe_template_artifacts[i_ipxe_template_artifacts].Name = StringFromAPI(m_ipxe_template_artifacts["name"])
-			items_ipxe_template_artifacts[i_ipxe_template_artifacts].Url = StringFromAPI(m_ipxe_template_artifacts["url"])
-			items_ipxe_template_artifacts[i_ipxe_template_artifacts].Sha = StringFromAPI(m_ipxe_template_artifacts["sha"])
-			items_ipxe_template_artifacts[i_ipxe_template_artifacts].AuthType = StringFromAPI(m_ipxe_template_artifacts["authType"])
-			items_ipxe_template_artifacts[i_ipxe_template_artifacts].AuthToken = StringFromAPI(m_ipxe_template_artifacts["authToken"])
-			items_ipxe_template_artifacts[i_ipxe_template_artifacts].CacheStrategy = StringFromAPI(m_ipxe_template_artifacts["cacheStrategy"])
-		}
-		data.IpxeTemplateArtifacts = items_ipxe_template_artifacts
-	} else {
-		data.IpxeTemplateArtifacts = nil
-	}
 	data.IsActive = BoolFromAPI(result["isActive"])
 	data.DeactivationNote = StringFromAPI(result["deactivationNote"])
 	data.Type = StringFromAPI(result["type"])
@@ -1084,39 +808,6 @@ func (r *OperatingSystemResource) populateModel(ctx context.Context, data *Opera
 	data.UserData = StringFromAPI(result["userData"])
 	data.IsCloudInit = BoolFromAPI(result["isCloudInit"])
 	data.AllowOverride = BoolFromAPI(result["allowOverride"])
-	data.IpxeTemplateId = StringFromAPI(result["ipxeTemplateId"])
-	if rawItems_ipxe_template_parameters, ok := result["ipxeTemplateParameters"].([]interface{}); ok && rawItems_ipxe_template_parameters != nil {
-		items_ipxe_template_parameters := make([]OperatingSystemIpxeTemplateParametersItem, len(rawItems_ipxe_template_parameters))
-		for i_ipxe_template_parameters, raw_ipxe_template_parameters := range rawItems_ipxe_template_parameters {
-			m_ipxe_template_parameters, _ := raw_ipxe_template_parameters.(map[string]interface{})
-			if m_ipxe_template_parameters == nil {
-				m_ipxe_template_parameters = map[string]interface{}{}
-			}
-			items_ipxe_template_parameters[i_ipxe_template_parameters].Name = StringFromAPI(m_ipxe_template_parameters["name"])
-			items_ipxe_template_parameters[i_ipxe_template_parameters].Value = StringFromAPI(m_ipxe_template_parameters["value"])
-		}
-		data.IpxeTemplateParameters = items_ipxe_template_parameters
-	} else {
-		data.IpxeTemplateParameters = nil
-	}
-	if rawItems_ipxe_template_artifacts, ok := result["ipxeTemplateArtifacts"].([]interface{}); ok && rawItems_ipxe_template_artifacts != nil {
-		items_ipxe_template_artifacts := make([]OperatingSystemIpxeTemplateArtifactsItem, len(rawItems_ipxe_template_artifacts))
-		for i_ipxe_template_artifacts, raw_ipxe_template_artifacts := range rawItems_ipxe_template_artifacts {
-			m_ipxe_template_artifacts, _ := raw_ipxe_template_artifacts.(map[string]interface{})
-			if m_ipxe_template_artifacts == nil {
-				m_ipxe_template_artifacts = map[string]interface{}{}
-			}
-			items_ipxe_template_artifacts[i_ipxe_template_artifacts].Name = StringFromAPI(m_ipxe_template_artifacts["name"])
-			items_ipxe_template_artifacts[i_ipxe_template_artifacts].Url = StringFromAPI(m_ipxe_template_artifacts["url"])
-			items_ipxe_template_artifacts[i_ipxe_template_artifacts].Sha = StringFromAPI(m_ipxe_template_artifacts["sha"])
-			items_ipxe_template_artifacts[i_ipxe_template_artifacts].AuthType = StringFromAPI(m_ipxe_template_artifacts["authType"])
-			items_ipxe_template_artifacts[i_ipxe_template_artifacts].AuthToken = StringFromAPI(m_ipxe_template_artifacts["authToken"])
-			items_ipxe_template_artifacts[i_ipxe_template_artifacts].CacheStrategy = StringFromAPI(m_ipxe_template_artifacts["cacheStrategy"])
-		}
-		data.IpxeTemplateArtifacts = items_ipxe_template_artifacts
-	} else {
-		data.IpxeTemplateArtifacts = nil
-	}
 	data.IsActive = BoolFromAPI(result["isActive"])
 	data.DeactivationNote = StringFromAPI(result["deactivationNote"])
 	data.Type = StringFromAPI(result["type"])

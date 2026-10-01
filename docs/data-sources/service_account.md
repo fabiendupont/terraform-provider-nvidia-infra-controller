@@ -3,12 +3,12 @@
 page_title: "nico_service_account Data Source - nico"
 subcategory: ""
 description: |-
-  When the API service is configured in Service Account mode, API users can act as both Provider and Tenant. Privileged Tenant behavior (for example, creating Instances by Machine ID) is determined by siteCapabilities on a Ready Tenant Account, not by tenant-level configuration.
+  When the API service is configured in Service Account mode, API users can act as both Provider and Tenant. For service accounts, the Tenant entity is initialized as a privileged Tenant with targetedInstanceCreation capability enabled.
 ---
 
 # nico_service_account (Data Source)
 
-When the API service is configured in Service Account mode, API users can act as both Provider and Tenant. Privileged Tenant behavior (for example, creating Instances by Machine ID) is determined by `siteCapabilities` on a Ready Tenant Account, not by tenant-level configuration.
+When the API service is configured in Service Account mode, API users can act as both Provider and Tenant. For service accounts, the Tenant entity is initialized as a privileged Tenant with `targetedInstanceCreation` capability enabled.
 
 ## Example Usage
 
