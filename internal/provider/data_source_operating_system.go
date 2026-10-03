@@ -26,33 +26,50 @@ type OperatingSystemDataSource struct {
 }
 
 type OperatingSystemDataSourceModel struct {
-	Id                       types.String                            `tfsdk:"id"`
-	SiteId                   types.String                            `tfsdk:"site_id"`
-	Type                     types.String                            `tfsdk:"type"`
-	Status                   types.String                            `tfsdk:"status"`
-	Query                    types.String                            `tfsdk:"query"`
-	Name                     types.String                            `tfsdk:"name"`
-	Description              types.String                            `tfsdk:"description"`
-	InfrastructureProviderId types.String                            `tfsdk:"infrastructure_provider_id"`
-	TenantId                 types.String                            `tfsdk:"tenant_id"`
-	ImageUrl                 types.String                            `tfsdk:"image_url"`
-	ImageSha                 types.String                            `tfsdk:"image_sha"`
-	ImageAuthType            types.String                            `tfsdk:"image_auth_type"`
-	ImageAuthToken           types.String                            `tfsdk:"image_auth_token"`
-	ImageDisk                types.String                            `tfsdk:"image_disk"`
-	RootFsId                 types.String                            `tfsdk:"root_fs_id"`
-	RootFsLabel              types.String                            `tfsdk:"root_fs_label"`
-	IpxeScript               types.String                            `tfsdk:"ipxe_script"`
-	UserData                 types.String                            `tfsdk:"user_data"`
-	IsCloudInit              types.Bool                              `tfsdk:"is_cloud_init"`
-	PhoneHomeEnabled         types.Bool                              `tfsdk:"phone_home_enabled"`
-	IsActive                 types.Bool                              `tfsdk:"is_active"`
-	DeactivationNote         types.String                            `tfsdk:"deactivation_note"`
-	AllowOverride            types.Bool                              `tfsdk:"allow_override"`
-	SiteAssociations         []OperatingSystemDsSiteAssociationsItem `tfsdk:"site_associations"`
-	StatusHistory            []OperatingSystemDsStatusHistoryItem    `tfsdk:"status_history"`
-	Created                  types.String                            `tfsdk:"created"`
-	Updated                  types.String                            `tfsdk:"updated"`
+	Id                       types.String                                  `tfsdk:"id"`
+	SiteId                   types.String                                  `tfsdk:"site_id"`
+	Type                     types.String                                  `tfsdk:"type"`
+	Status                   types.String                                  `tfsdk:"status"`
+	Query                    types.String                                  `tfsdk:"query"`
+	Name                     types.String                                  `tfsdk:"name"`
+	Description              types.String                                  `tfsdk:"description"`
+	InfrastructureProviderId types.String                                  `tfsdk:"infrastructure_provider_id"`
+	TenantId                 types.String                                  `tfsdk:"tenant_id"`
+	ImageUrl                 types.String                                  `tfsdk:"image_url"`
+	ImageSha                 types.String                                  `tfsdk:"image_sha"`
+	ImageAuthType            types.String                                  `tfsdk:"image_auth_type"`
+	ImageAuthToken           types.String                                  `tfsdk:"image_auth_token"`
+	ImageDisk                types.String                                  `tfsdk:"image_disk"`
+	RootFsId                 types.String                                  `tfsdk:"root_fs_id"`
+	RootFsLabel              types.String                                  `tfsdk:"root_fs_label"`
+	IpxeScript               types.String                                  `tfsdk:"ipxe_script"`
+	IpxeTemplateId           types.String                                  `tfsdk:"ipxe_template_id"`
+	IpxeTemplateParameters   []OperatingSystemDsIpxeTemplateParametersItem `tfsdk:"ipxe_template_parameters"`
+	IpxeTemplateArtifacts    []OperatingSystemDsIpxeTemplateArtifactsItem  `tfsdk:"ipxe_template_artifacts"`
+	UserData                 types.String                                  `tfsdk:"user_data"`
+	IsCloudInit              types.Bool                                    `tfsdk:"is_cloud_init"`
+	PhoneHomeEnabled         types.Bool                                    `tfsdk:"phone_home_enabled"`
+	IsActive                 types.Bool                                    `tfsdk:"is_active"`
+	DeactivationNote         types.String                                  `tfsdk:"deactivation_note"`
+	AllowOverride            types.Bool                                    `tfsdk:"allow_override"`
+	SiteAssociations         []OperatingSystemDsSiteAssociationsItem       `tfsdk:"site_associations"`
+	StatusHistory            []OperatingSystemDsStatusHistoryItem          `tfsdk:"status_history"`
+	Created                  types.String                                  `tfsdk:"created"`
+	Updated                  types.String                                  `tfsdk:"updated"`
+}
+
+type OperatingSystemDsIpxeTemplateParametersItem struct {
+	Name  types.String `tfsdk:"name"`
+	Value types.String `tfsdk:"value"`
+}
+
+type OperatingSystemDsIpxeTemplateArtifactsItem struct {
+	Name          types.String `tfsdk:"name"`
+	Url           types.String `tfsdk:"url"`
+	Sha           types.String `tfsdk:"sha"`
+	AuthType      types.String `tfsdk:"auth_type"`
+	AuthToken     types.String `tfsdk:"auth_token"`
+	CacheStrategy types.String `tfsdk:"cache_strategy"`
 }
 
 type OperatingSystemDsSiteAssociationsItem struct {
@@ -193,6 +210,80 @@ func (d *OperatingSystemDataSource) Schema(_ context.Context, _ datasource.Schem
 				Computed:    true,
 				Description: "iPXE script or URL, only applicable for iPXE-based Operating System",
 			},
+			"ipxe_template_id": schema.StringAttribute{
+				Required:    false,
+				Optional:    false,
+				Computed:    true,
+				Description: "ID of the iPXE template used, only present for Templated iPXE Operating System",
+			},
+			"ipxe_template_parameters": schema.ListNestedAttribute{
+				Required:    false,
+				Optional:    false,
+				Computed:    true,
+				Description: "Parameters passed to the iPXE template (Templated iPXE only)",
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"name": schema.StringAttribute{
+							Required:    false,
+							Optional:    false,
+							Computed:    true,
+							Description: "Parameter name (used as a variable in the template)",
+						},
+						"value": schema.StringAttribute{
+							Required:    false,
+							Optional:    false,
+							Computed:    true,
+							Description: "Parameter value",
+						},
+					},
+				},
+			},
+			"ipxe_template_artifacts": schema.ListNestedAttribute{
+				Required:    false,
+				Optional:    false,
+				Computed:    true,
+				Description: "Artifacts for the iPXE OS definition (Templated iPXE only). authToken is redacted.",
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"name": schema.StringAttribute{
+							Required:    false,
+							Optional:    false,
+							Computed:    true,
+							Description: "Artifact name",
+						},
+						"url": schema.StringAttribute{
+							Required:    false,
+							Optional:    false,
+							Computed:    true,
+							Description: "Original URL for the artifact",
+						},
+						"sha": schema.StringAttribute{
+							Required:    false,
+							Optional:    false,
+							Computed:    true,
+							Description: "Optional SHA256 checksum",
+						},
+						"auth_type": schema.StringAttribute{
+							Required:    false,
+							Optional:    false,
+							Computed:    true,
+							Description: "Optional auth type: Basic or Bearer",
+						},
+						"auth_token": schema.StringAttribute{
+							Required:    false,
+							Optional:    false,
+							Computed:    true,
+							Description: "Optional auth token. Redacted in API responses.",
+						},
+						"cache_strategy": schema.StringAttribute{
+							Required:    false,
+							Optional:    false,
+							Computed:    true,
+							Description: "How to handle caching for this artifact",
+						},
+					},
+				},
+			},
 			"user_data": schema.StringAttribute{
 				Required:    false,
 				Optional:    false,
@@ -203,7 +294,7 @@ func (d *OperatingSystemDataSource) Schema(_ context.Context, _ datasource.Schem
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
-				Description: "Specified when the Operating System is cloud-init based",
+				Description: "Whether the Operating System is cloud-init based; true if there is non-empty `userData`, false otherwise.",
 			},
 			"phone_home_enabled": schema.BoolAttribute{
 				Required:    false,
@@ -442,6 +533,39 @@ func (d *OperatingSystemDataSource) Read(ctx context.Context, req datasource.Rea
 		data.RootFsId = StringFromAPI(result["rootFsId"])
 		data.RootFsLabel = StringFromAPI(result["rootFsLabel"])
 		data.IpxeScript = StringFromAPI(result["ipxeScript"])
+		data.IpxeTemplateId = StringFromAPI(result["ipxeTemplateId"])
+		if rawItems_ipxe_template_parameters, ok := result["ipxeTemplateParameters"].([]interface{}); ok && rawItems_ipxe_template_parameters != nil {
+			items_ipxe_template_parameters := make([]OperatingSystemDsIpxeTemplateParametersItem, len(rawItems_ipxe_template_parameters))
+			for i_ipxe_template_parameters, raw_ipxe_template_parameters := range rawItems_ipxe_template_parameters {
+				m_ipxe_template_parameters, _ := raw_ipxe_template_parameters.(map[string]interface{})
+				if m_ipxe_template_parameters == nil {
+					m_ipxe_template_parameters = map[string]interface{}{}
+				}
+				items_ipxe_template_parameters[i_ipxe_template_parameters].Name = StringFromAPI(m_ipxe_template_parameters["name"])
+				items_ipxe_template_parameters[i_ipxe_template_parameters].Value = StringFromAPI(m_ipxe_template_parameters["value"])
+			}
+			data.IpxeTemplateParameters = items_ipxe_template_parameters
+		} else {
+			data.IpxeTemplateParameters = nil
+		}
+		if rawItems_ipxe_template_artifacts, ok := result["ipxeTemplateArtifacts"].([]interface{}); ok && rawItems_ipxe_template_artifacts != nil {
+			items_ipxe_template_artifacts := make([]OperatingSystemDsIpxeTemplateArtifactsItem, len(rawItems_ipxe_template_artifacts))
+			for i_ipxe_template_artifacts, raw_ipxe_template_artifacts := range rawItems_ipxe_template_artifacts {
+				m_ipxe_template_artifacts, _ := raw_ipxe_template_artifacts.(map[string]interface{})
+				if m_ipxe_template_artifacts == nil {
+					m_ipxe_template_artifacts = map[string]interface{}{}
+				}
+				items_ipxe_template_artifacts[i_ipxe_template_artifacts].Name = StringFromAPI(m_ipxe_template_artifacts["name"])
+				items_ipxe_template_artifacts[i_ipxe_template_artifacts].Url = StringFromAPI(m_ipxe_template_artifacts["url"])
+				items_ipxe_template_artifacts[i_ipxe_template_artifacts].Sha = StringFromAPI(m_ipxe_template_artifacts["sha"])
+				items_ipxe_template_artifacts[i_ipxe_template_artifacts].AuthType = StringFromAPI(m_ipxe_template_artifacts["authType"])
+				items_ipxe_template_artifacts[i_ipxe_template_artifacts].AuthToken = StringFromAPI(m_ipxe_template_artifacts["authToken"])
+				items_ipxe_template_artifacts[i_ipxe_template_artifacts].CacheStrategy = StringFromAPI(m_ipxe_template_artifacts["cacheStrategy"])
+			}
+			data.IpxeTemplateArtifacts = items_ipxe_template_artifacts
+		} else {
+			data.IpxeTemplateArtifacts = nil
+		}
 		data.UserData = StringFromAPI(result["userData"])
 		data.IsCloudInit = BoolFromAPI(result["isCloudInit"])
 		data.PhoneHomeEnabled = BoolFromAPI(result["phoneHomeEnabled"])
@@ -507,6 +631,39 @@ func (d *OperatingSystemDataSource) Read(ctx context.Context, req datasource.Rea
 			data.RootFsId = StringFromAPI(result["rootFsId"])
 			data.RootFsLabel = StringFromAPI(result["rootFsLabel"])
 			data.IpxeScript = StringFromAPI(result["ipxeScript"])
+			data.IpxeTemplateId = StringFromAPI(result["ipxeTemplateId"])
+			if rawItems_ipxe_template_parameters, ok := result["ipxeTemplateParameters"].([]interface{}); ok && rawItems_ipxe_template_parameters != nil {
+				items_ipxe_template_parameters := make([]OperatingSystemDsIpxeTemplateParametersItem, len(rawItems_ipxe_template_parameters))
+				for i_ipxe_template_parameters, raw_ipxe_template_parameters := range rawItems_ipxe_template_parameters {
+					m_ipxe_template_parameters, _ := raw_ipxe_template_parameters.(map[string]interface{})
+					if m_ipxe_template_parameters == nil {
+						m_ipxe_template_parameters = map[string]interface{}{}
+					}
+					items_ipxe_template_parameters[i_ipxe_template_parameters].Name = StringFromAPI(m_ipxe_template_parameters["name"])
+					items_ipxe_template_parameters[i_ipxe_template_parameters].Value = StringFromAPI(m_ipxe_template_parameters["value"])
+				}
+				data.IpxeTemplateParameters = items_ipxe_template_parameters
+			} else {
+				data.IpxeTemplateParameters = nil
+			}
+			if rawItems_ipxe_template_artifacts, ok := result["ipxeTemplateArtifacts"].([]interface{}); ok && rawItems_ipxe_template_artifacts != nil {
+				items_ipxe_template_artifacts := make([]OperatingSystemDsIpxeTemplateArtifactsItem, len(rawItems_ipxe_template_artifacts))
+				for i_ipxe_template_artifacts, raw_ipxe_template_artifacts := range rawItems_ipxe_template_artifacts {
+					m_ipxe_template_artifacts, _ := raw_ipxe_template_artifacts.(map[string]interface{})
+					if m_ipxe_template_artifacts == nil {
+						m_ipxe_template_artifacts = map[string]interface{}{}
+					}
+					items_ipxe_template_artifacts[i_ipxe_template_artifacts].Name = StringFromAPI(m_ipxe_template_artifacts["name"])
+					items_ipxe_template_artifacts[i_ipxe_template_artifacts].Url = StringFromAPI(m_ipxe_template_artifacts["url"])
+					items_ipxe_template_artifacts[i_ipxe_template_artifacts].Sha = StringFromAPI(m_ipxe_template_artifacts["sha"])
+					items_ipxe_template_artifacts[i_ipxe_template_artifacts].AuthType = StringFromAPI(m_ipxe_template_artifacts["authType"])
+					items_ipxe_template_artifacts[i_ipxe_template_artifacts].AuthToken = StringFromAPI(m_ipxe_template_artifacts["authToken"])
+					items_ipxe_template_artifacts[i_ipxe_template_artifacts].CacheStrategy = StringFromAPI(m_ipxe_template_artifacts["cacheStrategy"])
+				}
+				data.IpxeTemplateArtifacts = items_ipxe_template_artifacts
+			} else {
+				data.IpxeTemplateArtifacts = nil
+			}
 			data.UserData = StringFromAPI(result["userData"])
 			data.IsCloudInit = BoolFromAPI(result["isCloudInit"])
 			data.PhoneHomeEnabled = BoolFromAPI(result["phoneHomeEnabled"])
@@ -568,6 +725,39 @@ func (d *OperatingSystemDataSource) populateModel(ctx context.Context, data *Ope
 	data.RootFsId = StringFromAPI(result["rootFsId"])
 	data.RootFsLabel = StringFromAPI(result["rootFsLabel"])
 	data.IpxeScript = StringFromAPI(result["ipxeScript"])
+	data.IpxeTemplateId = StringFromAPI(result["ipxeTemplateId"])
+	if rawItems_ipxe_template_parameters, ok := result["ipxeTemplateParameters"].([]interface{}); ok && rawItems_ipxe_template_parameters != nil {
+		items_ipxe_template_parameters := make([]OperatingSystemDsIpxeTemplateParametersItem, len(rawItems_ipxe_template_parameters))
+		for i_ipxe_template_parameters, raw_ipxe_template_parameters := range rawItems_ipxe_template_parameters {
+			m_ipxe_template_parameters, _ := raw_ipxe_template_parameters.(map[string]interface{})
+			if m_ipxe_template_parameters == nil {
+				m_ipxe_template_parameters = map[string]interface{}{}
+			}
+			items_ipxe_template_parameters[i_ipxe_template_parameters].Name = StringFromAPI(m_ipxe_template_parameters["name"])
+			items_ipxe_template_parameters[i_ipxe_template_parameters].Value = StringFromAPI(m_ipxe_template_parameters["value"])
+		}
+		data.IpxeTemplateParameters = items_ipxe_template_parameters
+	} else {
+		data.IpxeTemplateParameters = nil
+	}
+	if rawItems_ipxe_template_artifacts, ok := result["ipxeTemplateArtifacts"].([]interface{}); ok && rawItems_ipxe_template_artifacts != nil {
+		items_ipxe_template_artifacts := make([]OperatingSystemDsIpxeTemplateArtifactsItem, len(rawItems_ipxe_template_artifacts))
+		for i_ipxe_template_artifacts, raw_ipxe_template_artifacts := range rawItems_ipxe_template_artifacts {
+			m_ipxe_template_artifacts, _ := raw_ipxe_template_artifacts.(map[string]interface{})
+			if m_ipxe_template_artifacts == nil {
+				m_ipxe_template_artifacts = map[string]interface{}{}
+			}
+			items_ipxe_template_artifacts[i_ipxe_template_artifacts].Name = StringFromAPI(m_ipxe_template_artifacts["name"])
+			items_ipxe_template_artifacts[i_ipxe_template_artifacts].Url = StringFromAPI(m_ipxe_template_artifacts["url"])
+			items_ipxe_template_artifacts[i_ipxe_template_artifacts].Sha = StringFromAPI(m_ipxe_template_artifacts["sha"])
+			items_ipxe_template_artifacts[i_ipxe_template_artifacts].AuthType = StringFromAPI(m_ipxe_template_artifacts["authType"])
+			items_ipxe_template_artifacts[i_ipxe_template_artifacts].AuthToken = StringFromAPI(m_ipxe_template_artifacts["authToken"])
+			items_ipxe_template_artifacts[i_ipxe_template_artifacts].CacheStrategy = StringFromAPI(m_ipxe_template_artifacts["cacheStrategy"])
+		}
+		data.IpxeTemplateArtifacts = items_ipxe_template_artifacts
+	} else {
+		data.IpxeTemplateArtifacts = nil
+	}
 	data.UserData = StringFromAPI(result["userData"])
 	data.IsCloudInit = BoolFromAPI(result["isCloudInit"])
 	data.PhoneHomeEnabled = BoolFromAPI(result["phoneHomeEnabled"])

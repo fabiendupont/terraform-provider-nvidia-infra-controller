@@ -28,7 +28,7 @@ output "instance_name" {
 ### Optional
 
 - `id` (String) ID of the resource to retrieve. When set, returns a single resource.
-- `infrastructure_provider_id` (String) Filter by Infrastructure Provider ID
+- `infrastructure_provider_id` (String) Filter by Infrastructure Provider ID. Deprecated: Instances will no longer be filtered by Infrastructure Provider; results are scoped to the org's Tenant. Use the siteId parameter to scope results to a specific Infrastructure Provider's Sites.
 - `instance_type_id` (String) Filter by instance type ID. Can be specified multiple times to filter on more than one instance type.
 - `ip_address` (String) Filter by IP address. Can be specified multiple times to filter on more than one IP address.
 - `machine_id` (String) Filter by machine ID. Can be specified multiple times to filter on more than one machine.
@@ -134,17 +134,19 @@ Read-Only:
 - `device` (String) Name of the device to use
 - `device_instance` (Number) Index of the device, used to identify which interface card to attache the Partition to
 - `id` (String) Unique UUID v4 identifier for the Interface
-- `inline_routing_profile` (String) Inline interface-local routing profile options. Only valid for VPC Prefix-based interfaces.
+- `inline_routing_profile` (String) Inline interface-local routing profile options. Only valid for VPC-backed interfaces.
 - `instance_id` (String) ID of the associated Instance
 - `ip_addresses` (List of String) A list of IPv4 or IPv6 addresses
-- `is_physical` (Boolean) IsPhysical indicates whether the Subnet is bound on a physical Interface
+- `ip_families` (List of String) Address families requested for Controller prefix selection
+- `is_physical` (Boolean) Indicates whether the network is bound on a physical Interface
 - `mac_address` (String) MAC address of the Interface
-- `requested_ip_address` (String) Explicitly requested IP address for the interface. This is only used for VPC Prefix-based interfaces and is not valid for Subnet-based interfaces. The least-significant host bit must be 1.
+- `requested_ip_address` (String) Explicitly requested IP address for the interface. This is only used with an explicit `vpcPrefixId` and is not valid with `subnetId` or VPC-selected interfaces. The least-significant host bit must be 1.
 - `status` (String) Status of the Interface
 - `subnet_id` (String) ID of the associated Subnet
 - `updated` (String) Date/time when the Interface was last updated
 - `virtual_function_id` (Number) Must be specified if isPhysical is false
-- `vpc_prefix_id` (String) ID of the associated VPCPrefix
+- `vpc_id` (String) ID of the VPC from which the Controller selects a prefix
+- `vpc_prefix_id` (String) ID of the VPC Prefix explicitly selected by the caller
 
 
 <a id="nestedatt--network_security_group_propagation_details"></a>

@@ -26,19 +26,26 @@ type TenantAccountResource struct {
 }
 
 type TenantAccountResourceModel struct {
-	Id                        types.String                     `tfsdk:"id"`
-	InfrastructureProviderId  types.String                     `tfsdk:"infrastructure_provider_id"`
-	TenantOrg                 types.String                     `tfsdk:"tenant_org"`
-	InfrastructureProviderOrg types.String                     `tfsdk:"infrastructure_provider_org"`
-	TenantId                  types.String                     `tfsdk:"tenant_id"`
-	TenantContact             *TenantAccountTenantContact      `tfsdk:"tenant_contact"`
-	AllocationCount           types.Int64                      `tfsdk:"allocation_count"`
-	Status                    types.String                     `tfsdk:"status"`
-	StatusHistory             []TenantAccountStatusHistoryItem `tfsdk:"status_history"`
-	Deprecations              []TenantAccountDeprecationsItem  `tfsdk:"deprecations"`
-	Created                   types.String                     `tfsdk:"created"`
-	Updated                   types.String                     `tfsdk:"updated"`
-	AccountId                 types.String                     `tfsdk:"account_id"`
+	Id                        types.String                        `tfsdk:"id"`
+	InfrastructureProviderId  types.String                        `tfsdk:"infrastructure_provider_id"`
+	TenantOrg                 types.String                        `tfsdk:"tenant_org"`
+	TenantContactId           types.String                        `tfsdk:"tenant_contact_id"`
+	SiteCapabilities          []TenantAccountSiteCapabilitiesItem `tfsdk:"site_capabilities"`
+	InfrastructureProviderOrg types.String                        `tfsdk:"infrastructure_provider_org"`
+	TenantId                  types.String                        `tfsdk:"tenant_id"`
+	TenantContact             *TenantAccountTenantContact         `tfsdk:"tenant_contact"`
+	AllocationCount           types.Int64                         `tfsdk:"allocation_count"`
+	Status                    types.String                        `tfsdk:"status"`
+	StatusHistory             []TenantAccountStatusHistoryItem    `tfsdk:"status_history"`
+	Deprecations              []TenantAccountDeprecationsItem     `tfsdk:"deprecations"`
+	Created                   types.String                        `tfsdk:"created"`
+	Updated                   types.String                        `tfsdk:"updated"`
+	AccountId                 types.String                        `tfsdk:"account_id"`
+}
+
+type TenantAccountSiteCapabilitiesItem struct {
+	SiteIds                  types.List `tfsdk:"site_ids"`
+	TargetedInstanceCreation types.Bool `tfsdk:"targeted_instance_creation"`
 }
 
 type TenantAccountTenantContact struct {
@@ -87,6 +94,35 @@ func (r *TenantAccountResource) Schema(_ context.Context, _ resource.SchemaReque
 				Optional:    false,
 				Computed:    false,
 				Description: "Must be a valid Org name",
+			},
+			"tenant_contact_id": schema.StringAttribute{
+				Required:    false,
+				Optional:    true,
+				Computed:    true,
+				Description: "Tenant Admin invite acceptance; must match the requesting user",
+			},
+			"site_capabilities": schema.ListNestedAttribute{
+				Required:    false,
+				Optional:    true,
+				Computed:    true,
+				Description: "Provider Admin replace payload for TargetedInstanceCreation configuration. Required to be non-empty when sent.  PATCH uses replace semantics: previously configured per-site overrides whose siteId is omitted from the new payload are cleared.  Server validation rules: - must contain at least one entry - must contain exactly one entry with omitted or empty siteIds - must not repeat any siteId across entries - every provided siteId must be a valid Site UUID - every provided siteId must identify a Site associated with the Tenant and owned by the Tenant Account's Infrastructure Provider; otherwise the server rejects the request with 400",
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"site_ids": schema.ListAttribute{
+							ElementType: types.StringType,
+							Required:    false,
+							Optional:    false,
+							Computed:    true,
+							Description: "Sites to configure. An omitted or empty array identifies the Tenant Account default entry. Each value must be a valid Site UUID, may appear only once across all siteCapabilities entries in the same request, must be associated with the Tenant, and must be owned by the Tenant Account's Infrastructure Provider; otherwise the server rejects the request with 400.",
+						},
+						"targeted_instance_creation": schema.BoolAttribute{
+							Required:    false,
+							Optional:    false,
+							Computed:    true,
+							Description: "Whether TargetedInstanceCreation is enabled for the Tenant Account default or listed Sites. When true, Tenant Admins with a Ready Tenant Account on the Site's Infrastructure Provider may create Instances by Machine ID and perform related privileged actions on that Site.",
+						},
+					},
+				},
 			},
 			"infrastructure_provider_org": schema.StringAttribute{
 				Required:    false,
@@ -299,6 +335,21 @@ func (r *TenantAccountResource) Create(ctx context.Context, req resource.CreateR
 	diags := resp.Diagnostics
 	data.InfrastructureProviderId = StringFromAPI(result["infrastructureProviderId"])
 	data.TenantOrg = StringFromAPI(result["tenantOrg"])
+	data.TenantContactId = StringFromAPI(result["tenantContactId"])
+	if rawItems_site_capabilities, ok := result["siteCapabilities"].([]interface{}); ok && rawItems_site_capabilities != nil {
+		items_site_capabilities := make([]TenantAccountSiteCapabilitiesItem, len(rawItems_site_capabilities))
+		for i_site_capabilities, raw_site_capabilities := range rawItems_site_capabilities {
+			m_site_capabilities, _ := raw_site_capabilities.(map[string]interface{})
+			if m_site_capabilities == nil {
+				m_site_capabilities = map[string]interface{}{}
+			}
+			// siteIds: nested field — expand manually if needed
+			items_site_capabilities[i_site_capabilities].TargetedInstanceCreation = BoolFromAPI(m_site_capabilities["targetedInstanceCreation"])
+		}
+		data.SiteCapabilities = items_site_capabilities
+	} else {
+		data.SiteCapabilities = nil
+	}
 	data.InfrastructureProviderOrg = StringFromAPI(result["infrastructureProviderOrg"])
 	data.TenantId = StringFromAPI(result["tenantId"])
 	if rawObj_tenant_contact, ok := result["tenantContact"].(map[string]interface{}); ok {
@@ -379,6 +430,21 @@ func (r *TenantAccountResource) Read(ctx context.Context, req resource.ReadReque
 	diags := resp.Diagnostics
 	data.InfrastructureProviderId = StringFromAPI(result["infrastructureProviderId"])
 	data.TenantOrg = StringFromAPI(result["tenantOrg"])
+	data.TenantContactId = StringFromAPI(result["tenantContactId"])
+	if rawItems_site_capabilities, ok := result["siteCapabilities"].([]interface{}); ok && rawItems_site_capabilities != nil {
+		items_site_capabilities := make([]TenantAccountSiteCapabilitiesItem, len(rawItems_site_capabilities))
+		for i_site_capabilities, raw_site_capabilities := range rawItems_site_capabilities {
+			m_site_capabilities, _ := raw_site_capabilities.(map[string]interface{})
+			if m_site_capabilities == nil {
+				m_site_capabilities = map[string]interface{}{}
+			}
+			// siteIds: nested field — expand manually if needed
+			items_site_capabilities[i_site_capabilities].TargetedInstanceCreation = BoolFromAPI(m_site_capabilities["targetedInstanceCreation"])
+		}
+		data.SiteCapabilities = items_site_capabilities
+	} else {
+		data.SiteCapabilities = nil
+	}
 	data.InfrastructureProviderOrg = StringFromAPI(result["infrastructureProviderOrg"])
 	data.TenantId = StringFromAPI(result["tenantId"])
 	if rawObj_tenant_contact, ok := result["tenantContact"].(map[string]interface{}); ok {
@@ -445,7 +511,21 @@ func (r *TenantAccountResource) Update(ctx context.Context, req resource.UpdateR
 	}
 
 	body := map[string]interface{}{}
-	// no update fields
+	if !data.TenantContactId.IsNull() && !data.TenantContactId.IsUnknown() {
+		body["tenantContactId"] = data.TenantContactId.ValueString()
+	}
+	if len(data.SiteCapabilities) > 0 {
+		items_site_capabilities := make([]map[string]interface{}, len(data.SiteCapabilities))
+		for i_site_capabilities, item_site_capabilities := range data.SiteCapabilities {
+			m_site_capabilities := map[string]interface{}{}
+			// siteIds: complex nested field — expand manually if needed
+			if !item_site_capabilities.TargetedInstanceCreation.IsNull() {
+				m_site_capabilities["targetedInstanceCreation"] = item_site_capabilities.TargetedInstanceCreation.ValueBool()
+			}
+			items_site_capabilities[i_site_capabilities] = m_site_capabilities
+		}
+		body["siteCapabilities"] = items_site_capabilities
+	}
 
 	url := r.client.ResolvePath("/v2/org/{org}/nico/tenant/account/{accountId}", map[string]string{"accountId": data.Id.ValueString()})
 	result, err := r.client.Patch(ctx, url, body)
@@ -458,6 +538,21 @@ func (r *TenantAccountResource) Update(ctx context.Context, req resource.UpdateR
 	diags := resp.Diagnostics
 	data.InfrastructureProviderId = StringFromAPI(result["infrastructureProviderId"])
 	data.TenantOrg = StringFromAPI(result["tenantOrg"])
+	data.TenantContactId = StringFromAPI(result["tenantContactId"])
+	if rawItems_site_capabilities, ok := result["siteCapabilities"].([]interface{}); ok && rawItems_site_capabilities != nil {
+		items_site_capabilities := make([]TenantAccountSiteCapabilitiesItem, len(rawItems_site_capabilities))
+		for i_site_capabilities, raw_site_capabilities := range rawItems_site_capabilities {
+			m_site_capabilities, _ := raw_site_capabilities.(map[string]interface{})
+			if m_site_capabilities == nil {
+				m_site_capabilities = map[string]interface{}{}
+			}
+			// siteIds: nested field — expand manually if needed
+			items_site_capabilities[i_site_capabilities].TargetedInstanceCreation = BoolFromAPI(m_site_capabilities["targetedInstanceCreation"])
+		}
+		data.SiteCapabilities = items_site_capabilities
+	} else {
+		data.SiteCapabilities = nil
+	}
 	data.InfrastructureProviderOrg = StringFromAPI(result["infrastructureProviderOrg"])
 	data.TenantId = StringFromAPI(result["tenantId"])
 	if rawObj_tenant_contact, ok := result["tenantContact"].(map[string]interface{}); ok {
@@ -533,6 +628,21 @@ func (r *TenantAccountResource) Delete(ctx context.Context, req resource.DeleteR
 func (r *TenantAccountResource) populateModel(ctx context.Context, data *TenantAccountResourceModel, result map[string]interface{}, diags diag.Diagnostics) {
 	data.InfrastructureProviderId = StringFromAPI(result["infrastructureProviderId"])
 	data.TenantOrg = StringFromAPI(result["tenantOrg"])
+	data.TenantContactId = StringFromAPI(result["tenantContactId"])
+	if rawItems_site_capabilities, ok := result["siteCapabilities"].([]interface{}); ok && rawItems_site_capabilities != nil {
+		items_site_capabilities := make([]TenantAccountSiteCapabilitiesItem, len(rawItems_site_capabilities))
+		for i_site_capabilities, raw_site_capabilities := range rawItems_site_capabilities {
+			m_site_capabilities, _ := raw_site_capabilities.(map[string]interface{})
+			if m_site_capabilities == nil {
+				m_site_capabilities = map[string]interface{}{}
+			}
+			// siteIds: nested field — expand manually if needed
+			items_site_capabilities[i_site_capabilities].TargetedInstanceCreation = BoolFromAPI(m_site_capabilities["targetedInstanceCreation"])
+		}
+		data.SiteCapabilities = items_site_capabilities
+	} else {
+		data.SiteCapabilities = nil
+	}
 	data.InfrastructureProviderOrg = StringFromAPI(result["infrastructureProviderOrg"])
 	data.TenantId = StringFromAPI(result["tenantId"])
 	if rawObj_tenant_contact, ok := result["tenantContact"].(map[string]interface{}); ok {
