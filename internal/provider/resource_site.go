@@ -70,6 +70,7 @@ type SiteCapabilities struct {
 	NvLinkPartition           types.Bool `tfsdk:"nv_link_partition"`
 	Flow                      types.Bool `tfsdk:"flow"`
 	ImageBasedOperatingSystem types.Bool `tfsdk:"image_based_operating_system"`
+	DpsPowerManagement        types.Bool `tfsdk:"dps_power_management"`
 }
 
 type SiteStatusHistoryItem struct {
@@ -88,14 +89,15 @@ type SiteMachineStats struct {
 }
 
 type SiteMachineStatsTotalByStatus struct {
-	Decommissioned types.Int64 `tfsdk:"decommissioned"`
-	Error          types.Int64 `tfsdk:"error"`
-	Initializing   types.Int64 `tfsdk:"initializing"`
-	InUse          types.Int64 `tfsdk:"in_use"`
-	Maintenance    types.Int64 `tfsdk:"maintenance"`
-	Ready          types.Int64 `tfsdk:"ready"`
-	Reset          types.Int64 `tfsdk:"reset"`
-	Unknown        types.Int64 `tfsdk:"unknown"`
+	Decommissioned  types.Int64 `tfsdk:"decommissioned"`
+	Decommissioning types.Int64 `tfsdk:"decommissioning"`
+	Error           types.Int64 `tfsdk:"error"`
+	Initializing    types.Int64 `tfsdk:"initializing"`
+	InUse           types.Int64 `tfsdk:"in_use"`
+	Maintenance     types.Int64 `tfsdk:"maintenance"`
+	Ready           types.Int64 `tfsdk:"ready"`
+	Reset           types.Int64 `tfsdk:"reset"`
+	Unknown         types.Int64 `tfsdk:"unknown"`
 }
 
 type SiteMachineStatsTotalByHealth struct {
@@ -104,17 +106,23 @@ type SiteMachineStatsTotalByHealth struct {
 }
 
 type SiteMachineStatsTotalByStatusAndHealth struct {
-	Decommissioned *SiteMachineStatsTotalByStatusAndHealthDecommissioned `tfsdk:"decommissioned"`
-	Error          *SiteMachineStatsTotalByStatusAndHealthError          `tfsdk:"error"`
-	Initializing   *SiteMachineStatsTotalByStatusAndHealthInitializing   `tfsdk:"initializing"`
-	InUse          *SiteMachineStatsTotalByStatusAndHealthInUse          `tfsdk:"in_use"`
-	Maintenance    *SiteMachineStatsTotalByStatusAndHealthMaintenance    `tfsdk:"maintenance"`
-	Ready          *SiteMachineStatsTotalByStatusAndHealthReady          `tfsdk:"ready"`
-	Reset          *SiteMachineStatsTotalByStatusAndHealthReset          `tfsdk:"reset"`
-	Unknown        *SiteMachineStatsTotalByStatusAndHealthUnknown        `tfsdk:"unknown"`
+	Decommissioned  *SiteMachineStatsTotalByStatusAndHealthDecommissioned  `tfsdk:"decommissioned"`
+	Decommissioning *SiteMachineStatsTotalByStatusAndHealthDecommissioning `tfsdk:"decommissioning"`
+	Error           *SiteMachineStatsTotalByStatusAndHealthError           `tfsdk:"error"`
+	Initializing    *SiteMachineStatsTotalByStatusAndHealthInitializing    `tfsdk:"initializing"`
+	InUse           *SiteMachineStatsTotalByStatusAndHealthInUse           `tfsdk:"in_use"`
+	Maintenance     *SiteMachineStatsTotalByStatusAndHealthMaintenance     `tfsdk:"maintenance"`
+	Ready           *SiteMachineStatsTotalByStatusAndHealthReady           `tfsdk:"ready"`
+	Reset           *SiteMachineStatsTotalByStatusAndHealthReset           `tfsdk:"reset"`
+	Unknown         *SiteMachineStatsTotalByStatusAndHealthUnknown         `tfsdk:"unknown"`
 }
 
 type SiteMachineStatsTotalByStatusAndHealthDecommissioned struct {
+	Healthy   types.Int64 `tfsdk:"healthy"`
+	Unhealthy types.Int64 `tfsdk:"unhealthy"`
+}
+
+type SiteMachineStatsTotalByStatusAndHealthDecommissioning struct {
 	Healthy   types.Int64 `tfsdk:"healthy"`
 	Unhealthy types.Int64 `tfsdk:"unhealthy"`
 }
@@ -300,6 +308,12 @@ func (r *SiteResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 						Computed:    true,
 						Description: "Enable or disable image-based operating system support for the Site",
 					},
+					"dps_power_management": schema.BoolAttribute{
+						Required:    false,
+						Optional:    false,
+						Computed:    true,
+						Description: "Enable or disable DPS power management for the Site. Omission or `null` preserves the current value. Only Providers can update this field.",
+					},
 				},
 			},
 			"org": schema.StringAttribute{
@@ -420,6 +434,12 @@ func (r *SiteResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 								Computed:    true,
 								Description: "Number of Machines in Decommissioned status",
 							},
+							"decommissioning": schema.Int64Attribute{
+								Required:    false,
+								Optional:    false,
+								Computed:    true,
+								Description: "Number of Machines in Decommissioning status",
+							},
 							"error": schema.Int64Attribute{
 								Required:    false,
 								Optional:    false,
@@ -495,6 +515,26 @@ func (r *SiteResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 								Optional:    false,
 								Computed:    true,
 								Description: "Health breakdown for Machines in Decommissioned status",
+								Attributes: map[string]schema.Attribute{
+									"healthy": schema.Int64Attribute{
+										Required:    false,
+										Optional:    false,
+										Computed:    true,
+										Description: "Number of healthy Machines",
+									},
+									"unhealthy": schema.Int64Attribute{
+										Required:    false,
+										Optional:    false,
+										Computed:    true,
+										Description: "Number of unhealthy Machines",
+									},
+								},
+							},
+							"decommissioning": schema.SingleNestedAttribute{
+								Required:    false,
+								Optional:    false,
+								Computed:    true,
+								Description: "Health breakdown for Machines in Decommissioning status",
 								Attributes: map[string]schema.Attribute{
 									"healthy": schema.Int64Attribute{
 										Required:    false,
@@ -813,6 +853,7 @@ func (r *SiteResource) Create(ctx context.Context, req resource.CreateRequest, r
 		obj_capabilities.NvLinkPartition = BoolFromAPI(rawObj_capabilities["nvLinkPartition"])
 		obj_capabilities.Flow = BoolFromAPI(rawObj_capabilities["flow"])
 		obj_capabilities.ImageBasedOperatingSystem = BoolFromAPI(rawObj_capabilities["imageBasedOperatingSystem"])
+		obj_capabilities.DpsPowerManagement = BoolFromAPI(rawObj_capabilities["dpsPowerManagement"])
 		_ = rawObj_capabilities
 		data.Capabilities = obj_capabilities
 	} else {
@@ -929,6 +970,7 @@ func (r *SiteResource) Read(ctx context.Context, req resource.ReadRequest, resp 
 		obj_capabilities.NvLinkPartition = BoolFromAPI(rawObj_capabilities["nvLinkPartition"])
 		obj_capabilities.Flow = BoolFromAPI(rawObj_capabilities["flow"])
 		obj_capabilities.ImageBasedOperatingSystem = BoolFromAPI(rawObj_capabilities["imageBasedOperatingSystem"])
+		obj_capabilities.DpsPowerManagement = BoolFromAPI(rawObj_capabilities["dpsPowerManagement"])
 		_ = rawObj_capabilities
 		data.Capabilities = obj_capabilities
 	} else {
@@ -1061,6 +1103,9 @@ func (r *SiteResource) Update(ctx context.Context, req resource.UpdateRequest, r
 		if !data.Capabilities.ImageBasedOperatingSystem.IsNull() {
 			m_capabilities["imageBasedOperatingSystem"] = data.Capabilities.ImageBasedOperatingSystem.ValueBool()
 		}
+		if !data.Capabilities.DpsPowerManagement.IsNull() {
+			m_capabilities["dpsPowerManagement"] = data.Capabilities.DpsPowerManagement.ValueBool()
+		}
 		body["capabilities"] = m_capabilities
 	}
 
@@ -1106,6 +1151,7 @@ func (r *SiteResource) Update(ctx context.Context, req resource.UpdateRequest, r
 		obj_capabilities.NvLinkPartition = BoolFromAPI(rawObj_capabilities["nvLinkPartition"])
 		obj_capabilities.Flow = BoolFromAPI(rawObj_capabilities["flow"])
 		obj_capabilities.ImageBasedOperatingSystem = BoolFromAPI(rawObj_capabilities["imageBasedOperatingSystem"])
+		obj_capabilities.DpsPowerManagement = BoolFromAPI(rawObj_capabilities["dpsPowerManagement"])
 		_ = rawObj_capabilities
 		data.Capabilities = obj_capabilities
 	} else {
@@ -1217,6 +1263,7 @@ func (r *SiteResource) populateModel(ctx context.Context, data *SiteResourceMode
 		obj_capabilities.NvLinkPartition = BoolFromAPI(rawObj_capabilities["nvLinkPartition"])
 		obj_capabilities.Flow = BoolFromAPI(rawObj_capabilities["flow"])
 		obj_capabilities.ImageBasedOperatingSystem = BoolFromAPI(rawObj_capabilities["imageBasedOperatingSystem"])
+		obj_capabilities.DpsPowerManagement = BoolFromAPI(rawObj_capabilities["dpsPowerManagement"])
 		_ = rawObj_capabilities
 		data.Capabilities = obj_capabilities
 	} else {

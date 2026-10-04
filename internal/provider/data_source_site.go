@@ -83,6 +83,8 @@ type SiteDsCapabilities struct {
 	NvLinkPartition           types.Bool `tfsdk:"nv_link_partition"`
 	Flow                      types.Bool `tfsdk:"flow"`
 	ImageBasedOperatingSystem types.Bool `tfsdk:"image_based_operating_system"`
+	VpcSlaac                  types.Bool `tfsdk:"vpc_slaac"`
+	DpsPowerManagement        types.Bool `tfsdk:"dps_power_management"`
 }
 
 type SiteDsMachineStats struct {
@@ -94,14 +96,15 @@ type SiteDsMachineStats struct {
 }
 
 type SiteDsMachineStatsTotalByStatus struct {
-	Decommissioned types.Int64 `tfsdk:"decommissioned"`
-	Error          types.Int64 `tfsdk:"error"`
-	Initializing   types.Int64 `tfsdk:"initializing"`
-	InUse          types.Int64 `tfsdk:"in_use"`
-	Maintenance    types.Int64 `tfsdk:"maintenance"`
-	Ready          types.Int64 `tfsdk:"ready"`
-	Reset          types.Int64 `tfsdk:"reset"`
-	Unknown        types.Int64 `tfsdk:"unknown"`
+	Decommissioned  types.Int64 `tfsdk:"decommissioned"`
+	Decommissioning types.Int64 `tfsdk:"decommissioning"`
+	Error           types.Int64 `tfsdk:"error"`
+	Initializing    types.Int64 `tfsdk:"initializing"`
+	InUse           types.Int64 `tfsdk:"in_use"`
+	Maintenance     types.Int64 `tfsdk:"maintenance"`
+	Ready           types.Int64 `tfsdk:"ready"`
+	Reset           types.Int64 `tfsdk:"reset"`
+	Unknown         types.Int64 `tfsdk:"unknown"`
 }
 
 type SiteDsMachineStatsTotalByHealth struct {
@@ -110,17 +113,23 @@ type SiteDsMachineStatsTotalByHealth struct {
 }
 
 type SiteDsMachineStatsTotalByStatusAndHealth struct {
-	Decommissioned *SiteDsMachineStatsTotalByStatusAndHealthDecommissioned `tfsdk:"decommissioned"`
-	Error          *SiteDsMachineStatsTotalByStatusAndHealthError          `tfsdk:"error"`
-	Initializing   *SiteDsMachineStatsTotalByStatusAndHealthInitializing   `tfsdk:"initializing"`
-	InUse          *SiteDsMachineStatsTotalByStatusAndHealthInUse          `tfsdk:"in_use"`
-	Maintenance    *SiteDsMachineStatsTotalByStatusAndHealthMaintenance    `tfsdk:"maintenance"`
-	Ready          *SiteDsMachineStatsTotalByStatusAndHealthReady          `tfsdk:"ready"`
-	Reset          *SiteDsMachineStatsTotalByStatusAndHealthReset          `tfsdk:"reset"`
-	Unknown        *SiteDsMachineStatsTotalByStatusAndHealthUnknown        `tfsdk:"unknown"`
+	Decommissioned  *SiteDsMachineStatsTotalByStatusAndHealthDecommissioned  `tfsdk:"decommissioned"`
+	Decommissioning *SiteDsMachineStatsTotalByStatusAndHealthDecommissioning `tfsdk:"decommissioning"`
+	Error           *SiteDsMachineStatsTotalByStatusAndHealthError           `tfsdk:"error"`
+	Initializing    *SiteDsMachineStatsTotalByStatusAndHealthInitializing    `tfsdk:"initializing"`
+	InUse           *SiteDsMachineStatsTotalByStatusAndHealthInUse           `tfsdk:"in_use"`
+	Maintenance     *SiteDsMachineStatsTotalByStatusAndHealthMaintenance     `tfsdk:"maintenance"`
+	Ready           *SiteDsMachineStatsTotalByStatusAndHealthReady           `tfsdk:"ready"`
+	Reset           *SiteDsMachineStatsTotalByStatusAndHealthReset           `tfsdk:"reset"`
+	Unknown         *SiteDsMachineStatsTotalByStatusAndHealthUnknown         `tfsdk:"unknown"`
 }
 
 type SiteDsMachineStatsTotalByStatusAndHealthDecommissioned struct {
+	Healthy   types.Int64 `tfsdk:"healthy"`
+	Unhealthy types.Int64 `tfsdk:"unhealthy"`
+}
+
+type SiteDsMachineStatsTotalByStatusAndHealthDecommissioning struct {
 	Healthy   types.Int64 `tfsdk:"healthy"`
 	Unhealthy types.Int64 `tfsdk:"unhealthy"`
 }
@@ -441,6 +450,18 @@ func (d *SiteDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 						Computed:    true,
 						Description: "Whether the Site supports image-based operating system provisioning",
 					},
+					"vpc_slaac": schema.BoolAttribute{
+						Required:    false,
+						Optional:    false,
+						Computed:    true,
+						Description: "Whether the latest successfully stored Site configuration inventory reports that Core supports VPCs with SLAAC enabled. False also represents a missing Site configuration or an inventory report that omits the capability. This value is managed by Site configuration inventory and cannot be updated through the Site API.",
+					},
+					"dps_power_management": schema.BoolAttribute{
+						Required:    false,
+						Optional:    false,
+						Computed:    true,
+						Description: "Whether this Site accepts non-empty power resource groups and power profiles for DPS power management. When false, omission and explicit clearing remain allowed.",
+					},
 				},
 			},
 			"machine_stats": schema.SingleNestedAttribute{
@@ -466,6 +487,12 @@ func (d *SiteDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 								Optional:    false,
 								Computed:    true,
 								Description: "Number of Machines in Decommissioned status",
+							},
+							"decommissioning": schema.Int64Attribute{
+								Required:    false,
+								Optional:    false,
+								Computed:    true,
+								Description: "Number of Machines in Decommissioning status",
 							},
 							"error": schema.Int64Attribute{
 								Required:    false,
@@ -542,6 +569,26 @@ func (d *SiteDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 								Optional:    false,
 								Computed:    true,
 								Description: "Health breakdown for Machines in Decommissioned status",
+								Attributes: map[string]schema.Attribute{
+									"healthy": schema.Int64Attribute{
+										Required:    false,
+										Optional:    false,
+										Computed:    true,
+										Description: "Number of healthy Machines",
+									},
+									"unhealthy": schema.Int64Attribute{
+										Required:    false,
+										Optional:    false,
+										Computed:    true,
+										Description: "Number of unhealthy Machines",
+									},
+								},
+							},
+							"decommissioning": schema.SingleNestedAttribute{
+								Required:    false,
+								Optional:    false,
+								Computed:    true,
+								Description: "Health breakdown for Machines in Decommissioning status",
 								Attributes: map[string]schema.Attribute{
 									"healthy": schema.Int64Attribute{
 										Required:    false,
@@ -850,6 +897,8 @@ func (d *SiteDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 			obj_capabilities.NvLinkPartition = BoolFromAPI(rawObj_capabilities["nvLinkPartition"])
 			obj_capabilities.Flow = BoolFromAPI(rawObj_capabilities["flow"])
 			obj_capabilities.ImageBasedOperatingSystem = BoolFromAPI(rawObj_capabilities["imageBasedOperatingSystem"])
+			obj_capabilities.VpcSlaac = BoolFromAPI(rawObj_capabilities["vpcSlaac"])
+			obj_capabilities.DpsPowerManagement = BoolFromAPI(rawObj_capabilities["dpsPowerManagement"])
 			_ = rawObj_capabilities
 			data.Capabilities = obj_capabilities
 		} else {
@@ -950,6 +999,8 @@ func (d *SiteDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 				obj_capabilities.NvLinkPartition = BoolFromAPI(rawObj_capabilities["nvLinkPartition"])
 				obj_capabilities.Flow = BoolFromAPI(rawObj_capabilities["flow"])
 				obj_capabilities.ImageBasedOperatingSystem = BoolFromAPI(rawObj_capabilities["imageBasedOperatingSystem"])
+				obj_capabilities.VpcSlaac = BoolFromAPI(rawObj_capabilities["vpcSlaac"])
+				obj_capabilities.DpsPowerManagement = BoolFromAPI(rawObj_capabilities["dpsPowerManagement"])
 				_ = rawObj_capabilities
 				data.Capabilities = obj_capabilities
 			} else {
@@ -1046,6 +1097,8 @@ func (d *SiteDataSource) populateModel(ctx context.Context, data *SiteDataSource
 		obj_capabilities.NvLinkPartition = BoolFromAPI(rawObj_capabilities["nvLinkPartition"])
 		obj_capabilities.Flow = BoolFromAPI(rawObj_capabilities["flow"])
 		obj_capabilities.ImageBasedOperatingSystem = BoolFromAPI(rawObj_capabilities["imageBasedOperatingSystem"])
+		obj_capabilities.VpcSlaac = BoolFromAPI(rawObj_capabilities["vpcSlaac"])
+		obj_capabilities.DpsPowerManagement = BoolFromAPI(rawObj_capabilities["dpsPowerManagement"])
 		_ = rawObj_capabilities
 		data.Capabilities = obj_capabilities
 	} else {

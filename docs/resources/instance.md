@@ -50,11 +50,13 @@ resource "nico_instance" "example" {
 - `interfaces` (Attributes List) Interface configuration shared across all instances. At least one interface must be specified unless `autoNetwork` is true. Interfaces must all be Subnet-backed or all be VPC-backed; VPC-backed interfaces may use an explicit `vpcPrefixId` or ask the Controller to select a prefix using `vpcId` and `ipFamilies`. Each batch member is resolved independently and may use a different prefix. Only one network can be attached over a physical interface. Interface `ipAddress` is not supported for batch instance creation requests. Mutually exclusive with `autoNetwork`: when `autoNetwork` is true this list MUST be empty. (see [below for nested schema](#nestedatt--interfaces))
 - `ipxe_script` (String) Override iPXE script specified in OS, must be specified if Operating System is not specified
 - `labels` (Map of String) Key-value objects to be applied to all instances (shared across all instances)
+- `machine_label_selector` (Map of String) Optional exact-match selector applied to Machine labels during placement. Property names are arbitrary Machine label keys rather than predefined selector fields. Every supplied key/value pair must match (AND semantics). An omitted or empty object does not restrict placement. The selector constrains placement only; it is not persisted on the created Instances.  A non-empty object requires the Tenant to have effective `targetedInstanceCreation` capability for the selected Site; otherwise the request is rejected with 403. Selection occurs before topology optimization. When `topologyOptimized` is true, all selected Machines must both match the selector and belong to the same NVLink domain. If too few matching Machines are available, the request is rejected with 409.
 - `name` (String) Updated name for the Instance
 - `network_security_group_id` (String) ID of a Network Security Group to attach to all instances
 - `nv_link_interfaces` (Attributes List) NVLink interface configuration shared across all instances. A subset of GPUs may be specified. Each item references one GPU index (`deviceInstance`) and one NVLink Logical Partition. Different interfaces may reference different NVLink Logical Partitions. (see [below for nested schema](#nestedatt--nv_link_interfaces))
 - `operating_system_id` (String) Must be specified if iPXE Script field is empty
 - `phone_home_enabled` (Boolean) When set to true, the Instances will be enabled with the Phone Home service.
+- `power_profile` (String) Power profile to apply to every Instance in the batch. A non-empty value requires the Site's `dpsPowerManagement` capability to be `true`.
 - `reboot_with_custom_ipxe` (Boolean) When specified along with triggerReboot, the Instance will boot using the custom iPXE specified by OS. If Instance has alwaysBootWithCustomIpxe flag set then this value will be ignored.
 - `secondary_vpc_ids` (List of String) IDs of additional VPCs the Instances should attach to through non-primary interfaces. This field may only be specified when every entry in `interfaces` uses `vpcPrefixId` or `vpcId`. IDs must be unique, must be valid UUIDs, and must not include the primary `vpcId`.
 - `ssh_key_group_ids` (List of String) SSH Key Group IDs that will provide Serial over LAN access to all instances
@@ -112,7 +114,7 @@ Read-Only:
 - `device_instance` (Number) Index of the device, used to identify which interface card to attache the Partition to
 - `inline_routing_profile` (String) Inline interface-local routing profile options. It cannot be specified for Subnet-based interfaces.
 - `ip_address` (String) Explicitly requested IP address for the interface. It can only be specified with an explicit `vpcPrefixId`. The least-significant host bit must be 1.
-- `ip_families` (List of String) Address families requested for Controller prefix selection. Required with `vpcId` and prohibited otherwise. Only `IPv4` is currently accepted.
+- `ip_families` (List of String) Address families requested for Controller prefix selection. Required with `vpcId` and prohibited otherwise. Specify `IPv4`, `IPv6`, or both for dual-stack allocation. Duplicate values are accepted and normalized in `IPv4`, then `IPv6` order.
 - `is_physical` (Boolean) Specifies whether this network should be attached to the Instance over a physical interface.
 - `subnet_id` (String) ID of the Subnet to attach to the Interface
 - `virtual_function_id` (Number) Index of the virtual function to use, must be specified if isPhysical is false
@@ -216,11 +218,13 @@ Read-Only:
 
 Read-Only:
 
+- `dps_power_management` (Boolean) Whether this Site accepts non-empty power resource groups and power profiles for DPS power management. When false, omission and explicit clearing remain allowed.
 - `flow` (Boolean) Whether the Site supports Flow-based operations
 - `image_based_operating_system` (Boolean) Whether the Site supports image-based operating system provisioning
 - `native_networking` (Boolean) Whether the Site supports native networking
 - `network_security_group` (Boolean) Whether the Site supports Network Security Groups
 - `nv_link_partition` (Boolean) Whether the Site supports NVLink partitioning
+- `vpc_slaac` (Boolean) Whether the latest successfully stored Site configuration inventory reports that Core supports VPCs with SLAAC enabled. False also represents a missing Site configuration or an inventory report that omits the capability. This value is managed by Site configuration inventory and cannot be updated through the Site API.
 
 
 

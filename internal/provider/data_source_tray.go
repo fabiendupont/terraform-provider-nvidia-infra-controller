@@ -46,6 +46,8 @@ type TrayDataSourceModel struct {
 	LeakStatus      types.String     `tfsdk:"leak_status"`
 	Position        *TrayDsPosition  `tfsdk:"position"`
 	Bmcs            []TrayDsBmcsItem `tfsdk:"bmcs"`
+	NvLinkDomainId  types.String     `tfsdk:"nv_link_domain_id"`
+	TaskStats       *TrayDsTaskStats `tfsdk:"task_stats"`
 }
 
 type TrayDsPosition struct {
@@ -58,6 +60,11 @@ type TrayDsBmcsItem struct {
 	Type       types.String `tfsdk:"type"`
 	MacAddress types.String `tfsdk:"mac_address"`
 	IpAddress  types.String `tfsdk:"ip_address"`
+}
+
+type TrayDsTaskStats struct {
+	PendingTaskCount types.Int64 `tfsdk:"pending_task_count"`
+	ActiveTaskCount  types.Int64 `tfsdk:"active_task_count"`
 }
 
 func (d *TrayDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -225,6 +232,32 @@ func (d *TrayDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 					},
 				},
 			},
+			"nv_link_domain_id": schema.StringAttribute{
+				Required:    false,
+				Optional:    false,
+				Computed:    true,
+				Description: "ID of the NVLink Domain containing this Tray's Rack. Null when the Rack is not assigned to an NVLink Domain.",
+			},
+			"task_stats": schema.SingleNestedAttribute{
+				Required:    false,
+				Optional:    false,
+				Computed:    true,
+				Description: "Counts of non-terminal tasks currently associated with a rack or tray. Rack stats include component-scoped tasks on the rack; tray stats include only tasks that explicitly target the tray.",
+				Attributes: map[string]schema.Attribute{
+					"pending_task_count": schema.Int64Attribute{
+						Required:    false,
+						Optional:    false,
+						Computed:    true,
+						Description: "Number of associated tasks in Waiting or Pending state.",
+					},
+					"active_task_count": schema.Int64Attribute{
+						Required:    false,
+						Optional:    false,
+						Computed:    true,
+						Description: "Number of associated tasks in Running state.",
+					},
+				},
+			},
 		},
 	}
 }
@@ -296,6 +329,16 @@ func (d *TrayDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 		} else {
 			data.Bmcs = nil
 		}
+		data.NvLinkDomainId = StringFromAPI(result["nvLinkDomainId"])
+		if rawObj_task_stats, ok := result["taskStats"].(map[string]interface{}); ok {
+			obj_task_stats := &TrayDsTaskStats{}
+			obj_task_stats.PendingTaskCount = Int64FromAPI(rawObj_task_stats["pendingTaskCount"])
+			obj_task_stats.ActiveTaskCount = Int64FromAPI(rawObj_task_stats["activeTaskCount"])
+			_ = rawObj_task_stats
+			data.TaskStats = obj_task_stats
+		} else {
+			data.TaskStats = nil
+		}
 		_ = diags
 	} else if true {
 		url := d.client.ResolvePath("/v2/org/{org}/nico/tray/{id}/task", map[string]string{"id": data.Id.ValueString()})
@@ -340,6 +383,16 @@ func (d *TrayDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 			} else {
 				data.Bmcs = nil
 			}
+			data.NvLinkDomainId = StringFromAPI(result["nvLinkDomainId"])
+			if rawObj_task_stats, ok := result["taskStats"].(map[string]interface{}); ok {
+				obj_task_stats := &TrayDsTaskStats{}
+				obj_task_stats.PendingTaskCount = Int64FromAPI(rawObj_task_stats["pendingTaskCount"])
+				obj_task_stats.ActiveTaskCount = Int64FromAPI(rawObj_task_stats["activeTaskCount"])
+				_ = rawObj_task_stats
+				data.TaskStats = obj_task_stats
+			} else {
+				data.TaskStats = nil
+			}
 			_ = diags
 		}
 	}
@@ -379,6 +432,16 @@ func (d *TrayDataSource) populateModel(ctx context.Context, data *TrayDataSource
 		data.Bmcs = items_bmcs
 	} else {
 		data.Bmcs = nil
+	}
+	data.NvLinkDomainId = StringFromAPI(result["nvLinkDomainId"])
+	if rawObj_task_stats, ok := result["taskStats"].(map[string]interface{}); ok {
+		obj_task_stats := &TrayDsTaskStats{}
+		obj_task_stats.PendingTaskCount = Int64FromAPI(rawObj_task_stats["pendingTaskCount"])
+		obj_task_stats.ActiveTaskCount = Int64FromAPI(rawObj_task_stats["activeTaskCount"])
+		_ = rawObj_task_stats
+		data.TaskStats = obj_task_stats
+	} else {
+		data.TaskStats = nil
 	}
 	_ = diags
 }

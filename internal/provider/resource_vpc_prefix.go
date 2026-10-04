@@ -112,7 +112,7 @@ func (r *VpcPrefixResource) Schema(_ context.Context, _ resource.SchemaRequest, 
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
-				Description: "Present when query parameter `includeUsageStats=true`. Prefix and IP usage data is derived by evaluating associated Ethernet interfaces. Each Interface associated with a VPC Prefix consumes a `/31` prefix.",
+				Description: "Present when query parameter `includeUsageStats=true` and the VPC Prefix has IPv4. This statistic reports IPv4 usage only. IP usage counts two addresses per associated Ethernet interface, while prefix usage counts each distinct `/31` containing an assigned IPv4 address.",
 				Attributes: map[string]schema.Attribute{
 					"available_i_ps": schema.Int64Attribute{
 						Required:    false,

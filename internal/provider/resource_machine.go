@@ -142,6 +142,7 @@ type MachineMetadata struct {
 	Gpus                 []MachineMetadataGpusItem                 `tfsdk:"gpus"`
 	NetworkInterfaces    []MachineMetadataNetworkInterfacesItem    `tfsdk:"network_interfaces"`
 	InfinibandInterfaces []MachineMetadataInfinibandInterfacesItem `tfsdk:"infiniband_interfaces"`
+	LifecycleState       types.String                              `tfsdk:"lifecycle_state"`
 }
 
 type MachineMetadataDmiData struct {
@@ -926,6 +927,12 @@ func (r *MachineResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 							},
 						},
 					},
+					"lifecycle_state": schema.StringAttribute{
+						Required:    false,
+						Optional:    false,
+						Computed:    true,
+						Description: "Lifecycle state details for the Machine",
+					},
 				},
 			},
 			"status": schema.StringAttribute{
@@ -1158,6 +1165,7 @@ func (r *MachineResource) Read(ctx context.Context, req resource.ReadRequest, re
 		// gpus: nested field — expand manually if needed
 		// networkInterfaces: nested field — expand manually if needed
 		// infinibandInterfaces: nested field — expand manually if needed
+		obj_metadata.LifecycleState = StringFromAPI(rawObj_metadata["lifecycleState"])
 		_ = rawObj_metadata
 		data.Metadata = obj_metadata
 	} else {
@@ -1368,6 +1376,7 @@ func (r *MachineResource) Update(ctx context.Context, req resource.UpdateRequest
 		// gpus: nested field — expand manually if needed
 		// networkInterfaces: nested field — expand manually if needed
 		// infinibandInterfaces: nested field — expand manually if needed
+		obj_metadata.LifecycleState = StringFromAPI(rawObj_metadata["lifecycleState"])
 		_ = rawObj_metadata
 		data.Metadata = obj_metadata
 	} else {
@@ -1536,6 +1545,7 @@ func (r *MachineResource) populateModel(ctx context.Context, data *MachineResour
 		// gpus: nested field — expand manually if needed
 		// networkInterfaces: nested field — expand manually if needed
 		// infinibandInterfaces: nested field — expand manually if needed
+		obj_metadata.LifecycleState = StringFromAPI(rawObj_metadata["lifecycleState"])
 		_ = rawObj_metadata
 		data.Metadata = obj_metadata
 	} else {

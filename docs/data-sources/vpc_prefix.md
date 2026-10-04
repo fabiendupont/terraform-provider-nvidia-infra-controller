@@ -28,7 +28,7 @@ output "vpc_prefix_name" {
 ### Optional
 
 - `id` (String) ID of the resource to retrieve. When set, returns a single resource.
-- `include_usage_stats` (String) When true, each VPC Prefix object includes usage statistics using the same structure as IP Block usage. Prefix and IP usage data is derived by evaluating associated Ethernet interfaces. Each Interface associated with a VPC Prefix consumes a `/31` prefix.
+- `include_usage_stats` (String) When true, each VPC Prefix with IPv4 includes IPv4 usage statistics using the same structure as IP Block usage. Usage is derived from associated Ethernet interfaces and their IPv4 addresses. IP usage counts two addresses per interface, while prefix usage counts each distinct `/31` containing an assigned IPv4 address.
 - `query` (String) Search for matches across all VPC Prefixes. Input will be matched against name and status fields
 - `site_id` (String) Filter VPC Prefixes by Site, required if the vpcId query parameter is not specified
 - `status` (String) Filter VPC Prefixes by Status
@@ -43,7 +43,7 @@ output "vpc_prefix_name" {
 - `prefix_length` (Number) Length of the prefix. Valid range is 8 to 31, and max usable value depends on prefix length of parent IP Block.
 - `status_history` (Attributes List) Details of 20 most recent status changes (see [below for nested schema](#nestedatt--status_history))
 - `updated` (String) Date and time when the VPC Prefix was updated
-- `usage_stats` (Attributes) Present when query parameter `includeUsageStats=true`. Prefix and IP usage data is derived by evaluating associated Ethernet interfaces. Each Interface associated with a VPC Prefix consumes a `/31` prefix. (see [below for nested schema](#nestedatt--usage_stats))
+- `usage_stats` (Attributes) Present when query parameter `includeUsageStats=true` and the VPC Prefix has IPv4. This statistic reports IPv4 usage only. IP usage counts two addresses per associated Ethernet interface, while prefix usage counts each distinct `/31` containing an assigned IPv4 address. (see [below for nested schema](#nestedatt--usage_stats))
 
 <a id="nestedatt--status_history"></a>
 ### Nested Schema for `status_history`

@@ -128,6 +128,7 @@ type MachineDsMetadata struct {
 	Gpus                 []MachineDsMetadataGpusItem                 `tfsdk:"gpus"`
 	NetworkInterfaces    []MachineDsMetadataNetworkInterfacesItem    `tfsdk:"network_interfaces"`
 	InfinibandInterfaces []MachineDsMetadataInfinibandInterfacesItem `tfsdk:"infiniband_interfaces"`
+	LifecycleState       types.String                                `tfsdk:"lifecycle_state"`
 }
 
 type MachineDsMetadataDmiData struct {
@@ -896,6 +897,12 @@ func (d *MachineDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 							},
 						},
 					},
+					"lifecycle_state": schema.StringAttribute{
+						Required:    false,
+						Optional:    false,
+						Computed:    true,
+						Description: "Lifecycle state details for the Machine",
+					},
 				},
 			},
 			"labels": schema.MapAttribute{
@@ -1085,6 +1092,7 @@ func (d *MachineDataSource) Read(ctx context.Context, req datasource.ReadRequest
 			// gpus: nested field — expand manually if needed
 			// networkInterfaces: nested field — expand manually if needed
 			// infinibandInterfaces: nested field — expand manually if needed
+			obj_metadata.LifecycleState = StringFromAPI(rawObj_metadata["lifecycleState"])
 			_ = rawObj_metadata
 			data.Metadata = obj_metadata
 		} else {
@@ -1217,6 +1225,7 @@ func (d *MachineDataSource) Read(ctx context.Context, req datasource.ReadRequest
 				// gpus: nested field — expand manually if needed
 				// networkInterfaces: nested field — expand manually if needed
 				// infinibandInterfaces: nested field — expand manually if needed
+				obj_metadata.LifecycleState = StringFromAPI(rawObj_metadata["lifecycleState"])
 				_ = rawObj_metadata
 				data.Metadata = obj_metadata
 			} else {
@@ -1345,6 +1354,7 @@ func (d *MachineDataSource) populateModel(ctx context.Context, data *MachineData
 		// gpus: nested field — expand manually if needed
 		// networkInterfaces: nested field — expand manually if needed
 		// infinibandInterfaces: nested field — expand manually if needed
+		obj_metadata.LifecycleState = StringFromAPI(rawObj_metadata["lifecycleState"])
 		_ = rawObj_metadata
 		data.Metadata = obj_metadata
 	} else {

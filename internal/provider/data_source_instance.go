@@ -41,6 +41,7 @@ type InstanceDataSourceModel struct {
 	Description                            types.String                                      `tfsdk:"description"`
 	TenantId                               types.String                                      `tfsdk:"tenant_id"`
 	SecondaryVpcIds                        types.List                                        `tfsdk:"secondary_vpc_ids"`
+	PowerProfile                           types.String                                      `tfsdk:"power_profile"`
 	NetworkSecurityGroupPropagationDetails *InstanceDsNetworkSecurityGroupPropagationDetails `tfsdk:"network_security_group_propagation_details"`
 	NetworkSecurityGroupInherited          types.Bool                                        `tfsdk:"network_security_group_inherited"`
 	ControllerInstanceId                   types.String                                      `tfsdk:"controller_instance_id"`
@@ -207,6 +208,8 @@ type InstanceDsSshKeyGroupsItemSiteAssociationsItemSiteCapabilities struct {
 	NvLinkPartition           types.Bool `tfsdk:"nv_link_partition"`
 	Flow                      types.Bool `tfsdk:"flow"`
 	ImageBasedOperatingSystem types.Bool `tfsdk:"image_based_operating_system"`
+	VpcSlaac                  types.Bool `tfsdk:"vpc_slaac"`
+	DpsPowerManagement        types.Bool `tfsdk:"dps_power_management"`
 }
 
 type InstanceDsSshKeyGroupsItemStatusHistoryItem struct {
@@ -325,6 +328,12 @@ func (d *InstanceDataSource) Schema(_ context.Context, _ datasource.SchemaReques
 				Optional:    false,
 				Computed:    true,
 				Description: "IDs of VPCs attached to the Instance through non-primary interfaces",
+			},
+			"power_profile": schema.StringAttribute{
+				Required:    false,
+				Optional:    false,
+				Computed:    true,
+				Description: "External power provisioning profile associated with the Instance.",
 			},
 			"network_security_group_propagation_details": schema.SingleNestedAttribute{
 				Required:    false,
@@ -1044,6 +1053,18 @@ func (d *InstanceDataSource) Schema(_ context.Context, _ datasource.SchemaReques
 														Computed:    true,
 														Description: "Whether the Site supports image-based operating system provisioning",
 													},
+													"vpc_slaac": schema.BoolAttribute{
+														Required:    false,
+														Optional:    false,
+														Computed:    true,
+														Description: "Whether the latest successfully stored Site configuration inventory reports that Core supports VPCs with SLAAC enabled. False also represents a missing Site configuration or an inventory report that omits the capability. This value is managed by Site configuration inventory and cannot be updated through the Site API.",
+													},
+													"dps_power_management": schema.BoolAttribute{
+														Required:    false,
+														Optional:    false,
+														Computed:    true,
+														Description: "Whether this Site accepts non-empty power resource groups and power profiles for DPS power management. When false, omission and explicit clearing remain allowed.",
+													},
 												},
 											},
 											"status": schema.StringAttribute{
@@ -1282,6 +1303,7 @@ func (d *InstanceDataSource) Read(ctx context.Context, req datasource.ReadReques
 		} else {
 			data.SecondaryVpcIds = types.ListNull(types.StringType)
 		}
+		data.PowerProfile = StringFromAPI(result["powerProfile"])
 		if rawObj_network_security_group_propagation_details, ok := result["networkSecurityGroupPropagationDetails"].(map[string]interface{}); ok {
 			obj_network_security_group_propagation_details := &InstanceDsNetworkSecurityGroupPropagationDetails{}
 			obj_network_security_group_propagation_details.ObjectId = StringFromAPI(rawObj_network_security_group_propagation_details["objectId"])
@@ -1494,6 +1516,7 @@ func (d *InstanceDataSource) Read(ctx context.Context, req datasource.ReadReques
 			} else {
 				data.SecondaryVpcIds = types.ListNull(types.StringType)
 			}
+			data.PowerProfile = StringFromAPI(result["powerProfile"])
 			if rawObj_network_security_group_propagation_details, ok := result["networkSecurityGroupPropagationDetails"].(map[string]interface{}); ok {
 				obj_network_security_group_propagation_details := &InstanceDsNetworkSecurityGroupPropagationDetails{}
 				obj_network_security_group_propagation_details.ObjectId = StringFromAPI(rawObj_network_security_group_propagation_details["objectId"])
@@ -1702,6 +1725,7 @@ func (d *InstanceDataSource) populateModel(ctx context.Context, data *InstanceDa
 	} else {
 		data.SecondaryVpcIds = types.ListNull(types.StringType)
 	}
+	data.PowerProfile = StringFromAPI(result["powerProfile"])
 	if rawObj_network_security_group_propagation_details, ok := result["networkSecurityGroupPropagationDetails"].(map[string]interface{}); ok {
 		obj_network_security_group_propagation_details := &InstanceDsNetworkSecurityGroupPropagationDetails{}
 		obj_network_security_group_propagation_details.ObjectId = StringFromAPI(rawObj_network_security_group_propagation_details["objectId"])

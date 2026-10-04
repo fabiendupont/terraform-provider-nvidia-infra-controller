@@ -27,7 +27,6 @@ type SiteExplorerDataSource struct {
 
 type SiteExplorerDataSourceModel struct {
 	SiteId                types.String          `tfsdk:"site_id"`
-	MachineId             types.String          `tfsdk:"machine_id"`
 	Address               types.String          `tfsdk:"address"`
 	Report                *SiteExplorerDsReport `tfsdk:"report"`
 	ReportVersion         types.String          `tfsdk:"report_version"`
@@ -202,12 +201,6 @@ func (d *SiteExplorerDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 				Optional:    true,
 				Computed:    true,
 				Description: "ID of the Site",
-			},
-			"machine_id": schema.StringAttribute{
-				Required:    false,
-				Optional:    true,
-				Computed:    true,
-				Description: "Only return endpoints whose exploration report has this Machine ID. Omit to return all endpoints in the Site.",
 			},
 			"address": schema.StringAttribute{
 				Required:    false,
@@ -879,7 +872,6 @@ func (d *SiteExplorerDataSource) Read(ctx context.Context, req datasource.ReadRe
 	url := d.client.ResolvePath("/v2/org/{org}/nico/site-explorer/endpoint/action", map[string]string{})
 	queryParams := map[string]string{}
 	queryParams["siteId"] = data.SiteId.ValueString()
-	queryParams["machineId"] = data.MachineId.ValueString()
 	items, err := d.client.List(ctx, url, queryParams)
 	if err != nil {
 		resp.Diagnostics.AddError("Error listing Site Explorer", err.Error())

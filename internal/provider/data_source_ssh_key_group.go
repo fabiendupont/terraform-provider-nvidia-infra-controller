@@ -77,6 +77,8 @@ type SshKeyGroupDsSiteAssociationsItemSiteCapabilities struct {
 	NvLinkPartition           types.Bool `tfsdk:"nv_link_partition"`
 	Flow                      types.Bool `tfsdk:"flow"`
 	ImageBasedOperatingSystem types.Bool `tfsdk:"image_based_operating_system"`
+	VpcSlaac                  types.Bool `tfsdk:"vpc_slaac"`
+	DpsPowerManagement        types.Bool `tfsdk:"dps_power_management"`
 }
 
 type SshKeyGroupDsStatusHistoryItem struct {
@@ -279,6 +281,18 @@ func (d *SshKeyGroupDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 											Optional:    false,
 											Computed:    true,
 											Description: "Whether the Site supports image-based operating system provisioning",
+										},
+										"vpc_slaac": schema.BoolAttribute{
+											Required:    false,
+											Optional:    false,
+											Computed:    true,
+											Description: "Whether the latest successfully stored Site configuration inventory reports that Core supports VPCs with SLAAC enabled. False also represents a missing Site configuration or an inventory report that omits the capability. This value is managed by Site configuration inventory and cannot be updated through the Site API.",
+										},
+										"dps_power_management": schema.BoolAttribute{
+											Required:    false,
+											Optional:    false,
+											Computed:    true,
+											Description: "Whether this Site accepts non-empty power resource groups and power profiles for DPS power management. When false, omission and explicit clearing remain allowed.",
 										},
 									},
 								},

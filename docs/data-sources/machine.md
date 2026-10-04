@@ -149,6 +149,7 @@ Read-Only:
 - `dmi_data` (Attributes) DMI data of the machine (see [below for nested schema](#nestedatt--metadata--dmi_data))
 - `gpus` (Attributes List) GPU inventory reported for the Machine (see [below for nested schema](#nestedatt--metadata--gpus))
 - `infiniband_interfaces` (Attributes List) List of InfiniBand interfaces of the machine (see [below for nested schema](#nestedatt--metadata--infiniband_interfaces))
+- `lifecycle_state` (String) Lifecycle state details for the Machine
 - `network_interfaces` (Attributes List) List of Ethernet interfaces of the machine (see [below for nested schema](#nestedatt--metadata--network_interfaces))
 
 <a id="nestedatt--metadata--bmc_info"></a>

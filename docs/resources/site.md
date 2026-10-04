@@ -62,6 +62,7 @@ resource "nico_site" "example" {
 
 Read-Only:
 
+- `dps_power_management` (Boolean) Enable or disable DPS power management for the Site. Omission or `null` preserves the current value. Only Providers can update this field.
 - `flow` (Boolean) Enable or disable NICo Flow for the Site
 - `image_based_operating_system` (Boolean) Enable or disable image-based operating system support for the Site
 - `native_networking` (Boolean) Enable or disable native networking for the Site
@@ -133,6 +134,7 @@ Read-Only:
 Read-Only:
 
 - `decommissioned` (Number) Number of Machines in Decommissioned status
+- `decommissioning` (Number) Number of Machines in Decommissioning status
 - `error` (Number) Number of Machines in Error status
 - `in_use` (Number) Number of Machines in InUse status
 - `initializing` (Number) Number of Machines in Initializing status
@@ -148,6 +150,7 @@ Read-Only:
 Read-Only:
 
 - `decommissioned` (Attributes) Health breakdown for Machines in Decommissioned status (see [below for nested schema](#nestedatt--machine_stats--total_by_status_and_health--decommissioned))
+- `decommissioning` (Attributes) Health breakdown for Machines in Decommissioning status (see [below for nested schema](#nestedatt--machine_stats--total_by_status_and_health--decommissioning))
 - `error` (Attributes) Health breakdown for Machines in Error status (see [below for nested schema](#nestedatt--machine_stats--total_by_status_and_health--error))
 - `in_use` (Attributes) Health breakdown for Machines in InUse status (see [below for nested schema](#nestedatt--machine_stats--total_by_status_and_health--in_use))
 - `initializing` (Attributes) Health breakdown for Machines in Initializing status (see [below for nested schema](#nestedatt--machine_stats--total_by_status_and_health--initializing))
@@ -158,6 +161,15 @@ Read-Only:
 
 <a id="nestedatt--machine_stats--total_by_status_and_health--decommissioned"></a>
 ### Nested Schema for `machine_stats.total_by_status_and_health.decommissioned`
+
+Read-Only:
+
+- `healthy` (Number) Number of healthy Machines
+- `unhealthy` (Number) Number of unhealthy Machines
+
+
+<a id="nestedatt--machine_stats--total_by_status_and_health--decommissioning"></a>
+### Nested Schema for `machine_stats.total_by_status_and_health.decommissioning`
 
 Read-Only:
 

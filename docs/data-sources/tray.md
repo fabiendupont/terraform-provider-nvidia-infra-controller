@@ -46,10 +46,12 @@ output "tray_name" {
 - `firmware_version` (String) Firmware version of the tray
 - `leak_status` (String) Whether the tray is considered leaking coolant
 - `model` (String) Model of the tray
+- `nv_link_domain_id` (String) ID of the NVLink Domain containing this Tray's Rack. Null when the Rack is not assigned to an NVLink Domain.
 - `operation_status` (String) Flow-derived operability phase of the tray
 - `position` (Attributes) Position of the Tray within the Rack (see [below for nested schema](#nestedatt--position))
 - `power_state` (String) Current power state of the tray
 - `serial_number` (String) Serial number of the tray
+- `task_stats` (Attributes) Counts of non-terminal tasks currently associated with a rack or tray. Rack stats include component-scoped tasks on the rack; tray stats include only tasks that explicitly target the tray. (see [below for nested schema](#nestedatt--task_stats))
 
 <a id="nestedatt--bmcs"></a>
 ### Nested Schema for `bmcs`
@@ -69,3 +71,12 @@ Read-Only:
 - `host_id` (Number) Host ID associated with the tray
 - `slot_id` (Number) Slot number of the tray in the rack
 - `tray_idx` (Number) Index of the tray within its slot
+
+
+<a id="nestedatt--task_stats"></a>
+### Nested Schema for `task_stats`
+
+Read-Only:
+
+- `active_task_count` (Number) Number of associated tasks in Running state.
+- `pending_task_count` (Number) Number of associated tasks in Waiting or Pending state.
