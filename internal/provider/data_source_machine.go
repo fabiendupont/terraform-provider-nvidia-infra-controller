@@ -57,7 +57,6 @@ type MachineDataSourceModel struct {
 	AssociatedDpuMachineIds  types.List                         `tfsdk:"associated_dpu_machine_ids"`
 	PlacementInRack          *MachineDsPlacementInRack          `tfsdk:"placement_in_rack"`
 	MaintenanceMessage       types.String                       `tfsdk:"maintenance_message"`
-	ScoutVersion             types.String                       `tfsdk:"scout_version"`
 	Health                   *MachineDsHealth                   `tfsdk:"health"`
 	Metadata                 *MachineDsMetadata                 `tfsdk:"metadata"`
 	Labels                   types.Map                          `tfsdk:"labels"`
@@ -128,7 +127,6 @@ type MachineDsMetadata struct {
 	Gpus                 []MachineDsMetadataGpusItem                 `tfsdk:"gpus"`
 	NetworkInterfaces    []MachineDsMetadataNetworkInterfacesItem    `tfsdk:"network_interfaces"`
 	InfinibandInterfaces []MachineDsMetadataInfinibandInterfacesItem `tfsdk:"infiniband_interfaces"`
-	LifecycleState       types.String                                `tfsdk:"lifecycle_state"`
 }
 
 type MachineDsMetadataDmiData struct {
@@ -540,12 +538,6 @@ func (d *MachineDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 				Computed:    true,
 				Description: "If the Machine is in maintenance mode, this message will typically describe the reason and how long it is expected to be in maintenance",
 			},
-			"scout_version": schema.StringAttribute{
-				Required:    false,
-				Optional:    false,
-				Computed:    true,
-				Description: "Scout version reported by the Machine, if known",
-			},
 			"health": schema.SingleNestedAttribute{
 				Required:    false,
 				Optional:    false,
@@ -897,12 +889,6 @@ func (d *MachineDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 							},
 						},
 					},
-					"lifecycle_state": schema.StringAttribute{
-						Required:    false,
-						Optional:    false,
-						Computed:    true,
-						Description: "Lifecycle state details for the Machine",
-					},
 				},
 			},
 			"labels": schema.MapAttribute{
@@ -1073,7 +1059,6 @@ func (d *MachineDataSource) Read(ctx context.Context, req datasource.ReadRequest
 			data.PlacementInRack = nil
 		}
 		data.MaintenanceMessage = StringFromAPI(result["maintenanceMessage"])
-		data.ScoutVersion = StringFromAPI(result["scoutVersion"])
 		if rawObj_health, ok := result["health"].(map[string]interface{}); ok {
 			obj_health := &MachineDsHealth{}
 			obj_health.Source = StringFromAPI(rawObj_health["source"])
@@ -1092,7 +1077,6 @@ func (d *MachineDataSource) Read(ctx context.Context, req datasource.ReadRequest
 			// gpus: nested field — expand manually if needed
 			// networkInterfaces: nested field — expand manually if needed
 			// infinibandInterfaces: nested field — expand manually if needed
-			obj_metadata.LifecycleState = StringFromAPI(rawObj_metadata["lifecycleState"])
 			_ = rawObj_metadata
 			data.Metadata = obj_metadata
 		} else {
@@ -1206,7 +1190,6 @@ func (d *MachineDataSource) Read(ctx context.Context, req datasource.ReadRequest
 				data.PlacementInRack = nil
 			}
 			data.MaintenanceMessage = StringFromAPI(result["maintenanceMessage"])
-			data.ScoutVersion = StringFromAPI(result["scoutVersion"])
 			if rawObj_health, ok := result["health"].(map[string]interface{}); ok {
 				obj_health := &MachineDsHealth{}
 				obj_health.Source = StringFromAPI(rawObj_health["source"])
@@ -1225,7 +1208,6 @@ func (d *MachineDataSource) Read(ctx context.Context, req datasource.ReadRequest
 				// gpus: nested field — expand manually if needed
 				// networkInterfaces: nested field — expand manually if needed
 				// infinibandInterfaces: nested field — expand manually if needed
-				obj_metadata.LifecycleState = StringFromAPI(rawObj_metadata["lifecycleState"])
 				_ = rawObj_metadata
 				data.Metadata = obj_metadata
 			} else {
@@ -1335,7 +1317,6 @@ func (d *MachineDataSource) populateModel(ctx context.Context, data *MachineData
 		data.PlacementInRack = nil
 	}
 	data.MaintenanceMessage = StringFromAPI(result["maintenanceMessage"])
-	data.ScoutVersion = StringFromAPI(result["scoutVersion"])
 	if rawObj_health, ok := result["health"].(map[string]interface{}); ok {
 		obj_health := &MachineDsHealth{}
 		obj_health.Source = StringFromAPI(rawObj_health["source"])
@@ -1354,7 +1335,6 @@ func (d *MachineDataSource) populateModel(ctx context.Context, data *MachineData
 		// gpus: nested field — expand manually if needed
 		// networkInterfaces: nested field — expand manually if needed
 		// infinibandInterfaces: nested field — expand manually if needed
-		obj_metadata.LifecycleState = StringFromAPI(rawObj_metadata["lifecycleState"])
 		_ = rawObj_metadata
 		data.Metadata = obj_metadata
 	} else {

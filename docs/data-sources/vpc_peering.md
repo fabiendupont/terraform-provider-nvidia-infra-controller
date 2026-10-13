@@ -64,13 +64,11 @@ Read-Only:
 
 Read-Only:
 
-- `dps_power_management` (Boolean) Whether this Site accepts non-empty power resource groups and power profiles for DPS power management. When false, omission and explicit clearing remain allowed.
 - `flow` (Boolean) Whether the Site supports Flow-based operations
 - `image_based_operating_system` (Boolean) Whether the Site supports image-based operating system provisioning
 - `native_networking` (Boolean) Whether the Site supports native networking
 - `network_security_group` (Boolean) Whether the Site supports Network Security Groups
 - `nv_link_partition` (Boolean) Whether the Site supports NVLink partitioning
-- `vpc_slaac` (Boolean) Whether the latest successfully stored Site configuration inventory reports that Core supports VPCs with SLAAC enabled. False also represents a missing Site configuration or an inventory report that omits the capability. This value is managed by Site configuration inventory and cannot be updated through the Site API.
 
 
 
@@ -79,8 +77,7 @@ Read-Only:
 
 Read-Only:
 
-- `capabilities` (Attributes) Deprecated compatibility object. The targetedInstanceCreation property is omitted; use Tenant Account siteCapabilities for the authoritative configuration. (see [below for nested schema](#nestedatt--tenant--capabilities))
-- `deprecations` (Attributes List) Deprecation notices for Tenant fields (see [below for nested schema](#nestedatt--tenant--deprecations))
+- `capabilities` (Attributes) Features that are enabled/disabled for Tenant (see [below for nested schema](#nestedatt--tenant--capabilities))
 - `org` (String) Name of the org this tenant belongs to
 - `org_display_name` (String) Display name of the org the Tenant belongs to
 
@@ -89,20 +86,7 @@ Read-Only:
 
 Read-Only:
 
-- `targeted_instance_creation` (Boolean) Deprecated in favor of TenantAccount.siteCapabilities. On GET `/tenant/current`, the property is present and true only when every Ready Tenant Account enables TargetedInstanceCreation and no Tenant Site explicitly disables it; otherwise it is omitted. It is also omitted from embedded TenantSummary objects.
-
-
-<a id="nestedatt--tenant--deprecations"></a>
-### Nested Schema for `tenant.deprecations`
-
-Read-Only:
-
-- `attribute` (String) Name of the attribute that is deprecated. Omitted if queryParam or endpoint is being deprecated.
-- `endpoint` (String) API endpoint that is deprecated. Omitted if attribute or queryParam is being deprecated.
-- `notice` (String) Message describing the deprecation
-- `query_param` (String) Query parameter that is deprecated. Omitted if attribute or endpoint is being deprecated.
-- `replaced_by` (String) Name of the attribute, query parameter, or endpoint that replaces the deprecated item. Omitted if no replacement is available.
-- `take_action_by` (String) Date/time by which clients should migrate away from the deprecated API surface
+- `targeted_instance_creation` (Boolean) Indicates whether Tenant can create Instances by specifying Machine ID
 
 
 

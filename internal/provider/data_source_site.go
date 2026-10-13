@@ -35,7 +35,6 @@ type SiteDataSourceModel struct {
 	IsNvLinkPartitionEnabled      types.String              `tfsdk:"is_nv_link_partition_enabled"`
 	IsFlowEnabled                 types.String              `tfsdk:"is_flow_enabled"`
 	IncludeMachineStats           types.String              `tfsdk:"include_machine_stats"`
-	IncludeGpuStats               types.String              `tfsdk:"include_gpu_stats"`
 	Query                         types.String              `tfsdk:"query"`
 	Name                          types.String              `tfsdk:"name"`
 	Description                   types.String              `tfsdk:"description"`
@@ -57,7 +56,6 @@ type SiteDataSourceModel struct {
 	Contact                       *SiteDsContact            `tfsdk:"contact"`
 	Capabilities                  *SiteDsCapabilities       `tfsdk:"capabilities"`
 	MachineStats                  *SiteDsMachineStats       `tfsdk:"machine_stats"`
-	GpuStats                      []SiteDsGpuStatsItem      `tfsdk:"gpu_stats"`
 }
 
 type SiteDsStatusHistoryItem struct {
@@ -83,8 +81,6 @@ type SiteDsCapabilities struct {
 	NvLinkPartition           types.Bool `tfsdk:"nv_link_partition"`
 	Flow                      types.Bool `tfsdk:"flow"`
 	ImageBasedOperatingSystem types.Bool `tfsdk:"image_based_operating_system"`
-	VpcSlaac                  types.Bool `tfsdk:"vpc_slaac"`
-	DpsPowerManagement        types.Bool `tfsdk:"dps_power_management"`
 }
 
 type SiteDsMachineStats struct {
@@ -96,15 +92,14 @@ type SiteDsMachineStats struct {
 }
 
 type SiteDsMachineStatsTotalByStatus struct {
-	Decommissioned  types.Int64 `tfsdk:"decommissioned"`
-	Decommissioning types.Int64 `tfsdk:"decommissioning"`
-	Error           types.Int64 `tfsdk:"error"`
-	Initializing    types.Int64 `tfsdk:"initializing"`
-	InUse           types.Int64 `tfsdk:"in_use"`
-	Maintenance     types.Int64 `tfsdk:"maintenance"`
-	Ready           types.Int64 `tfsdk:"ready"`
-	Reset           types.Int64 `tfsdk:"reset"`
-	Unknown         types.Int64 `tfsdk:"unknown"`
+	Decommissioned types.Int64 `tfsdk:"decommissioned"`
+	Error          types.Int64 `tfsdk:"error"`
+	Initializing   types.Int64 `tfsdk:"initializing"`
+	InUse          types.Int64 `tfsdk:"in_use"`
+	Maintenance    types.Int64 `tfsdk:"maintenance"`
+	Ready          types.Int64 `tfsdk:"ready"`
+	Reset          types.Int64 `tfsdk:"reset"`
+	Unknown        types.Int64 `tfsdk:"unknown"`
 }
 
 type SiteDsMachineStatsTotalByHealth struct {
@@ -113,23 +108,17 @@ type SiteDsMachineStatsTotalByHealth struct {
 }
 
 type SiteDsMachineStatsTotalByStatusAndHealth struct {
-	Decommissioned  *SiteDsMachineStatsTotalByStatusAndHealthDecommissioned  `tfsdk:"decommissioned"`
-	Decommissioning *SiteDsMachineStatsTotalByStatusAndHealthDecommissioning `tfsdk:"decommissioning"`
-	Error           *SiteDsMachineStatsTotalByStatusAndHealthError           `tfsdk:"error"`
-	Initializing    *SiteDsMachineStatsTotalByStatusAndHealthInitializing    `tfsdk:"initializing"`
-	InUse           *SiteDsMachineStatsTotalByStatusAndHealthInUse           `tfsdk:"in_use"`
-	Maintenance     *SiteDsMachineStatsTotalByStatusAndHealthMaintenance     `tfsdk:"maintenance"`
-	Ready           *SiteDsMachineStatsTotalByStatusAndHealthReady           `tfsdk:"ready"`
-	Reset           *SiteDsMachineStatsTotalByStatusAndHealthReset           `tfsdk:"reset"`
-	Unknown         *SiteDsMachineStatsTotalByStatusAndHealthUnknown         `tfsdk:"unknown"`
+	Decommissioned *SiteDsMachineStatsTotalByStatusAndHealthDecommissioned `tfsdk:"decommissioned"`
+	Error          *SiteDsMachineStatsTotalByStatusAndHealthError          `tfsdk:"error"`
+	Initializing   *SiteDsMachineStatsTotalByStatusAndHealthInitializing   `tfsdk:"initializing"`
+	InUse          *SiteDsMachineStatsTotalByStatusAndHealthInUse          `tfsdk:"in_use"`
+	Maintenance    *SiteDsMachineStatsTotalByStatusAndHealthMaintenance    `tfsdk:"maintenance"`
+	Ready          *SiteDsMachineStatsTotalByStatusAndHealthReady          `tfsdk:"ready"`
+	Reset          *SiteDsMachineStatsTotalByStatusAndHealthReset          `tfsdk:"reset"`
+	Unknown        *SiteDsMachineStatsTotalByStatusAndHealthUnknown        `tfsdk:"unknown"`
 }
 
 type SiteDsMachineStatsTotalByStatusAndHealthDecommissioned struct {
-	Healthy   types.Int64 `tfsdk:"healthy"`
-	Unhealthy types.Int64 `tfsdk:"unhealthy"`
-}
-
-type SiteDsMachineStatsTotalByStatusAndHealthDecommissioning struct {
 	Healthy   types.Int64 `tfsdk:"healthy"`
 	Unhealthy types.Int64 `tfsdk:"unhealthy"`
 }
@@ -175,12 +164,6 @@ type SiteDsMachineStatsTotalByAllocation struct {
 	Unallocated       types.Int64 `tfsdk:"unallocated"`
 }
 
-type SiteDsGpuStatsItem struct {
-	Name     types.String `tfsdk:"name"`
-	Gpus     types.Int64  `tfsdk:"gpus"`
-	Machines types.Int64  `tfsdk:"machines"`
-}
-
 func (d *SiteDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_site"
 }
@@ -194,13 +177,13 @@ func (d *SiteDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "Filter Sites by Infrastructure Provider ID. Deprecated: Infrastructure Provider is now inferred from the org's membership.",
+				Description: "Filter Sites by Infrastructure Provider ID",
 			},
 			"tenant_id": schema.StringAttribute{
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "Filter Sites by Tenant ID. Deprecated: Tenant is now inferred from the org's membership.",
+				Description: "Filter Sites by Tenant ID",
 			},
 			"status": schema.StringAttribute{
 				Required:    false,
@@ -237,12 +220,6 @@ func (d *SiteDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 				Optional:    true,
 				Computed:    true,
 				Description: "Include a breakdown of Machine counts by lifecycle status and health. Requires Provider Admin role.",
-			},
-			"include_gpu_stats": schema.StringAttribute{
-				Required:    false,
-				Optional:    true,
-				Computed:    true,
-				Description: "Include a per-Site breakdown of GPU counts grouped by GPU type. Requires Provider Admin role.",
 			},
 			"query": schema.StringAttribute{
 				Required:    false,
@@ -450,18 +427,6 @@ func (d *SiteDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 						Computed:    true,
 						Description: "Whether the Site supports image-based operating system provisioning",
 					},
-					"vpc_slaac": schema.BoolAttribute{
-						Required:    false,
-						Optional:    false,
-						Computed:    true,
-						Description: "Whether the latest successfully stored Site configuration inventory reports that Core supports VPCs with SLAAC enabled. False also represents a missing Site configuration or an inventory report that omits the capability. This value is managed by Site configuration inventory and cannot be updated through the Site API.",
-					},
-					"dps_power_management": schema.BoolAttribute{
-						Required:    false,
-						Optional:    false,
-						Computed:    true,
-						Description: "Whether this Site accepts non-empty power resource groups and power profiles for DPS power management. When false, omission and explicit clearing remain allowed.",
-					},
 				},
 			},
 			"machine_stats": schema.SingleNestedAttribute{
@@ -487,12 +452,6 @@ func (d *SiteDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 								Optional:    false,
 								Computed:    true,
 								Description: "Number of Machines in Decommissioned status",
-							},
-							"decommissioning": schema.Int64Attribute{
-								Required:    false,
-								Optional:    false,
-								Computed:    true,
-								Description: "Number of Machines in Decommissioning status",
 							},
 							"error": schema.Int64Attribute{
 								Required:    false,
@@ -569,26 +528,6 @@ func (d *SiteDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 								Optional:    false,
 								Computed:    true,
 								Description: "Health breakdown for Machines in Decommissioned status",
-								Attributes: map[string]schema.Attribute{
-									"healthy": schema.Int64Attribute{
-										Required:    false,
-										Optional:    false,
-										Computed:    true,
-										Description: "Number of healthy Machines",
-									},
-									"unhealthy": schema.Int64Attribute{
-										Required:    false,
-										Optional:    false,
-										Computed:    true,
-										Description: "Number of unhealthy Machines",
-									},
-								},
-							},
-							"decommissioning": schema.SingleNestedAttribute{
-								Required:    false,
-								Optional:    false,
-								Computed:    true,
-								Description: "Health breakdown for Machines in Decommissioning status",
 								Attributes: map[string]schema.Attribute{
 									"healthy": schema.Int64Attribute{
 										Required:    false,
@@ -774,34 +713,6 @@ func (d *SiteDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 					},
 				},
 			},
-			"gpu_stats": schema.ListNestedAttribute{
-				Required:    false,
-				Optional:    false,
-				Computed:    true,
-				Description: "GPU counts grouped by GPU type for the Site. Populated when includeGpuStats is set",
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"name": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "GPU name from the MachineCapability record",
-						},
-						"gpus": schema.Int64Attribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Total number of GPUs (summation of all Machine GPU capability counts)",
-						},
-						"machines": schema.Int64Attribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Number of machines that have this GPU capability",
-						},
-					},
-				},
-			},
 		},
 	}
 }
@@ -897,8 +808,6 @@ func (d *SiteDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 			obj_capabilities.NvLinkPartition = BoolFromAPI(rawObj_capabilities["nvLinkPartition"])
 			obj_capabilities.Flow = BoolFromAPI(rawObj_capabilities["flow"])
 			obj_capabilities.ImageBasedOperatingSystem = BoolFromAPI(rawObj_capabilities["imageBasedOperatingSystem"])
-			obj_capabilities.VpcSlaac = BoolFromAPI(rawObj_capabilities["vpcSlaac"])
-			obj_capabilities.DpsPowerManagement = BoolFromAPI(rawObj_capabilities["dpsPowerManagement"])
 			_ = rawObj_capabilities
 			data.Capabilities = obj_capabilities
 		} else {
@@ -915,21 +824,6 @@ func (d *SiteDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 			data.MachineStats = obj_machine_stats
 		} else {
 			data.MachineStats = nil
-		}
-		if rawItems_gpu_stats, ok := result["gpuStats"].([]interface{}); ok && rawItems_gpu_stats != nil {
-			items_gpu_stats := make([]SiteDsGpuStatsItem, len(rawItems_gpu_stats))
-			for i_gpu_stats, raw_gpu_stats := range rawItems_gpu_stats {
-				m_gpu_stats, _ := raw_gpu_stats.(map[string]interface{})
-				if m_gpu_stats == nil {
-					m_gpu_stats = map[string]interface{}{}
-				}
-				items_gpu_stats[i_gpu_stats].Name = StringFromAPI(m_gpu_stats["name"])
-				items_gpu_stats[i_gpu_stats].Gpus = Int64FromAPI(m_gpu_stats["gpus"])
-				items_gpu_stats[i_gpu_stats].Machines = Int64FromAPI(m_gpu_stats["machines"])
-			}
-			data.GpuStats = items_gpu_stats
-		} else {
-			data.GpuStats = nil
 		}
 		_ = diags
 	} else if true {
@@ -999,8 +893,6 @@ func (d *SiteDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 				obj_capabilities.NvLinkPartition = BoolFromAPI(rawObj_capabilities["nvLinkPartition"])
 				obj_capabilities.Flow = BoolFromAPI(rawObj_capabilities["flow"])
 				obj_capabilities.ImageBasedOperatingSystem = BoolFromAPI(rawObj_capabilities["imageBasedOperatingSystem"])
-				obj_capabilities.VpcSlaac = BoolFromAPI(rawObj_capabilities["vpcSlaac"])
-				obj_capabilities.DpsPowerManagement = BoolFromAPI(rawObj_capabilities["dpsPowerManagement"])
 				_ = rawObj_capabilities
 				data.Capabilities = obj_capabilities
 			} else {
@@ -1017,21 +909,6 @@ func (d *SiteDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 				data.MachineStats = obj_machine_stats
 			} else {
 				data.MachineStats = nil
-			}
-			if rawItems_gpu_stats, ok := result["gpuStats"].([]interface{}); ok && rawItems_gpu_stats != nil {
-				items_gpu_stats := make([]SiteDsGpuStatsItem, len(rawItems_gpu_stats))
-				for i_gpu_stats, raw_gpu_stats := range rawItems_gpu_stats {
-					m_gpu_stats, _ := raw_gpu_stats.(map[string]interface{})
-					if m_gpu_stats == nil {
-						m_gpu_stats = map[string]interface{}{}
-					}
-					items_gpu_stats[i_gpu_stats].Name = StringFromAPI(m_gpu_stats["name"])
-					items_gpu_stats[i_gpu_stats].Gpus = Int64FromAPI(m_gpu_stats["gpus"])
-					items_gpu_stats[i_gpu_stats].Machines = Int64FromAPI(m_gpu_stats["machines"])
-				}
-				data.GpuStats = items_gpu_stats
-			} else {
-				data.GpuStats = nil
 			}
 			_ = diags
 		}
@@ -1097,8 +974,6 @@ func (d *SiteDataSource) populateModel(ctx context.Context, data *SiteDataSource
 		obj_capabilities.NvLinkPartition = BoolFromAPI(rawObj_capabilities["nvLinkPartition"])
 		obj_capabilities.Flow = BoolFromAPI(rawObj_capabilities["flow"])
 		obj_capabilities.ImageBasedOperatingSystem = BoolFromAPI(rawObj_capabilities["imageBasedOperatingSystem"])
-		obj_capabilities.VpcSlaac = BoolFromAPI(rawObj_capabilities["vpcSlaac"])
-		obj_capabilities.DpsPowerManagement = BoolFromAPI(rawObj_capabilities["dpsPowerManagement"])
 		_ = rawObj_capabilities
 		data.Capabilities = obj_capabilities
 	} else {
@@ -1115,21 +990,6 @@ func (d *SiteDataSource) populateModel(ctx context.Context, data *SiteDataSource
 		data.MachineStats = obj_machine_stats
 	} else {
 		data.MachineStats = nil
-	}
-	if rawItems_gpu_stats, ok := result["gpuStats"].([]interface{}); ok && rawItems_gpu_stats != nil {
-		items_gpu_stats := make([]SiteDsGpuStatsItem, len(rawItems_gpu_stats))
-		for i_gpu_stats, raw_gpu_stats := range rawItems_gpu_stats {
-			m_gpu_stats, _ := raw_gpu_stats.(map[string]interface{})
-			if m_gpu_stats == nil {
-				m_gpu_stats = map[string]interface{}{}
-			}
-			items_gpu_stats[i_gpu_stats].Name = StringFromAPI(m_gpu_stats["name"])
-			items_gpu_stats[i_gpu_stats].Gpus = Int64FromAPI(m_gpu_stats["gpus"])
-			items_gpu_stats[i_gpu_stats].Machines = Int64FromAPI(m_gpu_stats["machines"])
-		}
-		data.GpuStats = items_gpu_stats
-	} else {
-		data.GpuStats = nil
 	}
 	_ = diags
 }

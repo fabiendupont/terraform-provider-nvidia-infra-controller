@@ -48,7 +48,6 @@ type MachineResourceModel struct {
 	MachineInterfaces        []MachineMachineInterfacesItem   `tfsdk:"machine_interfaces"`
 	AssociatedDpuMachineIds  types.List                       `tfsdk:"associated_dpu_machine_ids"`
 	PlacementInRack          *MachinePlacementInRack          `tfsdk:"placement_in_rack"`
-	ScoutVersion             types.String                     `tfsdk:"scout_version"`
 	Health                   *MachineHealth                   `tfsdk:"health"`
 	Metadata                 *MachineMetadata                 `tfsdk:"metadata"`
 	Status                   types.String                     `tfsdk:"status"`
@@ -142,7 +141,6 @@ type MachineMetadata struct {
 	Gpus                 []MachineMetadataGpusItem                 `tfsdk:"gpus"`
 	NetworkInterfaces    []MachineMetadataNetworkInterfacesItem    `tfsdk:"network_interfaces"`
 	InfinibandInterfaces []MachineMetadataInfinibandInterfacesItem `tfsdk:"infiniband_interfaces"`
-	LifecycleState       types.String                              `tfsdk:"lifecycle_state"`
 }
 
 type MachineMetadataDmiData struct {
@@ -570,12 +568,6 @@ func (r *MachineResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 					},
 				},
 			},
-			"scout_version": schema.StringAttribute{
-				Required:    false,
-				Optional:    false,
-				Computed:    true,
-				Description: "Scout version reported by the Machine, if known",
-			},
 			"health": schema.SingleNestedAttribute{
 				Required:    false,
 				Optional:    false,
@@ -927,12 +919,6 @@ func (r *MachineResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 							},
 						},
 					},
-					"lifecycle_state": schema.StringAttribute{
-						Required:    false,
-						Optional:    false,
-						Computed:    true,
-						Description: "Lifecycle state details for the Machine",
-					},
 				},
 			},
 			"status": schema.StringAttribute{
@@ -1146,7 +1132,6 @@ func (r *MachineResource) Read(ctx context.Context, req resource.ReadRequest, re
 	} else {
 		data.PlacementInRack = nil
 	}
-	data.ScoutVersion = StringFromAPI(result["scoutVersion"])
 	if rawObj_health, ok := result["health"].(map[string]interface{}); ok {
 		obj_health := &MachineHealth{}
 		obj_health.Source = StringFromAPI(rawObj_health["source"])
@@ -1165,7 +1150,6 @@ func (r *MachineResource) Read(ctx context.Context, req resource.ReadRequest, re
 		// gpus: nested field — expand manually if needed
 		// networkInterfaces: nested field — expand manually if needed
 		// infinibandInterfaces: nested field — expand manually if needed
-		obj_metadata.LifecycleState = StringFromAPI(rawObj_metadata["lifecycleState"])
 		_ = rawObj_metadata
 		data.Metadata = obj_metadata
 	} else {
@@ -1357,7 +1341,6 @@ func (r *MachineResource) Update(ctx context.Context, req resource.UpdateRequest
 	} else {
 		data.PlacementInRack = nil
 	}
-	data.ScoutVersion = StringFromAPI(result["scoutVersion"])
 	if rawObj_health, ok := result["health"].(map[string]interface{}); ok {
 		obj_health := &MachineHealth{}
 		obj_health.Source = StringFromAPI(rawObj_health["source"])
@@ -1376,7 +1359,6 @@ func (r *MachineResource) Update(ctx context.Context, req resource.UpdateRequest
 		// gpus: nested field — expand manually if needed
 		// networkInterfaces: nested field — expand manually if needed
 		// infinibandInterfaces: nested field — expand manually if needed
-		obj_metadata.LifecycleState = StringFromAPI(rawObj_metadata["lifecycleState"])
 		_ = rawObj_metadata
 		data.Metadata = obj_metadata
 	} else {
@@ -1526,7 +1508,6 @@ func (r *MachineResource) populateModel(ctx context.Context, data *MachineResour
 	} else {
 		data.PlacementInRack = nil
 	}
-	data.ScoutVersion = StringFromAPI(result["scoutVersion"])
 	if rawObj_health, ok := result["health"].(map[string]interface{}); ok {
 		obj_health := &MachineHealth{}
 		obj_health.Source = StringFromAPI(rawObj_health["source"])
@@ -1545,7 +1526,6 @@ func (r *MachineResource) populateModel(ctx context.Context, data *MachineResour
 		// gpus: nested field — expand manually if needed
 		// networkInterfaces: nested field — expand manually if needed
 		// infinibandInterfaces: nested field — expand manually if needed
-		obj_metadata.LifecycleState = StringFromAPI(rawObj_metadata["lifecycleState"])
 		_ = rawObj_metadata
 		data.Metadata = obj_metadata
 	} else {
