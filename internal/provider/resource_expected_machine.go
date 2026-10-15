@@ -61,11 +61,12 @@ type ExpectedMachineHostLifecycleProfile struct {
 type ExpectedMachineSku struct {
 	Id                   types.String                  `tfsdk:"id"`
 	SiteId               types.String                  `tfsdk:"site_id"`
+	Description          types.String                  `tfsdk:"description"`
+	SchemaVersion        types.Int64                   `tfsdk:"schema_version"`
 	DeviceType           types.String                  `tfsdk:"device_type"`
 	AssociatedMachineIds types.List                    `tfsdk:"associated_machine_ids"`
 	Components           *ExpectedMachineSkuComponents `tfsdk:"components"`
 	Created              types.String                  `tfsdk:"created"`
-	Updated              types.String                  `tfsdk:"updated"`
 }
 
 type ExpectedMachineSkuComponents struct {
@@ -100,27 +101,33 @@ type ExpectedMachineSkuComponentsMemoryItem struct {
 }
 
 type ExpectedMachineSkuComponentsStorageItem struct {
-	Vendor     types.String `tfsdk:"vendor"`
-	Model      types.String `tfsdk:"model"`
-	CapacityMb types.Int64  `tfsdk:"capacity_mb"`
-	CountValue types.Int64  `tfsdk:"count_value"`
+	Vendor      types.String `tfsdk:"vendor"`
+	Model       types.String `tfsdk:"model"`
+	CapacityMb  types.Int64  `tfsdk:"capacity_mb"`
+	CountValue  types.Int64  `tfsdk:"count_value"`
+	MinSizeMiB  types.Int64  `tfsdk:"min_size_mi_b"`
+	MaxSizeMiB  types.Int64  `tfsdk:"max_size_mi_b"`
+	PciPatterns types.List   `tfsdk:"pci_patterns"`
 }
 
 type ExpectedMachineSkuComponentsChassis struct {
-	Vendor types.String `tfsdk:"vendor"`
-	Model  types.String `tfsdk:"model"`
+	Vendor       types.String `tfsdk:"vendor"`
+	Model        types.String `tfsdk:"model"`
+	Architecture types.String `tfsdk:"architecture"`
 }
 
 type ExpectedMachineSkuComponentsEthernetDevicesItem struct {
-	Vendor     types.String `tfsdk:"vendor"`
-	Model      types.String `tfsdk:"model"`
-	CountValue types.Int64  `tfsdk:"count_value"`
+	Vendor      types.String `tfsdk:"vendor"`
+	Model       types.String `tfsdk:"model"`
+	CountValue  types.Int64  `tfsdk:"count_value"`
+	IsConnected types.Bool   `tfsdk:"is_connected"`
 }
 
 type ExpectedMachineSkuComponentsInfinibandDevicesItem struct {
-	Vendor     types.String `tfsdk:"vendor"`
-	Model      types.String `tfsdk:"model"`
-	CountValue types.Int64  `tfsdk:"count_value"`
+	Vendor          types.String `tfsdk:"vendor"`
+	Model           types.String `tfsdk:"model"`
+	CountValue      types.Int64  `tfsdk:"count_value"`
+	InactiveDevices types.List   `tfsdk:"inactive_devices"`
 }
 
 type ExpectedMachineSkuComponentsTpmItem struct {
@@ -153,7 +160,7 @@ func (r *ExpectedMachineResource) Schema(_ context.Context, _ resource.SchemaReq
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "MAC address of the Expected Machine's BMC (Baseboard Management Controller)",
+				Description: "The Expected Machine's BMC MAC address is immutable after creation. Omit this field, or provide another case/separator spelling of the current MAC as a compatibility no-op.",
 			},
 			"default_bmc_username": schema.StringAttribute{
 				Required:    false,
@@ -196,7 +203,7 @@ func (r *ExpectedMachineResource) Schema(_ context.Context, _ resource.SchemaReq
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "Optional BMC IP address (IPv4 or IPv6). When set, pre-allocates a reserved IP for the BMC.",
+				Description: "Optional BMC IP address (IPv4 or IPv6). A non-empty address sets the value and pre-allocates a reserved IP for the BMC. An empty string clears the value. Omission or null preserves the current value.",
 			},
 			"name": schema.StringAttribute{
 				Required:    false,
@@ -290,6 +297,18 @@ func (r *ExpectedMachineResource) Schema(_ context.Context, _ resource.SchemaReq
 						Optional:    false,
 						Computed:    true,
 						Description: "ID of the Site this SKU belongs to",
+					},
+					"description": schema.StringAttribute{
+						Required:    false,
+						Optional:    false,
+						Computed:    true,
+						Description: "Human-readable SKU description",
+					},
+					"schema_version": schema.Int64Attribute{
+						Required:    false,
+						Optional:    false,
+						Computed:    true,
+						Description: "Core SKU schema version when available",
 					},
 					"device_type": schema.StringAttribute{
 						Required:    false,
@@ -417,25 +436,44 @@ func (r *ExpectedMachineResource) Schema(_ context.Context, _ resource.SchemaReq
 											Required:    false,
 											Optional:    false,
 											Computed:    true,
-											Description: "Vendor of the storage device",
+											Description: "Storage vendor used for schema version 4 matching. Read-only in REST mutation requests and preserved in responses for legacy SKUs. Schema version 5 does not use this field.",
 										},
 										"model": schema.StringAttribute{
 											Required:    false,
 											Optional:    false,
 											Computed:    true,
-											Description: "Model of the storage device",
+											Description: "Informational storage model. Starting with the 2.1 release, NICo does not use this field for storage matching or validation.",
 										},
 										"capacity_mb": schema.Int64Attribute{
 											Required:    false,
 											Optional:    false,
 											Computed:    true,
-											Description: "Capacity in megabytes",
+											Description: "Storage capacity in megabytes used for schema version 4 matching. Read-only in REST mutation requests and preserved in responses for legacy SKUs. Schema version 5 uses minSizeMiB and maxSizeMiB instead.",
 										},
 										"count_value": schema.Int64Attribute{
 											Required:    false,
 											Optional:    false,
 											Computed:    true,
 											Description: "Number of storage devices present",
+										},
+										"min_size_mi_b": schema.Int64Attribute{
+											Required:    false,
+											Optional:    false,
+											Computed:    true,
+											Description: "Inclusive minimum size in MiB for each storage device. Null or omission means no lower bound. Used for SKU schema version 5 and later.",
+										},
+										"max_size_mi_b": schema.Int64Attribute{
+											Required:    false,
+											Optional:    false,
+											Computed:    true,
+											Description: "Inclusive maximum size in MiB for each storage device. Null or omission means no upper bound. Used for SKU schema version 5 and later.",
+										},
+										"pci_patterns": schema.ListAttribute{
+											ElementType: types.StringType,
+											Required:    false,
+											Optional:    false,
+											Computed:    true,
+											Description: "Regular expressions matched against each drive's sysfs PCI path. An empty or omitted list disables PCI location matching. Used for SKU schema version 5 and later.  The matched path is the NVMe controller's sysfs DEVPATH with its trailing kernel-assigned `nvmeN` node removed, for example `/devices/pci0000:00/0000:64:00.0/0000:65:00.0/nvme`, because that node changes with probe order. Patterns that anchor on the node (such as `nvme0$`) never match; end them at `/nvme` instead.",
 										},
 									},
 								},
@@ -458,13 +496,19 @@ func (r *ExpectedMachineResource) Schema(_ context.Context, _ resource.SchemaReq
 										Computed:    true,
 										Description: "Model of the chassis",
 									},
+									"architecture": schema.StringAttribute{
+										Required:    false,
+										Optional:    false,
+										Computed:    true,
+										Description: "Architecture of the chassis",
+									},
 								},
 							},
 							"ethernet_devices": schema.ListNestedAttribute{
 								Required:    false,
 								Optional:    false,
 								Computed:    true,
-								Description: "Ethernet device components",
+								Description: "Read-only Ethernet device components reported by Core. Omit this property from REST mutation requests; null and an empty array are accepted for compatibility, while a non-empty array is rejected with HTTP 400.",
 								NestedObject: schema.NestedAttributeObject{
 									Attributes: map[string]schema.Attribute{
 										"vendor": schema.StringAttribute{
@@ -484,6 +528,12 @@ func (r *ExpectedMachineResource) Schema(_ context.Context, _ resource.SchemaReq
 											Optional:    false,
 											Computed:    true,
 											Description: "Number of ethernet devices present",
+										},
+										"is_connected": schema.BoolAttribute{
+											Required:    false,
+											Optional:    false,
+											Computed:    true,
+											Description: "Whether the ethernet device is connected",
 										},
 									},
 								},
@@ -512,6 +562,13 @@ func (r *ExpectedMachineResource) Schema(_ context.Context, _ resource.SchemaReq
 											Optional:    false,
 											Computed:    true,
 											Description: "Number of infiniband devices present",
+										},
+										"inactive_devices": schema.ListAttribute{
+											ElementType: types.Int64Type,
+											Required:    false,
+											Optional:    false,
+											Computed:    true,
+											Description: "Zero-based indexes of inactive devices",
 										},
 									},
 								},
@@ -544,13 +601,7 @@ func (r *ExpectedMachineResource) Schema(_ context.Context, _ resource.SchemaReq
 						Required:    false,
 						Optional:    false,
 						Computed:    true,
-						Description: "ISO 8601 datetime when the SKU was created",
-					},
-					"updated": schema.StringAttribute{
-						Required:    false,
-						Optional:    false,
-						Computed:    true,
-						Description: "ISO 8601 datetime when the SKU was last updated",
+						Description: "ISO 8601 datetime when the SKU was created, using the Site-reported timestamp when available",
 					},
 				},
 			},
@@ -714,11 +765,12 @@ func (r *ExpectedMachineResource) Create(ctx context.Context, req resource.Creat
 		obj_sku := &ExpectedMachineSku{}
 		obj_sku.Id = StringFromAPI(rawObj_sku["id"])
 		obj_sku.SiteId = StringFromAPI(rawObj_sku["siteId"])
+		obj_sku.Description = StringFromAPI(rawObj_sku["description"])
+		obj_sku.SchemaVersion = Int64FromAPI(rawObj_sku["schemaVersion"])
 		obj_sku.DeviceType = StringFromAPI(rawObj_sku["deviceType"])
 		// associatedMachineIds: nested field — expand manually if needed
 		// components: nested field — expand manually if needed
 		obj_sku.Created = StringFromAPI(rawObj_sku["created"])
-		obj_sku.Updated = StringFromAPI(rawObj_sku["updated"])
 		_ = rawObj_sku
 		data.Sku = obj_sku
 	} else {
@@ -809,11 +861,12 @@ func (r *ExpectedMachineResource) Read(ctx context.Context, req resource.ReadReq
 		obj_sku := &ExpectedMachineSku{}
 		obj_sku.Id = StringFromAPI(rawObj_sku["id"])
 		obj_sku.SiteId = StringFromAPI(rawObj_sku["siteId"])
+		obj_sku.Description = StringFromAPI(rawObj_sku["description"])
+		obj_sku.SchemaVersion = Int64FromAPI(rawObj_sku["schemaVersion"])
 		obj_sku.DeviceType = StringFromAPI(rawObj_sku["deviceType"])
 		// associatedMachineIds: nested field — expand manually if needed
 		// components: nested field — expand manually if needed
 		obj_sku.Created = StringFromAPI(rawObj_sku["created"])
-		obj_sku.Updated = StringFromAPI(rawObj_sku["updated"])
 		_ = rawObj_sku
 		data.Sku = obj_sku
 	} else {
@@ -967,11 +1020,12 @@ func (r *ExpectedMachineResource) Update(ctx context.Context, req resource.Updat
 		obj_sku := &ExpectedMachineSku{}
 		obj_sku.Id = StringFromAPI(rawObj_sku["id"])
 		obj_sku.SiteId = StringFromAPI(rawObj_sku["siteId"])
+		obj_sku.Description = StringFromAPI(rawObj_sku["description"])
+		obj_sku.SchemaVersion = Int64FromAPI(rawObj_sku["schemaVersion"])
 		obj_sku.DeviceType = StringFromAPI(rawObj_sku["deviceType"])
 		// associatedMachineIds: nested field — expand manually if needed
 		// components: nested field — expand manually if needed
 		obj_sku.Created = StringFromAPI(rawObj_sku["created"])
-		obj_sku.Updated = StringFromAPI(rawObj_sku["updated"])
 		_ = rawObj_sku
 		data.Sku = obj_sku
 	} else {
@@ -1057,11 +1111,12 @@ func (r *ExpectedMachineResource) populateModel(ctx context.Context, data *Expec
 		obj_sku := &ExpectedMachineSku{}
 		obj_sku.Id = StringFromAPI(rawObj_sku["id"])
 		obj_sku.SiteId = StringFromAPI(rawObj_sku["siteId"])
+		obj_sku.Description = StringFromAPI(rawObj_sku["description"])
+		obj_sku.SchemaVersion = Int64FromAPI(rawObj_sku["schemaVersion"])
 		obj_sku.DeviceType = StringFromAPI(rawObj_sku["deviceType"])
 		// associatedMachineIds: nested field — expand manually if needed
 		// components: nested field — expand manually if needed
 		obj_sku.Created = StringFromAPI(rawObj_sku["created"])
-		obj_sku.Updated = StringFromAPI(rawObj_sku["updated"])
 		_ = rawObj_sku
 		data.Sku = obj_sku
 	} else {

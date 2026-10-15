@@ -43,6 +43,7 @@ resource "nico_site" "example" {
 ### Read-Only
 
 - `created` (String) Date/time when the Site was created
+- `gpu_stats` (Attributes List) GPU counts grouped by GPU type for the Site. Populated when includeGpuStats is set (see [below for nested schema](#nestedatt--gpu_stats))
 - `id` (String) The resource ID.
 - `infrastructure_provider_id` (String) ID of the Infrastructure Provider that owns the Site
 - `is_online` (Boolean) Indicates if the Site is currently reachable from Cloud
@@ -84,6 +85,16 @@ Read-Only:
 - `city` (String) City where the site is located
 - `country` (String) Country where the site is located
 - `state` (String) State where the site is located
+
+
+<a id="nestedatt--gpu_stats"></a>
+### Nested Schema for `gpu_stats`
+
+Read-Only:
+
+- `gpus` (Number) Total number of GPUs (summation of all Machine GPU capability counts)
+- `machines` (Number) Number of machines that have this GPU capability
+- `name` (String) GPU name from the MachineCapability record
 
 
 <a id="nestedatt--machine_stats"></a>

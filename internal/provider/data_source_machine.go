@@ -57,6 +57,7 @@ type MachineDataSourceModel struct {
 	AssociatedDpuMachineIds  types.List                         `tfsdk:"associated_dpu_machine_ids"`
 	PlacementInRack          *MachineDsPlacementInRack          `tfsdk:"placement_in_rack"`
 	MaintenanceMessage       types.String                       `tfsdk:"maintenance_message"`
+	ScoutVersion             types.String                       `tfsdk:"scout_version"`
 	Health                   *MachineDsHealth                   `tfsdk:"health"`
 	Metadata                 *MachineDsMetadata                 `tfsdk:"metadata"`
 	Labels                   types.Map                          `tfsdk:"labels"`
@@ -537,6 +538,12 @@ func (d *MachineDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 				Optional:    false,
 				Computed:    true,
 				Description: "If the Machine is in maintenance mode, this message will typically describe the reason and how long it is expected to be in maintenance",
+			},
+			"scout_version": schema.StringAttribute{
+				Required:    false,
+				Optional:    false,
+				Computed:    true,
+				Description: "Scout version reported by the Machine, if known",
 			},
 			"health": schema.SingleNestedAttribute{
 				Required:    false,
@@ -1059,6 +1066,7 @@ func (d *MachineDataSource) Read(ctx context.Context, req datasource.ReadRequest
 			data.PlacementInRack = nil
 		}
 		data.MaintenanceMessage = StringFromAPI(result["maintenanceMessage"])
+		data.ScoutVersion = StringFromAPI(result["scoutVersion"])
 		if rawObj_health, ok := result["health"].(map[string]interface{}); ok {
 			obj_health := &MachineDsHealth{}
 			obj_health.Source = StringFromAPI(rawObj_health["source"])
@@ -1190,6 +1198,7 @@ func (d *MachineDataSource) Read(ctx context.Context, req datasource.ReadRequest
 				data.PlacementInRack = nil
 			}
 			data.MaintenanceMessage = StringFromAPI(result["maintenanceMessage"])
+			data.ScoutVersion = StringFromAPI(result["scoutVersion"])
 			if rawObj_health, ok := result["health"].(map[string]interface{}); ok {
 				obj_health := &MachineDsHealth{}
 				obj_health.Source = StringFromAPI(rawObj_health["source"])
@@ -1317,6 +1326,7 @@ func (d *MachineDataSource) populateModel(ctx context.Context, data *MachineData
 		data.PlacementInRack = nil
 	}
 	data.MaintenanceMessage = StringFromAPI(result["maintenanceMessage"])
+	data.ScoutVersion = StringFromAPI(result["scoutVersion"])
 	if rawObj_health, ok := result["health"].(map[string]interface{}); ok {
 		obj_health := &MachineDsHealth{}
 		obj_health.Source = StringFromAPI(rawObj_health["source"])
