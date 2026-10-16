@@ -48,7 +48,6 @@ type MachineResourceModel struct {
 	MachineInterfaces        []MachineMachineInterfacesItem   `tfsdk:"machine_interfaces"`
 	AssociatedDpuMachineIds  types.List                       `tfsdk:"associated_dpu_machine_ids"`
 	PlacementInRack          *MachinePlacementInRack          `tfsdk:"placement_in_rack"`
-	ScoutVersion             types.String                     `tfsdk:"scout_version"`
 	Health                   *MachineHealth                   `tfsdk:"health"`
 	Metadata                 *MachineMetadata                 `tfsdk:"metadata"`
 	Status                   types.String                     `tfsdk:"status"`
@@ -568,12 +567,6 @@ func (r *MachineResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 						Description: "Index of the Machine's tray within its slot",
 					},
 				},
-			},
-			"scout_version": schema.StringAttribute{
-				Required:    false,
-				Optional:    false,
-				Computed:    true,
-				Description: "Scout version reported by the Machine, if known",
 			},
 			"health": schema.SingleNestedAttribute{
 				Required:    false,
@@ -1139,7 +1132,6 @@ func (r *MachineResource) Read(ctx context.Context, req resource.ReadRequest, re
 	} else {
 		data.PlacementInRack = nil
 	}
-	data.ScoutVersion = StringFromAPI(result["scoutVersion"])
 	if rawObj_health, ok := result["health"].(map[string]interface{}); ok {
 		obj_health := &MachineHealth{}
 		obj_health.Source = StringFromAPI(rawObj_health["source"])
@@ -1349,7 +1341,6 @@ func (r *MachineResource) Update(ctx context.Context, req resource.UpdateRequest
 	} else {
 		data.PlacementInRack = nil
 	}
-	data.ScoutVersion = StringFromAPI(result["scoutVersion"])
 	if rawObj_health, ok := result["health"].(map[string]interface{}); ok {
 		obj_health := &MachineHealth{}
 		obj_health.Source = StringFromAPI(rawObj_health["source"])
@@ -1517,7 +1508,6 @@ func (r *MachineResource) populateModel(ctx context.Context, data *MachineResour
 	} else {
 		data.PlacementInRack = nil
 	}
-	data.ScoutVersion = StringFromAPI(result["scoutVersion"])
 	if rawObj_health, ok := result["health"].(map[string]interface{}); ok {
 		obj_health := &MachineHealth{}
 		obj_health.Source = StringFromAPI(rawObj_health["source"])

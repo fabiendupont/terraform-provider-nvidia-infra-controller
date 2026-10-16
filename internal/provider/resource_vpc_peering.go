@@ -90,23 +90,13 @@ type VpcPeeringSiteCapabilities struct {
 }
 
 type VpcPeeringTenant struct {
-	Org            types.String                       `tfsdk:"org"`
-	OrgDisplayName types.String                       `tfsdk:"org_display_name"`
-	Capabilities   *VpcPeeringTenantCapabilities      `tfsdk:"capabilities"`
-	Deprecations   []VpcPeeringTenantDeprecationsItem `tfsdk:"deprecations"`
+	Org            types.String                  `tfsdk:"org"`
+	OrgDisplayName types.String                  `tfsdk:"org_display_name"`
+	Capabilities   *VpcPeeringTenantCapabilities `tfsdk:"capabilities"`
 }
 
 type VpcPeeringTenantCapabilities struct {
 	TargetedInstanceCreation types.Bool `tfsdk:"targeted_instance_creation"`
-}
-
-type VpcPeeringTenantDeprecationsItem struct {
-	Attribute    types.String `tfsdk:"attribute"`
-	QueryParam   types.String `tfsdk:"query_param"`
-	Endpoint     types.String `tfsdk:"endpoint"`
-	ReplacedBy   types.String `tfsdk:"replaced_by"`
-	TakeActionBy types.String `tfsdk:"take_action_by"`
-	Notice       types.String `tfsdk:"notice"`
 }
 
 func (r *VpcPeeringResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -375,59 +365,13 @@ func (r *VpcPeeringResource) Schema(_ context.Context, _ resource.SchemaRequest,
 						Required:    false,
 						Optional:    false,
 						Computed:    true,
-						Description: "Deprecated compatibility object. The targetedInstanceCreation property is omitted; use Tenant Account siteCapabilities for the authoritative configuration.",
+						Description: "Features that are enabled/disabled for Tenant",
 						Attributes: map[string]schema.Attribute{
 							"targeted_instance_creation": schema.BoolAttribute{
 								Required:    false,
 								Optional:    false,
 								Computed:    true,
-								Description: "Deprecated in favor of TenantAccount.siteCapabilities. On GET `/tenant/current`, the property is present and true only when every Ready Tenant Account enables TargetedInstanceCreation and no Tenant Site explicitly disables it; otherwise it is omitted. It is also omitted from embedded TenantSummary objects.",
-							},
-						},
-					},
-					"deprecations": schema.ListNestedAttribute{
-						Required:    false,
-						Optional:    false,
-						Computed:    true,
-						Description: "Deprecation notices for Tenant fields",
-						NestedObject: schema.NestedAttributeObject{
-							Attributes: map[string]schema.Attribute{
-								"attribute": schema.StringAttribute{
-									Required:    false,
-									Optional:    false,
-									Computed:    true,
-									Description: "Name of the attribute that is deprecated. Omitted if queryParam or endpoint is being deprecated.",
-								},
-								"query_param": schema.StringAttribute{
-									Required:    false,
-									Optional:    false,
-									Computed:    true,
-									Description: "Query parameter that is deprecated. Omitted if attribute or endpoint is being deprecated.",
-								},
-								"endpoint": schema.StringAttribute{
-									Required:    false,
-									Optional:    false,
-									Computed:    true,
-									Description: "API endpoint that is deprecated. Omitted if attribute or queryParam is being deprecated.",
-								},
-								"replaced_by": schema.StringAttribute{
-									Required:    false,
-									Optional:    false,
-									Computed:    true,
-									Description: "Name of the attribute, query parameter, or endpoint that replaces the deprecated item. Omitted if no replacement is available.",
-								},
-								"take_action_by": schema.StringAttribute{
-									Required:    false,
-									Optional:    false,
-									Computed:    true,
-									Description: "Date/time by which clients should migrate away from the deprecated API surface",
-								},
-								"notice": schema.StringAttribute{
-									Required:    false,
-									Optional:    false,
-									Computed:    true,
-									Description: "Message describing the deprecation",
-								},
+								Description: "Indicates whether Tenant can create Instances by specifying Machine ID",
 							},
 						},
 					},
@@ -552,7 +496,6 @@ func (r *VpcPeeringResource) Create(ctx context.Context, req resource.CreateRequ
 		obj_tenant.Org = StringFromAPI(rawObj_tenant["org"])
 		obj_tenant.OrgDisplayName = StringFromAPI(rawObj_tenant["orgDisplayName"])
 		// capabilities: nested field — expand manually if needed
-		// deprecations: nested field — expand manually if needed
 		_ = rawObj_tenant
 		data.Tenant = obj_tenant
 	} else {
@@ -635,7 +578,6 @@ func (r *VpcPeeringResource) Read(ctx context.Context, req resource.ReadRequest,
 		obj_tenant.Org = StringFromAPI(rawObj_tenant["org"])
 		obj_tenant.OrgDisplayName = StringFromAPI(rawObj_tenant["orgDisplayName"])
 		// capabilities: nested field — expand manually if needed
-		// deprecations: nested field — expand manually if needed
 		_ = rawObj_tenant
 		data.Tenant = obj_tenant
 	} else {
@@ -717,7 +659,6 @@ func (r *VpcPeeringResource) populateModel(ctx context.Context, data *VpcPeering
 		obj_tenant.Org = StringFromAPI(rawObj_tenant["org"])
 		obj_tenant.OrgDisplayName = StringFromAPI(rawObj_tenant["orgDisplayName"])
 		// capabilities: nested field — expand manually if needed
-		// deprecations: nested field — expand manually if needed
 		_ = rawObj_tenant
 		data.Tenant = obj_tenant
 	} else {

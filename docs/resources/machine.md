@@ -51,7 +51,6 @@ resource "nico_machine" "example" {
 - `metadata` (Attributes) Only available to Providers. Returned if the `includeMetadata` query parameter is specified. Otherwise attribute is omitted from response. (see [below for nested schema](#nestedatt--metadata))
 - `placement_in_rack` (Attributes) Physical placement of the Machine within its Rack, when known (see [below for nested schema](#nestedatt--placement_in_rack))
 - `product_name` (String) Product name of the Machine
-- `scout_version` (String) Scout version reported by the Machine, if known
 - `serial_number` (String) Serial number of the Machine, only visible to Provider
 - `site_id` (String) ID of the Site the Machine belongs to
 - `status` (String) Status represents the status of the machine

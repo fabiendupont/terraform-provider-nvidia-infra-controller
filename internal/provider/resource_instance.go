@@ -73,8 +73,6 @@ type InstanceResourceModel struct {
 type InstanceInterfacesItem struct {
 	SubnetId             types.String `tfsdk:"subnet_id"`
 	VpcPrefixId          types.String `tfsdk:"vpc_prefix_id"`
-	VpcId                types.String `tfsdk:"vpc_id"`
-	IpFamilies           types.List   `tfsdk:"ip_families"`
 	IpAddress            types.String `tfsdk:"ip_address"`
 	InlineRoutingProfile types.String `tfsdk:"inline_routing_profile"`
 	IsPhysical           types.Bool   `tfsdk:"is_physical"`
@@ -246,7 +244,7 @@ func (r *InstanceResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "IDs of additional VPCs the Instances should attach to through non-primary interfaces. This field may only be specified when every entry in `interfaces` uses `vpcPrefixId` or `vpcId`. IDs must be unique, must be valid UUIDs, and must not include the primary `vpcId`.",
+				Description: "IDs of additional VPCs the Instances should attach to through non-primary interfaces. This field may only be specified when every entry in `interfaces` uses `vpcPrefixId`. IDs must be unique, must be valid UUIDs, and must not include the primary `vpcId`.",
 			},
 			"user_data": schema.StringAttribute{
 				Required:    false,
@@ -295,7 +293,7 @@ func (r *InstanceResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "Interface configuration shared across all instances. At least one interface must be specified unless `autoNetwork` is true. Interfaces must all be Subnet-backed or all be VPC-backed; VPC-backed interfaces may use an explicit `vpcPrefixId` or ask the Controller to select a prefix using `vpcId` and `ipFamilies`. Each batch member is resolved independently and may use a different prefix. Only one network can be attached over a physical interface. Interface `ipAddress` is not supported for batch instance creation requests. Mutually exclusive with `autoNetwork`: when `autoNetwork` is true this list MUST be empty.",
+				Description: "Interface configuration shared across all instances. At least one interface must be specified unless `autoNetwork` is true. Either Subnet or VPC Prefix interfaces allowed, only one of the Subnets or VPC Prefixes can be attached over Physical interface. Interface `ipAddress` is not supported for batch instance creation requests. Mutually exclusive with `autoNetwork`: when `autoNetwork` is true this list MUST be empty.",
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"subnet_id": schema.StringAttribute{
@@ -310,24 +308,11 @@ func (r *InstanceResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 							Computed:    true,
 							Description: "ID of the VPC Prefix to attach to the Interface",
 						},
-						"vpc_id": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "ID of the VPC from which the Controller should select a prefix. `ipFamilies` must also be specified, and `ipAddress` cannot be specified.",
-						},
-						"ip_families": schema.ListAttribute{
-							ElementType: types.StringType,
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Address families requested for Controller prefix selection. Required with `vpcId` and prohibited otherwise. Only `IPv4` is currently accepted.",
-						},
 						"ip_address": schema.StringAttribute{
 							Required:    false,
 							Optional:    false,
 							Computed:    true,
-							Description: "Explicitly requested IP address for the interface. It can only be specified with an explicit `vpcPrefixId`. The least-significant host bit must be 1.",
+							Description: "Explicitly requested IP address for the interface. It cannot be specified for Subnet-based interfaces. The least-significant host bit must be 1.",
 						},
 						"inline_routing_profile": schema.StringAttribute{
 							Required:    false,
@@ -339,7 +324,7 @@ func (r *InstanceResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 							Required:    false,
 							Optional:    false,
 							Computed:    true,
-							Description: "Specifies whether this network should be attached to the Instance over a physical interface.",
+							Description: "Specifies whether this Subnet or VPC Prefix should be attached to the Instance over physical interface.",
 						},
 						"device": schema.StringAttribute{
 							Required:    false,
@@ -1085,10 +1070,6 @@ func (r *InstanceResource) Create(ctx context.Context, req resource.CreateReques
 			if !item_interfaces.VpcPrefixId.IsNull() {
 				m_interfaces["vpcPrefixId"] = item_interfaces.VpcPrefixId.ValueString()
 			}
-			if !item_interfaces.VpcId.IsNull() {
-				m_interfaces["vpcId"] = item_interfaces.VpcId.ValueString()
-			}
-			// ipFamilies: complex nested field — expand manually if needed
 			if !item_interfaces.IpAddress.IsNull() {
 				m_interfaces["ipAddress"] = item_interfaces.IpAddress.ValueString()
 			}
@@ -1221,8 +1202,6 @@ func (r *InstanceResource) Create(ctx context.Context, req resource.CreateReques
 			}
 			items_interfaces[i_interfaces].SubnetId = StringFromAPI(m_interfaces["subnetId"])
 			items_interfaces[i_interfaces].VpcPrefixId = StringFromAPI(m_interfaces["vpcPrefixId"])
-			items_interfaces[i_interfaces].VpcId = StringFromAPI(m_interfaces["vpcId"])
-			// ipFamilies: nested field — expand manually if needed
 			items_interfaces[i_interfaces].IpAddress = StringFromAPI(m_interfaces["ipAddress"])
 			items_interfaces[i_interfaces].InlineRoutingProfile = StringFromAPI(m_interfaces["inlineRoutingProfile"])
 			items_interfaces[i_interfaces].IsPhysical = BoolFromAPI(m_interfaces["isPhysical"])
@@ -1436,8 +1415,6 @@ func (r *InstanceResource) Read(ctx context.Context, req resource.ReadRequest, r
 			}
 			items_interfaces[i_interfaces].SubnetId = StringFromAPI(m_interfaces["subnetId"])
 			items_interfaces[i_interfaces].VpcPrefixId = StringFromAPI(m_interfaces["vpcPrefixId"])
-			items_interfaces[i_interfaces].VpcId = StringFromAPI(m_interfaces["vpcId"])
-			// ipFamilies: nested field — expand manually if needed
 			items_interfaces[i_interfaces].IpAddress = StringFromAPI(m_interfaces["ipAddress"])
 			items_interfaces[i_interfaces].InlineRoutingProfile = StringFromAPI(m_interfaces["inlineRoutingProfile"])
 			items_interfaces[i_interfaces].IsPhysical = BoolFromAPI(m_interfaces["isPhysical"])
@@ -1645,10 +1622,6 @@ func (r *InstanceResource) Update(ctx context.Context, req resource.UpdateReques
 			if !item_interfaces.VpcPrefixId.IsNull() {
 				m_interfaces["vpcPrefixId"] = item_interfaces.VpcPrefixId.ValueString()
 			}
-			if !item_interfaces.VpcId.IsNull() {
-				m_interfaces["vpcId"] = item_interfaces.VpcId.ValueString()
-			}
-			// ipFamilies: complex nested field — expand manually if needed
 			if !item_interfaces.IpAddress.IsNull() {
 				m_interfaces["ipAddress"] = item_interfaces.IpAddress.ValueString()
 			}
@@ -1790,8 +1763,6 @@ func (r *InstanceResource) Update(ctx context.Context, req resource.UpdateReques
 			}
 			items_interfaces[i_interfaces].SubnetId = StringFromAPI(m_interfaces["subnetId"])
 			items_interfaces[i_interfaces].VpcPrefixId = StringFromAPI(m_interfaces["vpcPrefixId"])
-			items_interfaces[i_interfaces].VpcId = StringFromAPI(m_interfaces["vpcId"])
-			// ipFamilies: nested field — expand manually if needed
 			items_interfaces[i_interfaces].IpAddress = StringFromAPI(m_interfaces["ipAddress"])
 			items_interfaces[i_interfaces].InlineRoutingProfile = StringFromAPI(m_interfaces["inlineRoutingProfile"])
 			items_interfaces[i_interfaces].IsPhysical = BoolFromAPI(m_interfaces["isPhysical"])
@@ -2001,8 +1972,6 @@ func (r *InstanceResource) populateModel(ctx context.Context, data *InstanceReso
 			}
 			items_interfaces[i_interfaces].SubnetId = StringFromAPI(m_interfaces["subnetId"])
 			items_interfaces[i_interfaces].VpcPrefixId = StringFromAPI(m_interfaces["vpcPrefixId"])
-			items_interfaces[i_interfaces].VpcId = StringFromAPI(m_interfaces["vpcId"])
-			// ipFamilies: nested field — expand manually if needed
 			items_interfaces[i_interfaces].IpAddress = StringFromAPI(m_interfaces["ipAddress"])
 			items_interfaces[i_interfaces].InlineRoutingProfile = StringFromAPI(m_interfaces["inlineRoutingProfile"])
 			items_interfaces[i_interfaces].IsPhysical = BoolFromAPI(m_interfaces["isPhysical"])
