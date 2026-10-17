@@ -45,7 +45,7 @@ resource "nico_vpc_prefix" "example" {
 - `status` (String) Status of the VPC Prefix
 - `status_history` (Attributes List) Details of 20 most recent status changes (see [below for nested schema](#nestedatt--status_history))
 - `updated` (String) Date and time when the VPC Prefix was updated
-- `usage_stats` (Attributes) Present when query parameter `includeUsageStats=true`. Prefix and IP usage data is derived by evaluating associated Ethernet interfaces. Each Interface associated with a VPC Prefix consumes a `/31` prefix. (see [below for nested schema](#nestedatt--usage_stats))
+- `usage_stats` (Attributes) Present when query parameter `includeUsageStats=true` and the VPC Prefix has IPv4. This statistic reports IPv4 usage only. IP usage counts two addresses per associated Ethernet interface, while prefix usage counts each distinct `/31` containing an assigned IPv4 address. (see [below for nested schema](#nestedatt--usage_stats))
 
 <a id="nestedatt--status_history"></a>
 ### Nested Schema for `status_history`

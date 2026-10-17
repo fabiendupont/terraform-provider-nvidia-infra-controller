@@ -36,8 +36,10 @@ type RackDataSourceModel struct {
 	Model             types.String           `tfsdk:"model"`
 	SerialNumber      types.String           `tfsdk:"serial_number"`
 	Description       types.String           `tfsdk:"description"`
+	NvLinkDomainIds   types.List             `tfsdk:"nv_link_domain_ids"`
 	Location          *RackDsLocation        `tfsdk:"location"`
 	Components        []RackDsComponentsItem `tfsdk:"components"`
+	TaskStats         *RackDsTaskStats       `tfsdk:"task_stats"`
 }
 
 type RackDsLocation struct {
@@ -71,6 +73,11 @@ type RackDsComponentsItemBmcsItem struct {
 	Type       types.String `tfsdk:"type"`
 	MacAddress types.String `tfsdk:"mac_address"`
 	IpAddress  types.String `tfsdk:"ip_address"`
+}
+
+type RackDsTaskStats struct {
+	PendingTaskCount types.Int64 `tfsdk:"pending_task_count"`
+	ActiveTaskCount  types.Int64 `tfsdk:"active_task_count"`
 }
 
 func (d *RackDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -135,6 +142,13 @@ func (d *RackDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 				Optional:    false,
 				Computed:    true,
 				Description: "Description of the Rack",
+			},
+			"nv_link_domain_ids": schema.ListAttribute{
+				ElementType: types.StringType,
+				Required:    false,
+				Optional:    false,
+				Computed:    true,
+				Description: "IDs of the NVLink Domains containing this Rack. Empty when the Rack is not assigned to an NVLink Domain.",
 			},
 			"location": schema.SingleNestedAttribute{
 				Required:    false,
@@ -302,6 +316,26 @@ func (d *RackDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 					},
 				},
 			},
+			"task_stats": schema.SingleNestedAttribute{
+				Required:    false,
+				Optional:    false,
+				Computed:    true,
+				Description: "Counts of non-terminal tasks currently associated with a rack or tray. Rack stats include component-scoped tasks on the rack; tray stats include only tasks that explicitly target the tray.",
+				Attributes: map[string]schema.Attribute{
+					"pending_task_count": schema.Int64Attribute{
+						Required:    false,
+						Optional:    false,
+						Computed:    true,
+						Description: "Number of associated tasks in Waiting or Pending state.",
+					},
+					"active_task_count": schema.Int64Attribute{
+						Required:    false,
+						Optional:    false,
+						Computed:    true,
+						Description: "Number of associated tasks in Running state.",
+					},
+				},
+			},
 		},
 	}
 }
@@ -344,6 +378,13 @@ func (d *RackDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 		data.Model = StringFromAPI(result["model"])
 		data.SerialNumber = StringFromAPI(result["serialNumber"])
 		data.Description = StringFromAPI(result["description"])
+		if rawSlice_nv_link_domain_ids := StringSliceFromAPI(result["nvLinkDomainIds"]); rawSlice_nv_link_domain_ids != nil {
+			lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_nv_link_domain_ids)
+			diags.Append(d...)
+			data.NvLinkDomainIds = lv
+		} else {
+			data.NvLinkDomainIds = types.ListNull(types.StringType)
+		}
 		if rawObj_location, ok := result["location"].(map[string]interface{}); ok {
 			obj_location := &RackDsLocation{}
 			obj_location.Region = StringFromAPI(rawObj_location["region"])
@@ -384,6 +425,15 @@ func (d *RackDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 		} else {
 			data.Components = nil
 		}
+		if rawObj_task_stats, ok := result["taskStats"].(map[string]interface{}); ok {
+			obj_task_stats := &RackDsTaskStats{}
+			obj_task_stats.PendingTaskCount = Int64FromAPI(rawObj_task_stats["pendingTaskCount"])
+			obj_task_stats.ActiveTaskCount = Int64FromAPI(rawObj_task_stats["activeTaskCount"])
+			_ = rawObj_task_stats
+			data.TaskStats = obj_task_stats
+		} else {
+			data.TaskStats = nil
+		}
 		_ = diags
 	} else if true {
 		url := d.client.ResolvePath("/v2/org/{org}/nico/rack/{id}/task", map[string]string{"id": data.Id.ValueString()})
@@ -399,6 +449,13 @@ func (d *RackDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 			data.Model = StringFromAPI(result["model"])
 			data.SerialNumber = StringFromAPI(result["serialNumber"])
 			data.Description = StringFromAPI(result["description"])
+			if rawSlice_nv_link_domain_ids := StringSliceFromAPI(result["nvLinkDomainIds"]); rawSlice_nv_link_domain_ids != nil {
+				lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_nv_link_domain_ids)
+				diags.Append(d...)
+				data.NvLinkDomainIds = lv
+			} else {
+				data.NvLinkDomainIds = types.ListNull(types.StringType)
+			}
 			if rawObj_location, ok := result["location"].(map[string]interface{}); ok {
 				obj_location := &RackDsLocation{}
 				obj_location.Region = StringFromAPI(rawObj_location["region"])
@@ -439,6 +496,15 @@ func (d *RackDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 			} else {
 				data.Components = nil
 			}
+			if rawObj_task_stats, ok := result["taskStats"].(map[string]interface{}); ok {
+				obj_task_stats := &RackDsTaskStats{}
+				obj_task_stats.PendingTaskCount = Int64FromAPI(rawObj_task_stats["pendingTaskCount"])
+				obj_task_stats.ActiveTaskCount = Int64FromAPI(rawObj_task_stats["activeTaskCount"])
+				_ = rawObj_task_stats
+				data.TaskStats = obj_task_stats
+			} else {
+				data.TaskStats = nil
+			}
 			_ = diags
 		}
 	}
@@ -450,6 +516,13 @@ func (d *RackDataSource) populateModel(ctx context.Context, data *RackDataSource
 	data.Model = StringFromAPI(result["model"])
 	data.SerialNumber = StringFromAPI(result["serialNumber"])
 	data.Description = StringFromAPI(result["description"])
+	if rawSlice_nv_link_domain_ids := StringSliceFromAPI(result["nvLinkDomainIds"]); rawSlice_nv_link_domain_ids != nil {
+		lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_nv_link_domain_ids)
+		diags.Append(d...)
+		data.NvLinkDomainIds = lv
+	} else {
+		data.NvLinkDomainIds = types.ListNull(types.StringType)
+	}
 	if rawObj_location, ok := result["location"].(map[string]interface{}); ok {
 		obj_location := &RackDsLocation{}
 		obj_location.Region = StringFromAPI(rawObj_location["region"])
@@ -489,6 +562,15 @@ func (d *RackDataSource) populateModel(ctx context.Context, data *RackDataSource
 		data.Components = items_components
 	} else {
 		data.Components = nil
+	}
+	if rawObj_task_stats, ok := result["taskStats"].(map[string]interface{}); ok {
+		obj_task_stats := &RackDsTaskStats{}
+		obj_task_stats.PendingTaskCount = Int64FromAPI(rawObj_task_stats["pendingTaskCount"])
+		obj_task_stats.ActiveTaskCount = Int64FromAPI(rawObj_task_stats["activeTaskCount"])
+		_ = rawObj_task_stats
+		data.TaskStats = obj_task_stats
+	} else {
+		data.TaskStats = nil
 	}
 	_ = diags
 }

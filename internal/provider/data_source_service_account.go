@@ -37,13 +37,13 @@ func (d *ServiceAccountDataSource) Metadata(_ context.Context, req datasource.Me
 
 func (d *ServiceAccountDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "When the API service is configured in Service Account mode, API users can act as both Provider and Tenant. For service accounts, the Tenant entity is initialized as a privileged Tenant with `targetedInstanceCreation` capability enabled.",
+		Description: "When the API service is configured in Service Account mode, API users can act as both Provider and Tenant. Privileged Tenant behavior (for example, creating Instances by Machine ID) is determined by `siteCapabilities` on a Ready Tenant Account, not by tenant-level configuration.",
 		Attributes: map[string]schema.Attribute{
 			"enabled": schema.BoolAttribute{
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
-				Description: "Indicates whether the calling token is authenticated as a Service Account. This is determined per request from how the token's issuer is configured at deployment time (the issuer config in the `nico-rest-api-config` ConfigMap); it cannot be toggled via the API. Rules by issuer origin:   - `keycloak`: true for a client-credentials (service-to-service) token —     i.e. the token carries a client ID — when the issuer is deployed with     `keycloak.serviceAccount: true`.   - `custom`: true when the `claimMapping` matched for this org sets     `isServiceAccount: true`. Only permitted when the API runs in     disconnected mode.   - `kas-ssa` / `kas-legacy`: always false; service accounts are not     supported for these origins.  For details on issuer origins and configuration, see the NICo REST `auth` module [README](https://github.com/NVIDIA/infra-controller/rest-api/tree/main/auth).",
+				Description: "Indicates whether the calling token is authenticated as a Service Account. This is determined per request from how the token's issuer is configured at deployment time (the issuer config in the `nico-rest-api-config` ConfigMap); it cannot be toggled via the API. Rules by issuer origin:   - `keycloak`: true for a client-credentials (service-to-service) token —     i.e. the token carries a client ID — when the issuer is deployed with     `keycloak.serviceAccount: true`.   - `custom`: true when the `claimMapping` matched for this org sets     `isServiceAccount: true`. Only permitted when the API runs in     disconnected mode.   - `kas-ssa` / `kas-legacy`: always false; service accounts are not     supported for these origins.  For details on issuer origins and configuration, see the NICo REST `auth` module [README](https://github.com/NVIDIA/infra-controller/tree/main/rest-api/auth).",
 			},
 			"infrastructure_provider_id": schema.StringAttribute{
 				Required:    false,

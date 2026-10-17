@@ -41,7 +41,9 @@ output "rack_name" {
 - `description` (String) Description of the Rack
 - `location` (Attributes) Physical or logical location of the Rack (see [below for nested schema](#nestedatt--location))
 - `model` (String) Model of the Rack
+- `nv_link_domain_ids` (List of String) IDs of the NVLink Domains containing this Rack. Empty when the Rack is not assigned to an NVLink Domain.
 - `serial_number` (String) Serial number of the Rack
+- `task_stats` (Attributes) Counts of non-terminal tasks currently associated with a rack or tray. Rack stats include component-scoped tasks on the rack; tray stats include only tasks that explicitly target the tray. (see [below for nested schema](#nestedatt--task_stats))
 
 <a id="nestedatt--components"></a>
 ### Nested Schema for `components`
@@ -86,3 +88,12 @@ Read-Only:
 - `position` (String) Position of the rack within the room
 - `region` (String) Region where the rack is located
 - `room` (String) Room within the datacenter
+
+
+<a id="nestedatt--task_stats"></a>
+### Nested Schema for `task_stats`
+
+Read-Only:
+
+- `active_task_count` (Number) Number of associated tasks in Running state.
+- `pending_task_count` (Number) Number of associated tasks in Waiting or Pending state.

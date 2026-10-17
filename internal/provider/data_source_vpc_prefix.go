@@ -94,7 +94,7 @@ func (d *VpcPrefixDataSource) Schema(_ context.Context, _ datasource.SchemaReque
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "When true, each VPC Prefix object includes usage statistics using the same structure as IP Block usage. Prefix and IP usage data is derived by evaluating associated Ethernet interfaces. Each Interface associated with a VPC Prefix consumes a `/31` prefix.",
+				Description: "When true, each VPC Prefix with IPv4 includes IPv4 usage statistics using the same structure as IP Block usage. Usage is derived from associated Ethernet interfaces and their IPv4 addresses. IP usage counts two addresses per interface, while prefix usage counts each distinct `/31` containing an assigned IPv4 address.",
 			},
 			"name": schema.StringAttribute{
 				Required:    false,
@@ -124,7 +124,7 @@ func (d *VpcPrefixDataSource) Schema(_ context.Context, _ datasource.SchemaReque
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
-				Description: "Present when query parameter `includeUsageStats=true`. Prefix and IP usage data is derived by evaluating associated Ethernet interfaces. Each Interface associated with a VPC Prefix consumes a `/31` prefix.",
+				Description: "Present when query parameter `includeUsageStats=true` and the VPC Prefix has IPv4. This statistic reports IPv4 usage only. IP usage counts two addresses per associated Ethernet interface, while prefix usage counts each distinct `/31` containing an assigned IPv4 address.",
 				Attributes: map[string]schema.Attribute{
 					"available_i_ps": schema.Int64Attribute{
 						Required:    false,

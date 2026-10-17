@@ -50,7 +50,7 @@ func (d *TaskRunDataSource) Metadata(_ context.Context, req datasource.MetadataR
 
 func (d *TaskRunDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "A Task Run is a phased, policy-gated execution of one operation (currently firmware) across many Racks. A Task Run narrows a candidate set of Racks with an optional selector, divides the selected Racks into phases, and drives one execution target per Rack; each target in turn drives at most one Task. Safety gates pause the Task Run when failures exceed a threshold, and phase gates hold each phase until an operator advances it. This tag exposes creation, retrieval, target listing, and the pause / resume / advance / cancel lifecycle actions; drill into per-Rack execution detail via the Task tag using each target's `taskId`.",
+		Description: "A Task Run is a phased, policy-gated execution of one operation across many Racks. A Task Run narrows a candidate set of Racks with an optional selector, divides the selected Racks into phases, and drives one execution target per Rack; each target in turn drives at most one Task. Safety gates pause the Task Run when failures exceed a threshold, and phase gates hold each phase until an operator advances it. This tag exposes creation, retrieval, target listing, and the pause / resume / advance / cancel lifecycle actions; drill into per-Rack execution detail via the Task tag using each target's `taskId`.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{Optional: true, Computed: true, Description: "ID of the resource to retrieve. When set, returns a single resource."},
 			"site_id": schema.StringAttribute{
