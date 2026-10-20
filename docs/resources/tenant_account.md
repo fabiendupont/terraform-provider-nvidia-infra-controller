@@ -29,8 +29,6 @@ resource "nico_tenant_account" "example" {
 
 - `account_id` (String) Path parameter: account_id.
 - `infrastructure_provider_id` (String) Deprecated; inferred from the caller's org Infrastructure Provider when omitted. When provided, the value must match the org's Infrastructure Provider — mismatched values are rejected with 400.
-- `site_capabilities` (Attributes List) Provider Admin replace payload for TargetedInstanceCreation configuration. Required to be non-empty when sent.  PATCH uses replace semantics: previously configured per-site overrides whose siteId is omitted from the new payload are cleared.  Server validation rules: - must contain at least one entry - must contain exactly one entry with omitted or empty siteIds - must not repeat any siteId across entries - every provided siteId must be a valid Site UUID - every provided siteId must identify a Site associated with the Tenant and owned by the Tenant Account's Infrastructure Provider; otherwise the server rejects the request with 400 (see [below for nested schema](#nestedatt--site_capabilities))
-- `tenant_contact_id` (String) Tenant Admin invite acceptance; must match the requesting user
 
 ### Read-Only
 
@@ -44,15 +42,6 @@ resource "nico_tenant_account" "example" {
 - `tenant_contact` (Attributes) Contact user for the Tenant (see [below for nested schema](#nestedatt--tenant_contact))
 - `tenant_id` (String) ID of the Tenant
 - `updated` (String) Date/time when the Tenant Account was last updated
-
-<a id="nestedatt--site_capabilities"></a>
-### Nested Schema for `site_capabilities`
-
-Read-Only:
-
-- `site_ids` (List of String) Sites to configure. An omitted or empty array identifies the Tenant Account default entry. Each value must be a valid Site UUID, may appear only once across all siteCapabilities entries in the same request, must be associated with the Tenant, and must be owned by the Tenant Account's Infrastructure Provider; otherwise the server rejects the request with 400.
-- `targeted_instance_creation` (Boolean) Whether TargetedInstanceCreation is enabled for the Tenant Account default or listed Sites. When true, Tenant Admins with a Ready Tenant Account on the Site's Infrastructure Provider may create Instances by Machine ID and perform related privileged actions on that Site.
-
 
 <a id="nestedatt--deprecations"></a>
 ### Nested Schema for `deprecations`

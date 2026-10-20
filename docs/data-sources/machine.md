@@ -65,7 +65,6 @@ output "machine_name" {
 - `metadata` (Attributes) Only available to Providers. Returned if the `includeMetadata` query parameter is specified. Otherwise attribute is omitted from response. (see [below for nested schema](#nestedatt--metadata))
 - `placement_in_rack` (Attributes) Physical placement of the Machine within its Rack, when known (see [below for nested schema](#nestedatt--placement_in_rack))
 - `product_name` (String) Product name of the Machine
-- `scout_version` (String) Scout version reported by the Machine, if known
 - `serial_number` (String) Serial number of the Machine, only visible to Provider
 - `status_history` (Attributes List) Chronological status history for the Machine (see [below for nested schema](#nestedatt--status_history))
 - `updated` (String) Date/time when the Machine was last updated
@@ -149,7 +148,6 @@ Read-Only:
 - `dmi_data` (Attributes) DMI data of the machine (see [below for nested schema](#nestedatt--metadata--dmi_data))
 - `gpus` (Attributes List) GPU inventory reported for the Machine (see [below for nested schema](#nestedatt--metadata--gpus))
 - `infiniband_interfaces` (Attributes List) List of InfiniBand interfaces of the machine (see [below for nested schema](#nestedatt--metadata--infiniband_interfaces))
-- `lifecycle_state` (String) Lifecycle state details for the Machine
 - `network_interfaces` (Attributes List) List of Ethernet interfaces of the machine (see [below for nested schema](#nestedatt--metadata--network_interfaces))
 
 <a id="nestedatt--metadata--bmc_info"></a>

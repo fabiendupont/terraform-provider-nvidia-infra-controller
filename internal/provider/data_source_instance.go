@@ -41,7 +41,6 @@ type InstanceDataSourceModel struct {
 	Description                            types.String                                      `tfsdk:"description"`
 	TenantId                               types.String                                      `tfsdk:"tenant_id"`
 	SecondaryVpcIds                        types.List                                        `tfsdk:"secondary_vpc_ids"`
-	PowerProfile                           types.String                                      `tfsdk:"power_profile"`
 	NetworkSecurityGroupPropagationDetails *InstanceDsNetworkSecurityGroupPropagationDetails `tfsdk:"network_security_group_propagation_details"`
 	NetworkSecurityGroupInherited          types.Bool                                        `tfsdk:"network_security_group_inherited"`
 	ControllerInstanceId                   types.String                                      `tfsdk:"controller_instance_id"`
@@ -90,8 +89,6 @@ type InstanceDsInterfacesItem struct {
 	InstanceId           types.String `tfsdk:"instance_id"`
 	SubnetId             types.String `tfsdk:"subnet_id"`
 	VpcPrefixId          types.String `tfsdk:"vpc_prefix_id"`
-	VpcId                types.String `tfsdk:"vpc_id"`
-	IpFamilies           types.List   `tfsdk:"ip_families"`
 	IsPhysical           types.Bool   `tfsdk:"is_physical"`
 	Device               types.String `tfsdk:"device"`
 	DeviceInstance       types.Int64  `tfsdk:"device_instance"`
@@ -208,8 +205,6 @@ type InstanceDsSshKeyGroupsItemSiteAssociationsItemSiteCapabilities struct {
 	NvLinkPartition           types.Bool `tfsdk:"nv_link_partition"`
 	Flow                      types.Bool `tfsdk:"flow"`
 	ImageBasedOperatingSystem types.Bool `tfsdk:"image_based_operating_system"`
-	VpcSlaac                  types.Bool `tfsdk:"vpc_slaac"`
-	DpsPowerManagement        types.Bool `tfsdk:"dps_power_management"`
 }
 
 type InstanceDsSshKeyGroupsItemStatusHistoryItem struct {
@@ -248,7 +243,7 @@ func (d *InstanceDataSource) Schema(_ context.Context, _ datasource.SchemaReques
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "Filter by Infrastructure Provider ID. Deprecated: Instances will no longer be filtered by Infrastructure Provider; results are scoped to the org's Tenant. Use the siteId parameter to scope results to a specific Infrastructure Provider's Sites.",
+				Description: "Filter by Infrastructure Provider ID",
 			},
 			"site_id": schema.StringAttribute{
 				Required:    false,
@@ -328,12 +323,6 @@ func (d *InstanceDataSource) Schema(_ context.Context, _ datasource.SchemaReques
 				Optional:    false,
 				Computed:    true,
 				Description: "IDs of VPCs attached to the Instance through non-primary interfaces",
-			},
-			"power_profile": schema.StringAttribute{
-				Required:    false,
-				Optional:    false,
-				Computed:    true,
-				Description: "External power provisioning profile associated with the Instance.",
 			},
 			"network_security_group_propagation_details": schema.SingleNestedAttribute{
 				Required:    false,
@@ -517,26 +506,13 @@ func (d *InstanceDataSource) Schema(_ context.Context, _ datasource.SchemaReques
 							Required:    false,
 							Optional:    false,
 							Computed:    true,
-							Description: "ID of the VPC Prefix explicitly selected by the caller",
-						},
-						"vpc_id": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "ID of the VPC from which the Controller selects a prefix",
-						},
-						"ip_families": schema.ListAttribute{
-							ElementType: types.StringType,
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Address families requested for Controller prefix selection",
+							Description: "ID of the associated VPCPrefix",
 						},
 						"is_physical": schema.BoolAttribute{
 							Required:    false,
 							Optional:    false,
 							Computed:    true,
-							Description: "Indicates whether the network is bound on a physical Interface",
+							Description: "IsPhysical indicates whether the Subnet is bound on a physical Interface",
 						},
 						"device": schema.StringAttribute{
 							Required:    false,
@@ -573,13 +549,13 @@ func (d *InstanceDataSource) Schema(_ context.Context, _ datasource.SchemaReques
 							Required:    false,
 							Optional:    false,
 							Computed:    true,
-							Description: "Explicitly requested IP address for the interface. This is only used with an explicit `vpcPrefixId` and is not valid with `subnetId` or VPC-selected interfaces. The least-significant host bit must be 1.",
+							Description: "Explicitly requested IP address for the interface. This is only used for VPC Prefix-based interfaces and is not valid for Subnet-based interfaces. The least-significant host bit must be 1.",
 						},
 						"inline_routing_profile": schema.StringAttribute{
 							Required:    false,
 							Optional:    false,
 							Computed:    true,
-							Description: "Inline interface-local routing profile options. Only valid for VPC-backed interfaces.",
+							Description: "Inline interface-local routing profile options. Only valid for VPC Prefix-based interfaces.",
 						},
 						"status": schema.StringAttribute{
 							Required:    false,
@@ -1053,18 +1029,6 @@ func (d *InstanceDataSource) Schema(_ context.Context, _ datasource.SchemaReques
 														Computed:    true,
 														Description: "Whether the Site supports image-based operating system provisioning",
 													},
-													"vpc_slaac": schema.BoolAttribute{
-														Required:    false,
-														Optional:    false,
-														Computed:    true,
-														Description: "Whether the latest successfully stored Site configuration inventory reports that Core supports VPCs with SLAAC enabled. False also represents a missing Site configuration or an inventory report that omits the capability. This value is managed by Site configuration inventory and cannot be updated through the Site API.",
-													},
-													"dps_power_management": schema.BoolAttribute{
-														Required:    false,
-														Optional:    false,
-														Computed:    true,
-														Description: "Whether this Site accepts non-empty power resource groups and power profiles for DPS power management. When false, omission and explicit clearing remain allowed.",
-													},
 												},
 											},
 											"status": schema.StringAttribute{
@@ -1303,7 +1267,6 @@ func (d *InstanceDataSource) Read(ctx context.Context, req datasource.ReadReques
 		} else {
 			data.SecondaryVpcIds = types.ListNull(types.StringType)
 		}
-		data.PowerProfile = StringFromAPI(result["powerProfile"])
 		if rawObj_network_security_group_propagation_details, ok := result["networkSecurityGroupPropagationDetails"].(map[string]interface{}); ok {
 			obj_network_security_group_propagation_details := &InstanceDsNetworkSecurityGroupPropagationDetails{}
 			obj_network_security_group_propagation_details.ObjectId = StringFromAPI(rawObj_network_security_group_propagation_details["objectId"])
@@ -1345,8 +1308,6 @@ func (d *InstanceDataSource) Read(ctx context.Context, req datasource.ReadReques
 				items_interfaces[i_interfaces].InstanceId = StringFromAPI(m_interfaces["instanceId"])
 				items_interfaces[i_interfaces].SubnetId = StringFromAPI(m_interfaces["subnetId"])
 				items_interfaces[i_interfaces].VpcPrefixId = StringFromAPI(m_interfaces["vpcPrefixId"])
-				items_interfaces[i_interfaces].VpcId = StringFromAPI(m_interfaces["vpcId"])
-				// ipFamilies: nested field — expand manually if needed
 				items_interfaces[i_interfaces].IsPhysical = BoolFromAPI(m_interfaces["isPhysical"])
 				items_interfaces[i_interfaces].Device = StringFromAPI(m_interfaces["device"])
 				items_interfaces[i_interfaces].DeviceInstance = Int64FromAPI(m_interfaces["deviceInstance"])
@@ -1516,7 +1477,6 @@ func (d *InstanceDataSource) Read(ctx context.Context, req datasource.ReadReques
 			} else {
 				data.SecondaryVpcIds = types.ListNull(types.StringType)
 			}
-			data.PowerProfile = StringFromAPI(result["powerProfile"])
 			if rawObj_network_security_group_propagation_details, ok := result["networkSecurityGroupPropagationDetails"].(map[string]interface{}); ok {
 				obj_network_security_group_propagation_details := &InstanceDsNetworkSecurityGroupPropagationDetails{}
 				obj_network_security_group_propagation_details.ObjectId = StringFromAPI(rawObj_network_security_group_propagation_details["objectId"])
@@ -1558,8 +1518,6 @@ func (d *InstanceDataSource) Read(ctx context.Context, req datasource.ReadReques
 					items_interfaces[i_interfaces].InstanceId = StringFromAPI(m_interfaces["instanceId"])
 					items_interfaces[i_interfaces].SubnetId = StringFromAPI(m_interfaces["subnetId"])
 					items_interfaces[i_interfaces].VpcPrefixId = StringFromAPI(m_interfaces["vpcPrefixId"])
-					items_interfaces[i_interfaces].VpcId = StringFromAPI(m_interfaces["vpcId"])
-					// ipFamilies: nested field — expand manually if needed
 					items_interfaces[i_interfaces].IsPhysical = BoolFromAPI(m_interfaces["isPhysical"])
 					items_interfaces[i_interfaces].Device = StringFromAPI(m_interfaces["device"])
 					items_interfaces[i_interfaces].DeviceInstance = Int64FromAPI(m_interfaces["deviceInstance"])
@@ -1725,7 +1683,6 @@ func (d *InstanceDataSource) populateModel(ctx context.Context, data *InstanceDa
 	} else {
 		data.SecondaryVpcIds = types.ListNull(types.StringType)
 	}
-	data.PowerProfile = StringFromAPI(result["powerProfile"])
 	if rawObj_network_security_group_propagation_details, ok := result["networkSecurityGroupPropagationDetails"].(map[string]interface{}); ok {
 		obj_network_security_group_propagation_details := &InstanceDsNetworkSecurityGroupPropagationDetails{}
 		obj_network_security_group_propagation_details.ObjectId = StringFromAPI(rawObj_network_security_group_propagation_details["objectId"])
@@ -1767,8 +1724,6 @@ func (d *InstanceDataSource) populateModel(ctx context.Context, data *InstanceDa
 			items_interfaces[i_interfaces].InstanceId = StringFromAPI(m_interfaces["instanceId"])
 			items_interfaces[i_interfaces].SubnetId = StringFromAPI(m_interfaces["subnetId"])
 			items_interfaces[i_interfaces].VpcPrefixId = StringFromAPI(m_interfaces["vpcPrefixId"])
-			items_interfaces[i_interfaces].VpcId = StringFromAPI(m_interfaces["vpcId"])
-			// ipFamilies: nested field — expand manually if needed
 			items_interfaces[i_interfaces].IsPhysical = BoolFromAPI(m_interfaces["isPhysical"])
 			items_interfaces[i_interfaces].Device = StringFromAPI(m_interfaces["device"])
 			items_interfaces[i_interfaces].DeviceInstance = Int64FromAPI(m_interfaces["deviceInstance"])
