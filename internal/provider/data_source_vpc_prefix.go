@@ -94,7 +94,7 @@ func (d *VpcPrefixDataSource) Schema(_ context.Context, _ datasource.SchemaReque
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "When true, each VPC Prefix object includes usage statistics using the same structure as IP Block usage. Prefix and IP usage data is derived by evaluating associated Ethernet interfaces. Each Interface associated with a VPC Prefix consumes a `/31` prefix.",
+				Description: "When true, each VPC Prefix with IPv4 includes IPv4 usage statistics using the same structure as IP Block usage. Usage is derived from associated Ethernet interfaces and their IPv4 addresses. IP usage counts two addresses per interface, while prefix usage counts each distinct `/31` containing an assigned IPv4 address.",
 			},
 			"name": schema.StringAttribute{
 				Required:    false,
@@ -118,19 +118,19 @@ func (d *VpcPrefixDataSource) Schema(_ context.Context, _ datasource.SchemaReque
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
-				Description: "Length of the prefix. Valid range is 8 to 31, and max usable value depends on prefix length of parent IP Block.",
+				Description: "Length of the returned prefix. A VPC Prefix reported by a Site may fall outside the bounds for REST create requests.",
 			},
 			"usage_stats": schema.SingleNestedAttribute{
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
-				Description: "Present when query parameter `includeUsageStats=true`. Prefix and IP usage data is derived by evaluating associated Ethernet interfaces. Each Interface associated with a VPC Prefix consumes a `/31` prefix.",
+				Description: "Present when query parameter `includeUsageStats=true` and the VPC Prefix has IPv4. This statistic reports IPv4 usage only. IP usage counts two addresses per associated Ethernet interface, while prefix usage counts each distinct `/31` containing an assigned IPv4 address.",
 				Attributes: map[string]schema.Attribute{
 					"available_i_ps": schema.Int64Attribute{
 						Required:    false,
 						Optional:    false,
 						Computed:    true,
-						Description: "Total number of IP addresses in the block (acquired and unused)",
+						Description: "Total number of IP addresses in the block (acquired and unused), capped at 2,147,483,647. An IP Block allocated to one child prefix of the same size reports zero. ",
 					},
 					"acquired_i_ps": schema.Int64Attribute{
 						Required:    false,
@@ -149,7 +149,7 @@ func (d *VpcPrefixDataSource) Schema(_ context.Context, _ datasource.SchemaReque
 						Required:    false,
 						Optional:    false,
 						Computed:    true,
-						Description: "Total number of /30 prefixes that can still be acquired from this block (only reduced if prefixes are acquired, not reduced by acquired IPs) ",
+						Description: "Number of complete `/30` IPv4 prefixes or `/126` IPv6 prefixes remaining after acquired child prefixes are excluded. Both prefix sizes contain four addresses. The count is capped at 2,147,483,647. The `acquiredIPs` count is not subtracted. ",
 					},
 					"acquired_prefixes": schema.Int64Attribute{
 						Required:    false,

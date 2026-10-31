@@ -25,14 +25,19 @@ resource "nico_machine" "example" {
 
 ### Optional
 
+- `allowed_tests` (List of String) Validation test names allowed for this run.
 - `clear_instance_type` (Boolean) Set to true to clear the existing Instance Type. Cannot be specified if Instance Type ID is specified. Can only be set by Provider.
+- `contexts` (List of String) Contexts used to select validation tests.
 - `health_issue` (Attributes) Required when `onlineRepair.enabled` is true. Must not be set when exiting online repair (`onlineRepair.enabled` false). (see [below for nested schema](#nestedatt--health_issue))
 - `instance_type_id` (String) Update the Instance Type of the Machine. Cannot be specified when clearing Instance Type. Can only be updated by Provider.
 - `labels` (Map of String) Machine labels will be overwritten, include existing labels to preserve them. Can be updated by Provider or privileged Tenant.
 - `machine_id` (String) Path parameter: machine_id.
 - `maintenance_message` (String) Optional message describing the reason for moving Machine into maintenance mode. Can be updated by Provider or privileged Tenant.
 - `online_repair` (Attributes) Request to enter/exit online repair (see [below for nested schema](#nestedatt--online_repair))
+- `run_unverified_tests` (Boolean) Whether unverified validation tests may run.
 - `set_maintenance_mode` (Boolean) Set to `true` to enable maintenance mode and to `false` to disable maintenance mode. Can be set by Provider or privileged Tenant.
+- `source` (String) Path parameter: source.
+- `tags` (List of String) Tags used to select validation tests.
 
 ### Read-Only
 
@@ -44,16 +49,17 @@ resource "nico_machine" "example" {
 - `hw_sku_device_type` (String) SKU derived device type of the machine, e.g. cpu, gpu, cache, storage, etc.
 - `id` (String) The resource ID.
 - `infrastructure_provider_id` (String) ID of the Provider that owns the Machine
-- `instance_id` (String) ID of the Instance if this Machine is assigned to one
-- `is_usable_by_tenant` (Boolean) Indicates whether the machine is usable by or currently in use by a tenant.
+- `instance_id` (String) ID of the associated Instance, or null when unassigned. The association remains during termination until Instance inventory confirms deletion. A non-null value precludes Ready status.
+- `is_usable_by_tenant` (Boolean) Indicates whether the machine is usable by or currently in use by a tenant. It does not indicate that a Machine is available for Instance creation.
 - `machine_capabilities` (Attributes List) List of capabilities of the machine (see [below for nested schema](#nestedatt--machine_capabilities))
 - `machine_interfaces` (Attributes List) List of admin interfaces of the machine (see [below for nested schema](#nestedatt--machine_interfaces))
 - `metadata` (Attributes) Only available to Providers. Returned if the `includeMetadata` query parameter is specified. Otherwise attribute is omitted from response. (see [below for nested schema](#nestedatt--metadata))
 - `placement_in_rack` (Attributes) Physical placement of the Machine within its Rack, when known (see [below for nested schema](#nestedatt--placement_in_rack))
 - `product_name` (String) Product name of the Machine
+- `scout_version` (String) Scout version reported by the Machine, if known
 - `serial_number` (String) Serial number of the Machine, only visible to Provider
 - `site_id` (String) ID of the Site the Machine belongs to
-- `status` (String) Status represents the status of the machine
+- `status` (String) Machine status combines the observed Core lifecycle with REST Instance assignment. A Ready Machine becomes InUse when REST assigns it, and remains InUse if Core reports Ready while the REST assignment still exists. Error, Maintenance, Initializing, and other non-Ready states retain precedence. When Instance deletion clears the assignment, InUse returns to Ready only if the retained Core snapshot reports Ready; otherwise fresh Machine inventory establishes the next status. Ready is not a reservation and does not guarantee that a subsequent Instance creation will succeed.
 - `status_history` (Attributes List) Chronological status history for the Machine (see [below for nested schema](#nestedatt--status_history))
 - `tenant_id` (String) ID of the Tenant that owns the Instance if the Machine is assigned to one
 - `updated` (String) Date/time when the Machine was last updated
@@ -176,6 +182,7 @@ Read-Only:
 - `dmi_data` (Attributes) DMI data of the machine (see [below for nested schema](#nestedatt--metadata--dmi_data))
 - `gpus` (Attributes List) GPU inventory reported for the Machine (see [below for nested schema](#nestedatt--metadata--gpus))
 - `infiniband_interfaces` (Attributes List) List of InfiniBand interfaces of the machine (see [below for nested schema](#nestedatt--metadata--infiniband_interfaces))
+- `lifecycle_state` (String) Lifecycle state details for the Machine
 - `network_interfaces` (Attributes List) List of Ethernet interfaces of the machine (see [below for nested schema](#nestedatt--metadata--network_interfaces))
 
 <a id="nestedatt--metadata--bmc_info"></a>
@@ -184,7 +191,7 @@ Read-Only:
 Read-Only:
 
 - `firmware_revision` (String) Firmware revision reported by the Machine BMC
-- `ip` (String) IP address of the Machine BMC
+- `ip` (String) IPv4 or IPv6 address of the Machine BMC
 - `mac` (String) MAC address of the Machine BMC
 - `version` (String) Version reported by the Machine BMC
 

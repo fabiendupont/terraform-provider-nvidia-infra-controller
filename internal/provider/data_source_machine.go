@@ -46,6 +46,7 @@ type MachineDataSourceModel struct {
 	Vendor                   types.String                       `tfsdk:"vendor"`
 	InactiveDevices          types.String                       `tfsdk:"inactive_devices"`
 	CountValue               types.String                       `tfsdk:"count_value"`
+	MachineId                types.String                       `tfsdk:"machine_id"`
 	InfrastructureProviderId types.String                       `tfsdk:"infrastructure_provider_id"`
 	InstanceId               types.String                       `tfsdk:"instance_id"`
 	ControllerMachineId      types.String                       `tfsdk:"controller_machine_id"`
@@ -57,6 +58,7 @@ type MachineDataSourceModel struct {
 	AssociatedDpuMachineIds  types.List                         `tfsdk:"associated_dpu_machine_ids"`
 	PlacementInRack          *MachineDsPlacementInRack          `tfsdk:"placement_in_rack"`
 	MaintenanceMessage       types.String                       `tfsdk:"maintenance_message"`
+	ScoutVersion             types.String                       `tfsdk:"scout_version"`
 	Health                   *MachineDsHealth                   `tfsdk:"health"`
 	Metadata                 *MachineDsMetadata                 `tfsdk:"metadata"`
 	Labels                   types.Map                          `tfsdk:"labels"`
@@ -127,6 +129,7 @@ type MachineDsMetadata struct {
 	Gpus                 []MachineDsMetadataGpusItem                 `tfsdk:"gpus"`
 	NetworkInterfaces    []MachineDsMetadataNetworkInterfacesItem    `tfsdk:"network_interfaces"`
 	InfinibandInterfaces []MachineDsMetadataInfinibandInterfacesItem `tfsdk:"infiniband_interfaces"`
+	LifecycleState       types.String                                `tfsdk:"lifecycle_state"`
 }
 
 type MachineDsMetadataDmiData struct {
@@ -309,6 +312,12 @@ func (d *MachineDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 				Computed:    true,
 				Description: "Filter Capabilities by Count",
 			},
+			"machine_id": schema.StringAttribute{
+				Required:    false,
+				Optional:    true,
+				Computed:    true,
+				Description: "Path parameter: machine_id.",
+			},
 			"infrastructure_provider_id": schema.StringAttribute{
 				Required:    false,
 				Optional:    false,
@@ -319,7 +328,7 @@ func (d *MachineDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
-				Description: "ID of the Instance if this Machine is assigned to one",
+				Description: "ID of the associated Instance, or null when unassigned. The association remains during termination until Instance inventory confirms deletion. A non-null value precludes Ready status.",
 			},
 			"controller_machine_id": schema.StringAttribute{
 				Required:    false,
@@ -538,6 +547,12 @@ func (d *MachineDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 				Computed:    true,
 				Description: "If the Machine is in maintenance mode, this message will typically describe the reason and how long it is expected to be in maintenance",
 			},
+			"scout_version": schema.StringAttribute{
+				Required:    false,
+				Optional:    false,
+				Computed:    true,
+				Description: "Scout version reported by the Machine, if known",
+			},
 			"health": schema.SingleNestedAttribute{
 				Required:    false,
 				Optional:    false,
@@ -705,7 +720,7 @@ func (d *MachineDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 								Required:    false,
 								Optional:    false,
 								Computed:    true,
-								Description: "IP address of the Machine BMC",
+								Description: "IPv4 or IPv6 address of the Machine BMC",
 							},
 							"mac": schema.StringAttribute{
 								Required:    false,
@@ -889,6 +904,12 @@ func (d *MachineDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 							},
 						},
 					},
+					"lifecycle_state": schema.StringAttribute{
+						Required:    false,
+						Optional:    false,
+						Computed:    true,
+						Description: "Lifecycle state details for the Machine",
+					},
 				},
 			},
 			"labels": schema.MapAttribute{
@@ -902,7 +923,7 @@ func (d *MachineDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
-				Description: "Indicates whether the machine is usable by or currently in use by a tenant.",
+				Description: "Indicates whether the machine is usable by or currently in use by a tenant. It does not indicate that a Machine is available for Instance creation.",
 			},
 			"status_history": schema.ListNestedAttribute{
 				Required:    false,
@@ -977,7 +998,7 @@ func (d *MachineDataSource) Read(ctx context.Context, req datasource.ReadRequest
 	}
 
 	if !data.Id.IsNull() && !data.Id.IsUnknown() && data.Id.ValueString() != "" {
-		url := d.client.ResolvePath("/v2/org/{org}/nico/machine/{machineId}", map[string]string{"machineId": data.Id.ValueString()})
+		url := d.client.ResolvePath("/v2/org/{org}/nico/machine/{machineId}/health-report/{source}", map[string]string{"machineId": data.MachineId.ValueString(), "source": data.Id.ValueString()})
 		result, err := d.client.Get(ctx, url)
 		if err != nil {
 			resp.Diagnostics.AddError("Error reading Machine", err.Error())
@@ -1059,6 +1080,7 @@ func (d *MachineDataSource) Read(ctx context.Context, req datasource.ReadRequest
 			data.PlacementInRack = nil
 		}
 		data.MaintenanceMessage = StringFromAPI(result["maintenanceMessage"])
+		data.ScoutVersion = StringFromAPI(result["scoutVersion"])
 		if rawObj_health, ok := result["health"].(map[string]interface{}); ok {
 			obj_health := &MachineDsHealth{}
 			obj_health.Source = StringFromAPI(rawObj_health["source"])
@@ -1077,6 +1099,7 @@ func (d *MachineDataSource) Read(ctx context.Context, req datasource.ReadRequest
 			// gpus: nested field — expand manually if needed
 			// networkInterfaces: nested field — expand manually if needed
 			// infinibandInterfaces: nested field — expand manually if needed
+			obj_metadata.LifecycleState = StringFromAPI(rawObj_metadata["lifecycleState"])
 			_ = rawObj_metadata
 			data.Metadata = obj_metadata
 		} else {
@@ -1190,6 +1213,7 @@ func (d *MachineDataSource) Read(ctx context.Context, req datasource.ReadRequest
 				data.PlacementInRack = nil
 			}
 			data.MaintenanceMessage = StringFromAPI(result["maintenanceMessage"])
+			data.ScoutVersion = StringFromAPI(result["scoutVersion"])
 			if rawObj_health, ok := result["health"].(map[string]interface{}); ok {
 				obj_health := &MachineDsHealth{}
 				obj_health.Source = StringFromAPI(rawObj_health["source"])
@@ -1208,6 +1232,7 @@ func (d *MachineDataSource) Read(ctx context.Context, req datasource.ReadRequest
 				// gpus: nested field — expand manually if needed
 				// networkInterfaces: nested field — expand manually if needed
 				// infinibandInterfaces: nested field — expand manually if needed
+				obj_metadata.LifecycleState = StringFromAPI(rawObj_metadata["lifecycleState"])
 				_ = rawObj_metadata
 				data.Metadata = obj_metadata
 			} else {
@@ -1317,6 +1342,7 @@ func (d *MachineDataSource) populateModel(ctx context.Context, data *MachineData
 		data.PlacementInRack = nil
 	}
 	data.MaintenanceMessage = StringFromAPI(result["maintenanceMessage"])
+	data.ScoutVersion = StringFromAPI(result["scoutVersion"])
 	if rawObj_health, ok := result["health"].(map[string]interface{}); ok {
 		obj_health := &MachineDsHealth{}
 		obj_health.Source = StringFromAPI(rawObj_health["source"])
@@ -1335,6 +1361,7 @@ func (d *MachineDataSource) populateModel(ctx context.Context, data *MachineData
 		// gpus: nested field — expand manually if needed
 		// networkInterfaces: nested field — expand manually if needed
 		// infinibandInterfaces: nested field — expand manually if needed
+		obj_metadata.LifecycleState = StringFromAPI(rawObj_metadata["lifecycleState"])
 		_ = rawObj_metadata
 		data.Metadata = obj_metadata
 	} else {

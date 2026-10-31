@@ -36,8 +36,12 @@ type RackDataSourceModel struct {
 	Model             types.String           `tfsdk:"model"`
 	SerialNumber      types.String           `tfsdk:"serial_number"`
 	Description       types.String           `tfsdk:"description"`
+	OperationStatus   types.String           `tfsdk:"operation_status"`
+	NvLinkDomainIds   types.List             `tfsdk:"nv_link_domain_ids"`
 	Location          *RackDsLocation        `tfsdk:"location"`
 	Components        []RackDsComponentsItem `tfsdk:"components"`
+	TaskStats         *RackDsTaskStats       `tfsdk:"task_stats"`
+	Health            types.String           `tfsdk:"health"`
 }
 
 type RackDsLocation struct {
@@ -48,29 +52,35 @@ type RackDsLocation struct {
 }
 
 type RackDsComponentsItem struct {
-	Id              types.String                   `tfsdk:"id"`
-	ComponentId     types.String                   `tfsdk:"component_id"`
-	RackId          types.String                   `tfsdk:"rack_id"`
-	Type            types.String                   `tfsdk:"type"`
-	Name            types.String                   `tfsdk:"name"`
-	SerialNumber    types.String                   `tfsdk:"serial_number"`
-	Manufacturer    types.String                   `tfsdk:"manufacturer"`
-	Model           types.String                   `tfsdk:"model"`
-	Description     types.String                   `tfsdk:"description"`
-	FirmwareVersion types.String                   `tfsdk:"firmware_version"`
-	SlotId          types.Int64                    `tfsdk:"slot_id"`
-	TrayIdx         types.Int64                    `tfsdk:"tray_idx"`
-	HostId          types.Int64                    `tfsdk:"host_id"`
-	Bmcs            []RackDsComponentsItemBmcsItem `tfsdk:"bmcs"`
-	PowerState      types.String                   `tfsdk:"power_state"`
-	OperationStatus types.String                   `tfsdk:"operation_status"`
-	LeakStatus      types.String                   `tfsdk:"leak_status"`
+	Id                 types.String                   `tfsdk:"id"`
+	RackId             types.String                   `tfsdk:"rack_id"`
+	Type               types.String                   `tfsdk:"type"`
+	Name               types.String                   `tfsdk:"name"`
+	SerialNumber       types.String                   `tfsdk:"serial_number"`
+	Manufacturer       types.String                   `tfsdk:"manufacturer"`
+	Model              types.String                   `tfsdk:"model"`
+	Description        types.String                   `tfsdk:"description"`
+	FirmwareVersion    types.String                   `tfsdk:"firmware_version"`
+	SlotId             types.Int64                    `tfsdk:"slot_id"`
+	TrayIdx            types.Int64                    `tfsdk:"tray_idx"`
+	HostId             types.Int64                    `tfsdk:"host_id"`
+	Bmcs               []RackDsComponentsItemBmcsItem `tfsdk:"bmcs"`
+	PowerState         types.String                   `tfsdk:"power_state"`
+	OperationStatus    types.String                   `tfsdk:"operation_status"`
+	LeakStatus         types.String                   `tfsdk:"leak_status"`
+	LeakHandlingStatus types.String                   `tfsdk:"leak_handling_status"`
+	Health             types.String                   `tfsdk:"health"`
 }
 
 type RackDsComponentsItemBmcsItem struct {
 	Type       types.String `tfsdk:"type"`
 	MacAddress types.String `tfsdk:"mac_address"`
 	IpAddress  types.String `tfsdk:"ip_address"`
+}
+
+type RackDsTaskStats struct {
+	PendingTaskCount types.Int64 `tfsdk:"pending_task_count"`
+	ActiveTaskCount  types.Int64 `tfsdk:"active_task_count"`
 }
 
 func (d *RackDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -136,6 +146,19 @@ func (d *RackDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 				Computed:    true,
 				Description: "Description of the Rack",
 			},
+			"operation_status": schema.StringAttribute{
+				Required:    false,
+				Optional:    false,
+				Computed:    true,
+				Description: "Operability phase aggregated from tray operationStatus values.",
+			},
+			"nv_link_domain_ids": schema.ListAttribute{
+				ElementType: types.StringType,
+				Required:    false,
+				Optional:    false,
+				Computed:    true,
+				Description: "Domain external IDs (rack group IDs) containing this Rack. Empty when no rack-group Domain is assigned.",
+			},
 			"location": schema.SingleNestedAttribute{
 				Required:    false,
 				Optional:    false,
@@ -179,19 +202,13 @@ func (d *RackDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 							Required:    false,
 							Optional:    false,
 							Computed:    true,
-							Description: "Unique identifier of the component",
-						},
-						"component_id": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "ID of the component",
+							Description: "Component ID",
 						},
 						"rack_id": schema.StringAttribute{
 							Required:    false,
 							Optional:    false,
 							Computed:    true,
-							Description: "ID of the rack this component belongs to",
+							Description: "ID of the Rack this component belongs to",
 						},
 						"type": schema.StringAttribute{
 							Required:    false,
@@ -299,8 +316,46 @@ func (d *RackDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 							Computed:    true,
 							Description: "Whether the component is considered leaking coolant",
 						},
+						"leak_handling_status": schema.StringAttribute{
+							Required:    false,
+							Optional:    false,
+							Computed:    true,
+							Description: "Flow's leakage-handling status. Unknown means Flow could not determine the status; None means no supported handling task exists; ShuttingDown means a forced-shutdown task is waiting, pending, or running; Down means it completed; and Failed means the latest supported handling task failed or was terminated. Down describes handling progress, not the component's current power state.",
+						},
+						"health": schema.StringAttribute{
+							Required:    false,
+							Optional:    false,
+							Computed:    true,
+							Description: "Latest Core aggregate health snapshot synchronized by Flow. Null when Core reports no aggregate health, including before the first successful inventory sync.",
+						},
 					},
 				},
+			},
+			"task_stats": schema.SingleNestedAttribute{
+				Required:    false,
+				Optional:    false,
+				Computed:    true,
+				Description: "Counts of non-terminal tasks currently associated with a rack or tray. Rack stats include component-scoped tasks on the rack; tray stats include only tasks that explicitly target the tray.",
+				Attributes: map[string]schema.Attribute{
+					"pending_task_count": schema.Int64Attribute{
+						Required:    false,
+						Optional:    false,
+						Computed:    true,
+						Description: "Number of associated tasks in Waiting or Pending state.",
+					},
+					"active_task_count": schema.Int64Attribute{
+						Required:    false,
+						Optional:    false,
+						Computed:    true,
+						Description: "Number of associated tasks in Running state.",
+					},
+				},
+			},
+			"health": schema.StringAttribute{
+				Required:    false,
+				Optional:    false,
+				Computed:    true,
+				Description: "Latest Core aggregate health snapshot synchronized by Flow. Null when Core reports no aggregate health, including before the first successful inventory sync.",
 			},
 		},
 	}
@@ -329,7 +384,7 @@ func (d *RackDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 	}
 
 	if !data.Id.IsNull() && !data.Id.IsUnknown() && data.Id.ValueString() != "" {
-		url := d.client.ResolvePath("/v2/org/{org}/nico/rack/{id}", map[string]string{"id": data.Id.ValueString()})
+		url := d.client.ResolvePath("/v2/org/{org}/nico/rack/{id}/health-report/{source}", map[string]string{"id": data.Id.ValueString(), "source": data.Id.ValueString()})
 		result, err := d.client.Get(ctx, url)
 		if err != nil {
 			resp.Diagnostics.AddError("Error reading Rack", err.Error())
@@ -344,6 +399,14 @@ func (d *RackDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 		data.Model = StringFromAPI(result["model"])
 		data.SerialNumber = StringFromAPI(result["serialNumber"])
 		data.Description = StringFromAPI(result["description"])
+		data.OperationStatus = StringFromAPI(result["operationStatus"])
+		if rawSlice_nv_link_domain_ids := StringSliceFromAPI(result["nvLinkDomainIds"]); rawSlice_nv_link_domain_ids != nil {
+			lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_nv_link_domain_ids)
+			diags.Append(d...)
+			data.NvLinkDomainIds = lv
+		} else {
+			data.NvLinkDomainIds = types.ListNull(types.StringType)
+		}
 		if rawObj_location, ok := result["location"].(map[string]interface{}); ok {
 			obj_location := &RackDsLocation{}
 			obj_location.Region = StringFromAPI(rawObj_location["region"])
@@ -363,7 +426,6 @@ func (d *RackDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 					m_components = map[string]interface{}{}
 				}
 				items_components[i_components].Id = StringFromAPI(m_components["id"])
-				items_components[i_components].ComponentId = StringFromAPI(m_components["componentId"])
 				items_components[i_components].RackId = StringFromAPI(m_components["rackId"])
 				items_components[i_components].Type = StringFromAPI(m_components["type"])
 				items_components[i_components].Name = StringFromAPI(m_components["name"])
@@ -379,11 +441,23 @@ func (d *RackDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 				items_components[i_components].PowerState = StringFromAPI(m_components["powerState"])
 				items_components[i_components].OperationStatus = StringFromAPI(m_components["operationStatus"])
 				items_components[i_components].LeakStatus = StringFromAPI(m_components["leakStatus"])
+				items_components[i_components].LeakHandlingStatus = StringFromAPI(m_components["leakHandlingStatus"])
+				items_components[i_components].Health = StringFromAPI(m_components["health"])
 			}
 			data.Components = items_components
 		} else {
 			data.Components = nil
 		}
+		if rawObj_task_stats, ok := result["taskStats"].(map[string]interface{}); ok {
+			obj_task_stats := &RackDsTaskStats{}
+			obj_task_stats.PendingTaskCount = Int64FromAPI(rawObj_task_stats["pendingTaskCount"])
+			obj_task_stats.ActiveTaskCount = Int64FromAPI(rawObj_task_stats["activeTaskCount"])
+			_ = rawObj_task_stats
+			data.TaskStats = obj_task_stats
+		} else {
+			data.TaskStats = nil
+		}
+		data.Health = StringFromAPI(result["health"])
 		_ = diags
 	} else if true {
 		url := d.client.ResolvePath("/v2/org/{org}/nico/rack/{id}/task", map[string]string{"id": data.Id.ValueString()})
@@ -399,6 +473,14 @@ func (d *RackDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 			data.Model = StringFromAPI(result["model"])
 			data.SerialNumber = StringFromAPI(result["serialNumber"])
 			data.Description = StringFromAPI(result["description"])
+			data.OperationStatus = StringFromAPI(result["operationStatus"])
+			if rawSlice_nv_link_domain_ids := StringSliceFromAPI(result["nvLinkDomainIds"]); rawSlice_nv_link_domain_ids != nil {
+				lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_nv_link_domain_ids)
+				diags.Append(d...)
+				data.NvLinkDomainIds = lv
+			} else {
+				data.NvLinkDomainIds = types.ListNull(types.StringType)
+			}
 			if rawObj_location, ok := result["location"].(map[string]interface{}); ok {
 				obj_location := &RackDsLocation{}
 				obj_location.Region = StringFromAPI(rawObj_location["region"])
@@ -418,7 +500,6 @@ func (d *RackDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 						m_components = map[string]interface{}{}
 					}
 					items_components[i_components].Id = StringFromAPI(m_components["id"])
-					items_components[i_components].ComponentId = StringFromAPI(m_components["componentId"])
 					items_components[i_components].RackId = StringFromAPI(m_components["rackId"])
 					items_components[i_components].Type = StringFromAPI(m_components["type"])
 					items_components[i_components].Name = StringFromAPI(m_components["name"])
@@ -434,11 +515,23 @@ func (d *RackDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 					items_components[i_components].PowerState = StringFromAPI(m_components["powerState"])
 					items_components[i_components].OperationStatus = StringFromAPI(m_components["operationStatus"])
 					items_components[i_components].LeakStatus = StringFromAPI(m_components["leakStatus"])
+					items_components[i_components].LeakHandlingStatus = StringFromAPI(m_components["leakHandlingStatus"])
+					items_components[i_components].Health = StringFromAPI(m_components["health"])
 				}
 				data.Components = items_components
 			} else {
 				data.Components = nil
 			}
+			if rawObj_task_stats, ok := result["taskStats"].(map[string]interface{}); ok {
+				obj_task_stats := &RackDsTaskStats{}
+				obj_task_stats.PendingTaskCount = Int64FromAPI(rawObj_task_stats["pendingTaskCount"])
+				obj_task_stats.ActiveTaskCount = Int64FromAPI(rawObj_task_stats["activeTaskCount"])
+				_ = rawObj_task_stats
+				data.TaskStats = obj_task_stats
+			} else {
+				data.TaskStats = nil
+			}
+			data.Health = StringFromAPI(result["health"])
 			_ = diags
 		}
 	}
@@ -450,6 +543,14 @@ func (d *RackDataSource) populateModel(ctx context.Context, data *RackDataSource
 	data.Model = StringFromAPI(result["model"])
 	data.SerialNumber = StringFromAPI(result["serialNumber"])
 	data.Description = StringFromAPI(result["description"])
+	data.OperationStatus = StringFromAPI(result["operationStatus"])
+	if rawSlice_nv_link_domain_ids := StringSliceFromAPI(result["nvLinkDomainIds"]); rawSlice_nv_link_domain_ids != nil {
+		lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_nv_link_domain_ids)
+		diags.Append(d...)
+		data.NvLinkDomainIds = lv
+	} else {
+		data.NvLinkDomainIds = types.ListNull(types.StringType)
+	}
 	if rawObj_location, ok := result["location"].(map[string]interface{}); ok {
 		obj_location := &RackDsLocation{}
 		obj_location.Region = StringFromAPI(rawObj_location["region"])
@@ -469,7 +570,6 @@ func (d *RackDataSource) populateModel(ctx context.Context, data *RackDataSource
 				m_components = map[string]interface{}{}
 			}
 			items_components[i_components].Id = StringFromAPI(m_components["id"])
-			items_components[i_components].ComponentId = StringFromAPI(m_components["componentId"])
 			items_components[i_components].RackId = StringFromAPI(m_components["rackId"])
 			items_components[i_components].Type = StringFromAPI(m_components["type"])
 			items_components[i_components].Name = StringFromAPI(m_components["name"])
@@ -485,10 +585,22 @@ func (d *RackDataSource) populateModel(ctx context.Context, data *RackDataSource
 			items_components[i_components].PowerState = StringFromAPI(m_components["powerState"])
 			items_components[i_components].OperationStatus = StringFromAPI(m_components["operationStatus"])
 			items_components[i_components].LeakStatus = StringFromAPI(m_components["leakStatus"])
+			items_components[i_components].LeakHandlingStatus = StringFromAPI(m_components["leakHandlingStatus"])
+			items_components[i_components].Health = StringFromAPI(m_components["health"])
 		}
 		data.Components = items_components
 	} else {
 		data.Components = nil
 	}
+	if rawObj_task_stats, ok := result["taskStats"].(map[string]interface{}); ok {
+		obj_task_stats := &RackDsTaskStats{}
+		obj_task_stats.PendingTaskCount = Int64FromAPI(rawObj_task_stats["pendingTaskCount"])
+		obj_task_stats.ActiveTaskCount = Int64FromAPI(rawObj_task_stats["activeTaskCount"])
+		_ = rawObj_task_stats
+		data.TaskStats = obj_task_stats
+	} else {
+		data.TaskStats = nil
+	}
+	data.Health = StringFromAPI(result["health"])
 	_ = diags
 }
