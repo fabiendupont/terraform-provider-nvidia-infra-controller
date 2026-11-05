@@ -28,18 +28,17 @@ resource "nico_expected_machine" "example" {
 
 ### Optional
 
-- `bmc_ip_address` (String) Optional BMC IP address (IPv4 or IPv6). A non-empty address sets the value and pre-allocates a reserved IP for the BMC. An empty string clears the value. Omission or null preserves the current value.
-- `bmc_mac_address` (String) The Expected Machine's BMC MAC address is immutable after creation. Omit this field, or provide another case/separator spelling of the current MAC as a compatibility no-op.
+- `bmc_ip_address` (String) Optional BMC IP address (IPv4 or IPv6). When set, pre-allocates a reserved IP for the BMC.
+- `bmc_mac_address` (String) MAC address of the Expected Machine's BMC (Baseboard Management Controller)
 - `chassis_serial_number` (String) Serial number of the Expected Machine's chassis
-- `default_bmc_password` (String) Password for accessing the Expected Machine's BMC. Omission or null preserves the value. A non-empty value can be supplied without defaultBmcUsername.
-- `default_bmc_username` (String) Username for accessing the Expected Machine's BMC. Omission or null preserves the value. A non-empty value can be supplied without defaultBmcPassword.
+- `default_bmc_password` (String) Password for accessing the Expected Machine's BMC
+- `default_bmc_username` (String) Username for accessing the Expected Machine's BMC
 - `description` (String) Description of this component
 - `expected_machine_id` (String) Path parameter: expected_machine_id.
 - `fallback_dpu_serial_numbers` (List of String) Serial numbers of the Expected Machine's fallback DPUs (Data Processing Units)
 - `host_id` (Number) Host ID within the tray
 - `host_lifecycle_profile` (Attributes) Optional per-host lifecycle profile (see [below for nested schema](#nestedatt--host_lifecycle_profile))
-- `interfaces` (Attributes List) Complete expected host NIC list. Omission or null preserves the current list; an explicit empty list clears it. (see [below for nested schema](#nestedatt--interfaces))
-- `is_dpf_enabled` (Boolean) When true, this host is eligible for DPF-based provisioning. Optional. Omission or null leaves the existing setting unchanged. An explicit true or false value updates the setting.
+- `is_dpf_enabled` (Boolean) When true, this host is eligible for DPF-based provisioning.
 - `labels` (Map of String) User-defined key-value pairs for organizing and categorizing Expected Machines
 - `manufacturer` (String) Manufacturer of this component
 - `model` (String) Model of this component
@@ -67,22 +66,6 @@ Read-Only:
 - `disable_lockdown` (Boolean) When true, the server is not locked down during host lifecycle management. When omitted, the existing value is preserved.
 
 
-<a id="nestedatt--interfaces"></a>
-### Nested Schema for `interfaces`
-
-Read-Only:
-
-- `fixed_gateway` (String) Optional IPv4 or IPv6 gateway. Omission, null, or an empty string clears it when replacing the declaration.
-- `fixed_ip` (String) Optional fixed IPv4 or IPv6 address for the interface. REST preserves repeated MAC declarations without enforcing uniqueness by MAC and address family; Core applies allocation validation.
-- `fixed_mask` (String) Optional legacy mask string, forwarded unchanged. Omission or null clears it when replacing the declaration.
-- `ip_allocation` (String) On create, omission, null, or Unspecified infers Fixed from fixedIp, otherwise Retained for HostBmc and Dynamic for other roles. On update, omission or null preserves a matching stored policy while fixedIp presence is unchanged; Unspecified resets inference. Fixed requires fixedIp; Dynamic and Retained forbid it. Explicit Fixed, inferred DPU Fixed, and inferred HostBmc Fixed with a segment constraint require a containing managed prefix; legacy Host or inferred HostBmc Fixed without a constraint may use static assignments. Retained keeps a DHCP-allocated address for the interface row lifetime.
-- `mac_address` (String) MAC address of the expected interface. Accepts six colon- or hyphen-separated octets in either case; stored and returned in uppercase colon-separated form, for example AA:BB:CC:DD:EE:FF. The same MAC may have separate IPv4 and IPv6 declarations.
-- `network_segment_type` (String) Optional segment constraint that takes precedence over nicType. Omission or null clears it. For explicit allocation policies and DPU roles it constrains relay-selected or fixed-address segments; legacy Host declarations without an explicit policy use it only for initial DHCP segment selection.
-- `nic_type` (String) Optional NIC type. Use `CX9` for ConnectX-9 interfaces on Astra hosts.
-- `primary` (Boolean) Host boot-interface selection. At most one Host interface per machine may set true. Omission or null clears the declaration. DpuOs and DpuBmc must omit it; HostBmc also accepts false.
-- `role` (String) Interface owner. On create, omission, null, or Unspecified means Host. On update, omission or null preserves a matching stored role; Unspecified resets it to Host. At most one HostBmc is allowed, with the same MAC as bmcMacAddress.
-
-
 <a id="nestedatt--machine"></a>
 ### Nested Schema for `machine`
 
@@ -105,12 +88,11 @@ Read-Only:
 
 - `associated_machine_ids` (List of String) List of machine IDs associated with this SKU
 - `components` (Attributes) Hardware components of this SKU (see [below for nested schema](#nestedatt--sku--components))
-- `created` (String) ISO 8601 datetime when the SKU was created, using the Site-reported timestamp when available
-- `description` (String) Human-readable SKU description
+- `created` (String) ISO 8601 datetime when the SKU was created
 - `device_type` (String) Optional device type identifier (e.g. "gpu", "cpu", "storage")
 - `id` (String) Unique identifier for the SKU
-- `schema_version` (Number) Core SKU schema version when available
 - `site_id` (String) ID of the Site this SKU belongs to
+- `updated` (String) ISO 8601 datetime when the SKU was last updated
 
 <a id="nestedatt--sku--components"></a>
 ### Nested Schema for `sku.components`
@@ -119,7 +101,7 @@ Read-Only:
 
 - `chassis` (Attributes) Chassis component (see [below for nested schema](#nestedatt--sku--components--chassis))
 - `cpus` (Attributes List) CPU components (see [below for nested schema](#nestedatt--sku--components--cpus))
-- `ethernet_devices` (Attributes List) Read-only Ethernet device components reported by Core. Omit this property from REST mutation requests; null and an empty array are accepted for compatibility, while a non-empty array is rejected with HTTP 400. (see [below for nested schema](#nestedatt--sku--components--ethernet_devices))
+- `ethernet_devices` (Attributes List) Ethernet device components (see [below for nested schema](#nestedatt--sku--components--ethernet_devices))
 - `gpus` (Attributes List) GPU components (see [below for nested schema](#nestedatt--sku--components--gpus))
 - `infiniband_devices` (Attributes List) Infiniband device components (see [below for nested schema](#nestedatt--sku--components--infiniband_devices))
 - `memory` (Attributes List) Memory components (see [below for nested schema](#nestedatt--sku--components--memory))
@@ -131,7 +113,6 @@ Read-Only:
 
 Read-Only:
 
-- `architecture` (String) Architecture of the chassis
 - `model` (String) Model of the chassis
 - `vendor` (String) Vendor of the chassis
 
@@ -153,7 +134,6 @@ Read-Only:
 Read-Only:
 
 - `count_value` (Number) Number of ethernet devices present
-- `is_connected` (Boolean) Whether the ethernet device is connected
 - `model` (String) Model of the ethernet device
 - `vendor` (String) Vendor of the ethernet device
 
@@ -175,7 +155,6 @@ Read-Only:
 Read-Only:
 
 - `count_value` (Number) Number of infiniband devices present
-- `inactive_devices` (List of Number) Zero-based indexes of inactive devices
 - `model` (String) Model of the infiniband device
 - `vendor` (String) Vendor of the infiniband device
 
@@ -195,13 +174,10 @@ Read-Only:
 
 Read-Only:
 
-- `capacity_mb` (Number) Storage capacity in megabytes used for schema version 4 matching. Read-only in REST mutation requests and preserved in responses for legacy SKUs. Schema version 5 uses minSizeMiB and maxSizeMiB instead.
+- `capacity_mb` (Number) Capacity in megabytes
 - `count_value` (Number) Number of storage devices present
-- `max_size_mi_b` (Number) Inclusive maximum size in MiB for each storage device. Null or omission means no upper bound. Used for SKU schema version 5 and later.
-- `min_size_mi_b` (Number) Inclusive minimum size in MiB for each storage device. Null or omission means no lower bound. Used for SKU schema version 5 and later.
-- `model` (String) Informational storage model. Starting with the 2.1 release, NICo does not use this field for storage matching or validation.
-- `pci_patterns` (List of String) Regular expressions matched against each drive's sysfs PCI path. An empty or omitted list disables PCI location matching. Used for SKU schema version 5 and later.  The matched path is the NVMe controller's sysfs DEVPATH with its trailing kernel-assigned `nvmeN` node removed, for example `/devices/pci0000:00/0000:64:00.0/0000:65:00.0/nvme`, because that node changes with probe order. Patterns that anchor on the node (such as `nvme0$`) never match; end them at `/nvme` instead.
-- `vendor` (String) Storage vendor used for schema version 4 matching. Read-only in REST mutation requests and preserved in responses for legacy SKUs. Schema version 5 does not use this field.
+- `model` (String) Model of the storage device
+- `vendor` (String) Vendor of the storage device
 
 
 <a id="nestedatt--sku--components--tpm"></a>

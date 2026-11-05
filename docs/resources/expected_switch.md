@@ -48,7 +48,6 @@ resource "nico_expected_switch" "example" {
 - `name` (String) Display name for this component
 - `nv_os_password` (String) NvOS password for the Expected Switch
 - `nv_os_username` (String) NvOS username for the Expected Switch
-- `nvos_mac_addresses` (List of String) MAC addresses of the Expected Switch's NvOS management interfaces
 - `rack_id` (String) Optional rack identifier for this component
 - `slot_id` (Number) Slot ID within the rack
 - `tray_idx` (Number) Tray index within the rack

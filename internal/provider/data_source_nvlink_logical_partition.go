@@ -118,7 +118,7 @@ func (d *NvlinkLogicalPartitionDataSource) Schema(_ context.Context, _ datasourc
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "Filter NVLink Interfaces by Core-reported NVLink domain UUID, not the rack group ID returned by the Domain API. Can be specified multiple times to filter on more than one UUID.",
+				Description: "Filter NVLink Interfaces by NVLink Domain ID.  Can be specified multiple times to filter on more than one ID.",
 			},
 			"name": schema.StringAttribute{
 				Required:    false,

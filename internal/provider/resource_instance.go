@@ -32,12 +32,10 @@ type InstanceResourceModel struct {
 	Description                            types.String                                    `tfsdk:"description"`
 	TenantId                               types.String                                    `tfsdk:"tenant_id"`
 	InstanceTypeId                         types.String                                    `tfsdk:"instance_type_id"`
-	MachineLabelSelector                   types.Map                                       `tfsdk:"machine_label_selector"`
 	VpcId                                  types.String                                    `tfsdk:"vpc_id"`
 	SecondaryVpcIds                        types.List                                      `tfsdk:"secondary_vpc_ids"`
 	UserData                               types.String                                    `tfsdk:"user_data"`
 	OperatingSystemId                      types.String                                    `tfsdk:"operating_system_id"`
-	PowerProfile                           types.String                                    `tfsdk:"power_profile"`
 	NetworkSecurityGroupId                 types.String                                    `tfsdk:"network_security_group_id"`
 	IpxeScript                             types.String                                    `tfsdk:"ipxe_script"`
 	AlwaysBootWithCustomIpxe               types.Bool                                      `tfsdk:"always_boot_with_custom_ipxe"`
@@ -46,7 +44,6 @@ type InstanceResourceModel struct {
 	Interfaces                             []InstanceInterfacesItem                        `tfsdk:"interfaces"`
 	AutoNetwork                            types.Bool                                      `tfsdk:"auto_network"`
 	InfinibandInterfaces                   []InstanceInfinibandInterfacesItem              `tfsdk:"infiniband_interfaces"`
-	SpectrumXAttachments                   []InstanceSpectrumXAttachmentsItem              `tfsdk:"spectrum_x_attachments"`
 	DpuExtensionServiceDeployments         []InstanceDpuExtensionServiceDeploymentsItem    `tfsdk:"dpu_extension_service_deployments"`
 	NvLinkInterfaces                       []InstanceNvLinkInterfacesItem                  `tfsdk:"nv_link_interfaces"`
 	SshKeyGroupIds                         types.List                                      `tfsdk:"ssh_key_group_ids"`
@@ -76,8 +73,6 @@ type InstanceResourceModel struct {
 type InstanceInterfacesItem struct {
 	SubnetId             types.String `tfsdk:"subnet_id"`
 	VpcPrefixId          types.String `tfsdk:"vpc_prefix_id"`
-	VpcId                types.String `tfsdk:"vpc_id"`
-	IpFamilies           types.List   `tfsdk:"ip_families"`
 	IpAddress            types.String `tfsdk:"ip_address"`
 	InlineRoutingProfile types.String `tfsdk:"inline_routing_profile"`
 	IsPhysical           types.Bool   `tfsdk:"is_physical"`
@@ -93,16 +88,6 @@ type InstanceInfinibandInterfacesItem struct {
 	DeviceInstance    types.Int64  `tfsdk:"device_instance"`
 	IsPhysical        types.Bool   `tfsdk:"is_physical"`
 	VirtualFunctionId types.Int64  `tfsdk:"virtual_function_id"`
-}
-
-type InstanceSpectrumXAttachmentsItem struct {
-	SpectrumXPartitionId types.String `tfsdk:"spectrum_x_partition_id"`
-	Device               types.String `tfsdk:"device"`
-	DeviceInstance       types.Int64  `tfsdk:"device_instance"`
-	AttachmentType       types.String `tfsdk:"attachment_type"`
-	VirtualFunctionId    types.Int64  `tfsdk:"virtual_function_id"`
-	BridgeName           types.String `tfsdk:"bridge_name"`
-	OvnNetworkName       types.String `tfsdk:"ovn_network_name"`
 }
 
 type InstanceDpuExtensionServiceDeploymentsItem struct {
@@ -183,8 +168,6 @@ type InstanceSshKeyGroupsItemSiteAssociationsItemSiteCapabilities struct {
 	NvLinkPartition           types.Bool `tfsdk:"nv_link_partition"`
 	Flow                      types.Bool `tfsdk:"flow"`
 	ImageBasedOperatingSystem types.Bool `tfsdk:"image_based_operating_system"`
-	VpcSlaac                  types.Bool `tfsdk:"vpc_slaac"`
-	DpsPowerManagement        types.Bool `tfsdk:"dps_power_management"`
 }
 
 type InstanceSshKeyGroupsItemStatusHistoryItem struct {
@@ -250,13 +233,6 @@ func (r *InstanceResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 				Computed:    false,
 				Description: "ID of the Instance Type to use for all Instances in the batch",
 			},
-			"machine_label_selector": schema.MapAttribute{
-				ElementType: types.StringType,
-				Required:    false,
-				Optional:    true,
-				Computed:    true,
-				Description: "Optional exact-match selector applied to Machine labels during placement. Property names are arbitrary Machine label keys rather than predefined selector fields. Every supplied key/value pair must match (AND semantics). An omitted or empty object does not restrict placement. The selector constrains placement only; it is not persisted on the created Instances.  A non-empty object requires the Tenant to have effective `targetedInstanceCreation` capability for the selected Site; otherwise the request is rejected with 403. Selection occurs before topology optimization. When `topologyOptimized` is true, all selected Machines must both match the selector and belong to the same NVLink domain. If too few matching Machines are available, the request is rejected with 409.",
-			},
 			"vpc_id": schema.StringAttribute{
 				Required:    true,
 				Optional:    false,
@@ -268,25 +244,19 @@ func (r *InstanceResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "IDs of additional VPCs the Instances should attach to through non-primary interfaces. This field may only be specified when every entry in `interfaces` uses `vpcPrefixId` or `vpcId`. IDs must be unique, must be valid UUIDs, and must not include the primary `vpcId`.",
+				Description: "IDs of additional VPCs the Instances should attach to through non-primary interfaces. This field may only be specified when every entry in `interfaces` uses `vpcPrefixId`. IDs must be unique, must be valid UUIDs, and must not include the primary `vpcId`.",
 			},
 			"user_data": schema.StringAttribute{
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "User data applied to all instances. Can only be specified if allowOverride is set to true in Operating System. Limited to 32768 bytes (32 KiB), measured on the effective value NICo stores rather than the text submitted. Operating System defaults are inherited first, and when phone-home is configured the document is re-serialized with a `phone_home` block added. Re-serialization normalizes indentation and can grow the document, so a request just under the limit may still be rejected.",
+				Description: "User data applied to all instances. Can only be specified if allowOverride is set to true in Operating System",
 			},
 			"operating_system_id": schema.StringAttribute{
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
 				Description: "Must be specified if iPXE Script field is empty",
-			},
-			"power_profile": schema.StringAttribute{
-				Required:    false,
-				Optional:    true,
-				Computed:    true,
-				Description: "Power profile to apply to every Instance in the batch. A non-empty value requires the Site's `dpsPowerManagement` capability to be `true`.",
 			},
 			"network_security_group_id": schema.StringAttribute{
 				Required:    false,
@@ -323,7 +293,7 @@ func (r *InstanceResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "Interface configuration shared across all instances. At least one interface must be specified unless `autoNetwork` is true. Interfaces must all be Subnet-backed or all be VPC-backed; VPC-backed interfaces may use an explicit `vpcPrefixId` or ask the Controller to select a prefix using `vpcId` and `ipFamilies`. Each batch member is resolved independently and may use a different prefix. Only one network can be attached over a physical interface. Interface `ipAddress` is not supported for batch instance creation requests. Mutually exclusive with `autoNetwork`: when `autoNetwork` is true this list MUST be empty.",
+				Description: "Interface configuration shared across all instances. At least one interface must be specified unless `autoNetwork` is true. Either Subnet or VPC Prefix interfaces allowed, only one of the Subnets or VPC Prefixes can be attached over Physical interface. Interface `ipAddress` is not supported for batch instance creation requests. Mutually exclusive with `autoNetwork`: when `autoNetwork` is true this list MUST be empty.",
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"subnet_id": schema.StringAttribute{
@@ -338,24 +308,11 @@ func (r *InstanceResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 							Computed:    true,
 							Description: "ID of the VPC Prefix to attach to the Interface",
 						},
-						"vpc_id": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "ID of the VPC from which the Controller should select a prefix. `ipFamilies` must also be specified, and `ipAddress` cannot be specified.",
-						},
-						"ip_families": schema.ListAttribute{
-							ElementType: types.StringType,
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Address families requested for Controller prefix selection. Required with `vpcId` and prohibited otherwise. Specify `IPv4`, `IPv6`, or both for dual-stack allocation. Duplicate values are accepted and normalized in `IPv4`, then `IPv6` order.",
-						},
 						"ip_address": schema.StringAttribute{
 							Required:    false,
 							Optional:    false,
 							Computed:    true,
-							Description: "Explicitly requested IP address for the interface. It can only be specified with an explicit `vpcPrefixId`. The least-significant host bit must be 1.",
+							Description: "Explicitly requested IP address for the interface. It cannot be specified for Subnet-based interfaces. The least-significant host bit must be 1.",
 						},
 						"inline_routing_profile": schema.StringAttribute{
 							Required:    false,
@@ -367,7 +324,7 @@ func (r *InstanceResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 							Required:    false,
 							Optional:    false,
 							Computed:    true,
-							Description: "Specifies whether this network should be attached to the Instance over a physical interface.",
+							Description: "Specifies whether this Subnet or VPC Prefix should be attached to the Instance over physical interface.",
 						},
 						"device": schema.StringAttribute{
 							Required:    false,
@@ -438,58 +395,6 @@ func (r *InstanceResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 							Optional:    false,
 							Computed:    true,
 							Description: "Must be specified if isPhysical is false",
-						},
-					},
-				},
-			},
-			"spectrum_x_attachments": schema.ListNestedAttribute{
-				Required:    false,
-				Optional:    true,
-				Computed:    true,
-				Description: "SpectrumX Partition attachments shared across all Instances in the batch. Each `device` and `deviceInstance` pair may appear only once, irrespective of `virtualFunctionId`.",
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"spectrum_x_partition_id": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "ID of the SpectrumX Partition the attachment should associate with",
-						},
-						"device": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "SpectrumX device to attach over, matching the device description reported for the Machine's SpectrumX interfaces",
-						},
-						"device_instance": schema.Int64Attribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Index of the device, used to identify which interface card to attach the Partition to",
-						},
-						"attachment_type": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Type of SpectrumX attachment. `Virtual` is not currently supported and is rejected.",
-						},
-						"virtual_function_id": schema.Int64Attribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Must be omitted, as virtual functions are not currently supported",
-						},
-						"bridge_name": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "OVS bridge to attach over. Required for an `OVS` attachment and must be omitted for any other type",
-						},
-						"ovn_network_name": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "OVN network the OVS attachment maps onto. Optional for an `OVS` attachment and must be omitted for any other type",
 						},
 					},
 				},
@@ -883,18 +788,6 @@ func (r *InstanceResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 														Computed:    true,
 														Description: "Whether the Site supports image-based operating system provisioning",
 													},
-													"vpc_slaac": schema.BoolAttribute{
-														Required:    false,
-														Optional:    false,
-														Computed:    true,
-														Description: "Whether the latest successfully stored Site configuration inventory reports that Core supports VPCs with SLAAC enabled. False also represents a missing Site configuration or an inventory report that omits the capability. This value is managed by Site configuration inventory and cannot be updated through the Site API.",
-													},
-													"dps_power_management": schema.BoolAttribute{
-														Required:    false,
-														Optional:    false,
-														Computed:    true,
-														Description: "Whether this Site accepts non-empty power resource groups and power profiles for DPS power management. When false, omission and explicit clearing remain allowed.",
-													},
 												},
 											},
 											"status": schema.StringAttribute{
@@ -1136,11 +1029,6 @@ func (r *InstanceResource) Create(ctx context.Context, req resource.CreateReques
 	if !data.InstanceTypeId.IsNull() && !data.InstanceTypeId.IsUnknown() {
 		body["instanceTypeId"] = data.InstanceTypeId.ValueString()
 	}
-	if !data.MachineLabelSelector.IsNull() && !data.MachineLabelSelector.IsUnknown() {
-		var m_machine_label_selector map[string]string
-		data.MachineLabelSelector.ElementsAs(ctx, &m_machine_label_selector, false)
-		body["machineLabelSelector"] = m_machine_label_selector
-	}
 	if !data.VpcId.IsNull() && !data.VpcId.IsUnknown() {
 		body["vpcId"] = data.VpcId.ValueString()
 	}
@@ -1154,9 +1042,6 @@ func (r *InstanceResource) Create(ctx context.Context, req resource.CreateReques
 	}
 	if !data.OperatingSystemId.IsNull() && !data.OperatingSystemId.IsUnknown() {
 		body["operatingSystemId"] = data.OperatingSystemId.ValueString()
-	}
-	if !data.PowerProfile.IsNull() && !data.PowerProfile.IsUnknown() {
-		body["powerProfile"] = data.PowerProfile.ValueString()
 	}
 	if !data.NetworkSecurityGroupId.IsNull() && !data.NetworkSecurityGroupId.IsUnknown() {
 		body["networkSecurityGroupId"] = data.NetworkSecurityGroupId.ValueString()
@@ -1185,10 +1070,6 @@ func (r *InstanceResource) Create(ctx context.Context, req resource.CreateReques
 			if !item_interfaces.VpcPrefixId.IsNull() {
 				m_interfaces["vpcPrefixId"] = item_interfaces.VpcPrefixId.ValueString()
 			}
-			if !item_interfaces.VpcId.IsNull() {
-				m_interfaces["vpcId"] = item_interfaces.VpcId.ValueString()
-			}
-			// ipFamilies: complex nested field — expand manually if needed
 			if !item_interfaces.IpAddress.IsNull() {
 				m_interfaces["ipAddress"] = item_interfaces.IpAddress.ValueString()
 			}
@@ -1239,35 +1120,6 @@ func (r *InstanceResource) Create(ctx context.Context, req resource.CreateReques
 			items_infiniband_interfaces[i_infiniband_interfaces] = m_infiniband_interfaces
 		}
 		body["infinibandInterfaces"] = items_infiniband_interfaces
-	}
-	if len(data.SpectrumXAttachments) > 0 {
-		items_spectrum_x_attachments := make([]map[string]interface{}, len(data.SpectrumXAttachments))
-		for i_spectrum_x_attachments, item_spectrum_x_attachments := range data.SpectrumXAttachments {
-			m_spectrum_x_attachments := map[string]interface{}{}
-			if !item_spectrum_x_attachments.SpectrumXPartitionId.IsNull() {
-				m_spectrum_x_attachments["spectrumXPartitionId"] = item_spectrum_x_attachments.SpectrumXPartitionId.ValueString()
-			}
-			if !item_spectrum_x_attachments.Device.IsNull() {
-				m_spectrum_x_attachments["device"] = item_spectrum_x_attachments.Device.ValueString()
-			}
-			if !item_spectrum_x_attachments.DeviceInstance.IsNull() {
-				m_spectrum_x_attachments["deviceInstance"] = item_spectrum_x_attachments.DeviceInstance.ValueInt64()
-			}
-			if !item_spectrum_x_attachments.AttachmentType.IsNull() {
-				m_spectrum_x_attachments["attachmentType"] = item_spectrum_x_attachments.AttachmentType.ValueString()
-			}
-			if !item_spectrum_x_attachments.VirtualFunctionId.IsNull() {
-				m_spectrum_x_attachments["virtualFunctionId"] = item_spectrum_x_attachments.VirtualFunctionId.ValueInt64()
-			}
-			if !item_spectrum_x_attachments.BridgeName.IsNull() {
-				m_spectrum_x_attachments["bridgeName"] = item_spectrum_x_attachments.BridgeName.ValueString()
-			}
-			if !item_spectrum_x_attachments.OvnNetworkName.IsNull() {
-				m_spectrum_x_attachments["ovnNetworkName"] = item_spectrum_x_attachments.OvnNetworkName.ValueString()
-			}
-			items_spectrum_x_attachments[i_spectrum_x_attachments] = m_spectrum_x_attachments
-		}
-		body["spectrumXAttachments"] = items_spectrum_x_attachments
 	}
 	if len(data.DpuExtensionServiceDeployments) > 0 {
 		items_dpu_extension_service_deployments := make([]map[string]interface{}, len(data.DpuExtensionServiceDeployments))
@@ -1320,13 +1172,6 @@ func (r *InstanceResource) Create(ctx context.Context, req resource.CreateReques
 	data.Description = StringFromAPI(result["description"])
 	data.TenantId = StringFromAPI(result["tenantId"])
 	data.InstanceTypeId = StringFromAPI(result["instanceTypeId"])
-	if rawMap_machine_label_selector := StringMapFromAPI(result["machineLabelSelector"]); rawMap_machine_label_selector != nil {
-		mv, d := types.MapValueFrom(ctx, types.StringType, rawMap_machine_label_selector)
-		diags.Append(d...)
-		data.MachineLabelSelector = mv
-	} else {
-		data.MachineLabelSelector = types.MapNull(types.StringType)
-	}
 	data.VpcId = StringFromAPI(result["vpcId"])
 	if rawSlice_secondary_vpc_ids := StringSliceFromAPI(result["secondaryVpcIds"]); rawSlice_secondary_vpc_ids != nil {
 		lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_secondary_vpc_ids)
@@ -1337,7 +1182,6 @@ func (r *InstanceResource) Create(ctx context.Context, req resource.CreateReques
 	}
 	data.UserData = StringFromAPI(result["userData"])
 	data.OperatingSystemId = StringFromAPI(result["operatingSystemId"])
-	data.PowerProfile = StringFromAPI(result["powerProfile"])
 	data.NetworkSecurityGroupId = StringFromAPI(result["networkSecurityGroupId"])
 	data.IpxeScript = StringFromAPI(result["ipxeScript"])
 	data.AlwaysBootWithCustomIpxe = BoolFromAPI(result["alwaysBootWithCustomIpxe"])
@@ -1358,8 +1202,6 @@ func (r *InstanceResource) Create(ctx context.Context, req resource.CreateReques
 			}
 			items_interfaces[i_interfaces].SubnetId = StringFromAPI(m_interfaces["subnetId"])
 			items_interfaces[i_interfaces].VpcPrefixId = StringFromAPI(m_interfaces["vpcPrefixId"])
-			items_interfaces[i_interfaces].VpcId = StringFromAPI(m_interfaces["vpcId"])
-			// ipFamilies: nested field — expand manually if needed
 			items_interfaces[i_interfaces].IpAddress = StringFromAPI(m_interfaces["ipAddress"])
 			items_interfaces[i_interfaces].InlineRoutingProfile = StringFromAPI(m_interfaces["inlineRoutingProfile"])
 			items_interfaces[i_interfaces].IsPhysical = BoolFromAPI(m_interfaces["isPhysical"])
@@ -1389,25 +1231,6 @@ func (r *InstanceResource) Create(ctx context.Context, req resource.CreateReques
 		data.InfinibandInterfaces = items_infiniband_interfaces
 	} else {
 		data.InfinibandInterfaces = nil
-	}
-	if rawItems_spectrum_x_attachments, ok := result["spectrumXAttachments"].([]interface{}); ok && rawItems_spectrum_x_attachments != nil {
-		items_spectrum_x_attachments := make([]InstanceSpectrumXAttachmentsItem, len(rawItems_spectrum_x_attachments))
-		for i_spectrum_x_attachments, raw_spectrum_x_attachments := range rawItems_spectrum_x_attachments {
-			m_spectrum_x_attachments, _ := raw_spectrum_x_attachments.(map[string]interface{})
-			if m_spectrum_x_attachments == nil {
-				m_spectrum_x_attachments = map[string]interface{}{}
-			}
-			items_spectrum_x_attachments[i_spectrum_x_attachments].SpectrumXPartitionId = StringFromAPI(m_spectrum_x_attachments["spectrumXPartitionId"])
-			items_spectrum_x_attachments[i_spectrum_x_attachments].Device = StringFromAPI(m_spectrum_x_attachments["device"])
-			items_spectrum_x_attachments[i_spectrum_x_attachments].DeviceInstance = Int64FromAPI(m_spectrum_x_attachments["deviceInstance"])
-			items_spectrum_x_attachments[i_spectrum_x_attachments].AttachmentType = StringFromAPI(m_spectrum_x_attachments["attachmentType"])
-			items_spectrum_x_attachments[i_spectrum_x_attachments].VirtualFunctionId = Int64FromAPI(m_spectrum_x_attachments["virtualFunctionId"])
-			items_spectrum_x_attachments[i_spectrum_x_attachments].BridgeName = StringFromAPI(m_spectrum_x_attachments["bridgeName"])
-			items_spectrum_x_attachments[i_spectrum_x_attachments].OvnNetworkName = StringFromAPI(m_spectrum_x_attachments["ovnNetworkName"])
-		}
-		data.SpectrumXAttachments = items_spectrum_x_attachments
-	} else {
-		data.SpectrumXAttachments = nil
 	}
 	if rawItems_dpu_extension_service_deployments, ok := result["dpuExtensionServiceDeployments"].([]interface{}); ok && rawItems_dpu_extension_service_deployments != nil {
 		items_dpu_extension_service_deployments := make([]InstanceDpuExtensionServiceDeploymentsItem, len(rawItems_dpu_extension_service_deployments))
@@ -1562,13 +1385,6 @@ func (r *InstanceResource) Read(ctx context.Context, req resource.ReadRequest, r
 	data.Description = StringFromAPI(result["description"])
 	data.TenantId = StringFromAPI(result["tenantId"])
 	data.InstanceTypeId = StringFromAPI(result["instanceTypeId"])
-	if rawMap_machine_label_selector := StringMapFromAPI(result["machineLabelSelector"]); rawMap_machine_label_selector != nil {
-		mv, d := types.MapValueFrom(ctx, types.StringType, rawMap_machine_label_selector)
-		diags.Append(d...)
-		data.MachineLabelSelector = mv
-	} else {
-		data.MachineLabelSelector = types.MapNull(types.StringType)
-	}
 	data.VpcId = StringFromAPI(result["vpcId"])
 	if rawSlice_secondary_vpc_ids := StringSliceFromAPI(result["secondaryVpcIds"]); rawSlice_secondary_vpc_ids != nil {
 		lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_secondary_vpc_ids)
@@ -1579,7 +1395,6 @@ func (r *InstanceResource) Read(ctx context.Context, req resource.ReadRequest, r
 	}
 	data.UserData = StringFromAPI(result["userData"])
 	data.OperatingSystemId = StringFromAPI(result["operatingSystemId"])
-	data.PowerProfile = StringFromAPI(result["powerProfile"])
 	data.NetworkSecurityGroupId = StringFromAPI(result["networkSecurityGroupId"])
 	data.IpxeScript = StringFromAPI(result["ipxeScript"])
 	data.AlwaysBootWithCustomIpxe = BoolFromAPI(result["alwaysBootWithCustomIpxe"])
@@ -1600,8 +1415,6 @@ func (r *InstanceResource) Read(ctx context.Context, req resource.ReadRequest, r
 			}
 			items_interfaces[i_interfaces].SubnetId = StringFromAPI(m_interfaces["subnetId"])
 			items_interfaces[i_interfaces].VpcPrefixId = StringFromAPI(m_interfaces["vpcPrefixId"])
-			items_interfaces[i_interfaces].VpcId = StringFromAPI(m_interfaces["vpcId"])
-			// ipFamilies: nested field — expand manually if needed
 			items_interfaces[i_interfaces].IpAddress = StringFromAPI(m_interfaces["ipAddress"])
 			items_interfaces[i_interfaces].InlineRoutingProfile = StringFromAPI(m_interfaces["inlineRoutingProfile"])
 			items_interfaces[i_interfaces].IsPhysical = BoolFromAPI(m_interfaces["isPhysical"])
@@ -1631,25 +1444,6 @@ func (r *InstanceResource) Read(ctx context.Context, req resource.ReadRequest, r
 		data.InfinibandInterfaces = items_infiniband_interfaces
 	} else {
 		data.InfinibandInterfaces = nil
-	}
-	if rawItems_spectrum_x_attachments, ok := result["spectrumXAttachments"].([]interface{}); ok && rawItems_spectrum_x_attachments != nil {
-		items_spectrum_x_attachments := make([]InstanceSpectrumXAttachmentsItem, len(rawItems_spectrum_x_attachments))
-		for i_spectrum_x_attachments, raw_spectrum_x_attachments := range rawItems_spectrum_x_attachments {
-			m_spectrum_x_attachments, _ := raw_spectrum_x_attachments.(map[string]interface{})
-			if m_spectrum_x_attachments == nil {
-				m_spectrum_x_attachments = map[string]interface{}{}
-			}
-			items_spectrum_x_attachments[i_spectrum_x_attachments].SpectrumXPartitionId = StringFromAPI(m_spectrum_x_attachments["spectrumXPartitionId"])
-			items_spectrum_x_attachments[i_spectrum_x_attachments].Device = StringFromAPI(m_spectrum_x_attachments["device"])
-			items_spectrum_x_attachments[i_spectrum_x_attachments].DeviceInstance = Int64FromAPI(m_spectrum_x_attachments["deviceInstance"])
-			items_spectrum_x_attachments[i_spectrum_x_attachments].AttachmentType = StringFromAPI(m_spectrum_x_attachments["attachmentType"])
-			items_spectrum_x_attachments[i_spectrum_x_attachments].VirtualFunctionId = Int64FromAPI(m_spectrum_x_attachments["virtualFunctionId"])
-			items_spectrum_x_attachments[i_spectrum_x_attachments].BridgeName = StringFromAPI(m_spectrum_x_attachments["bridgeName"])
-			items_spectrum_x_attachments[i_spectrum_x_attachments].OvnNetworkName = StringFromAPI(m_spectrum_x_attachments["ovnNetworkName"])
-		}
-		data.SpectrumXAttachments = items_spectrum_x_attachments
-	} else {
-		data.SpectrumXAttachments = nil
 	}
 	if rawItems_dpu_extension_service_deployments, ok := result["dpuExtensionServiceDeployments"].([]interface{}); ok && rawItems_dpu_extension_service_deployments != nil {
 		items_dpu_extension_service_deployments := make([]InstanceDpuExtensionServiceDeploymentsItem, len(rawItems_dpu_extension_service_deployments))
@@ -1801,9 +1595,6 @@ func (r *InstanceResource) Update(ctx context.Context, req resource.UpdateReques
 	if !data.OperatingSystemId.IsNull() && !data.OperatingSystemId.IsUnknown() {
 		body["operatingSystemId"] = data.OperatingSystemId.ValueString()
 	}
-	if !data.PowerProfile.IsNull() && !data.PowerProfile.IsUnknown() {
-		body["powerProfile"] = data.PowerProfile.ValueString()
-	}
 	if !data.NetworkSecurityGroupId.IsNull() && !data.NetworkSecurityGroupId.IsUnknown() {
 		body["networkSecurityGroupId"] = data.NetworkSecurityGroupId.ValueString()
 	}
@@ -1831,10 +1622,6 @@ func (r *InstanceResource) Update(ctx context.Context, req resource.UpdateReques
 			if !item_interfaces.VpcPrefixId.IsNull() {
 				m_interfaces["vpcPrefixId"] = item_interfaces.VpcPrefixId.ValueString()
 			}
-			if !item_interfaces.VpcId.IsNull() {
-				m_interfaces["vpcId"] = item_interfaces.VpcId.ValueString()
-			}
-			// ipFamilies: complex nested field — expand manually if needed
 			if !item_interfaces.IpAddress.IsNull() {
 				m_interfaces["ipAddress"] = item_interfaces.IpAddress.ValueString()
 			}
@@ -1885,35 +1672,6 @@ func (r *InstanceResource) Update(ctx context.Context, req resource.UpdateReques
 			items_infiniband_interfaces[i_infiniband_interfaces] = m_infiniband_interfaces
 		}
 		body["infinibandInterfaces"] = items_infiniband_interfaces
-	}
-	if len(data.SpectrumXAttachments) > 0 {
-		items_spectrum_x_attachments := make([]map[string]interface{}, len(data.SpectrumXAttachments))
-		for i_spectrum_x_attachments, item_spectrum_x_attachments := range data.SpectrumXAttachments {
-			m_spectrum_x_attachments := map[string]interface{}{}
-			if !item_spectrum_x_attachments.SpectrumXPartitionId.IsNull() {
-				m_spectrum_x_attachments["spectrumXPartitionId"] = item_spectrum_x_attachments.SpectrumXPartitionId.ValueString()
-			}
-			if !item_spectrum_x_attachments.Device.IsNull() {
-				m_spectrum_x_attachments["device"] = item_spectrum_x_attachments.Device.ValueString()
-			}
-			if !item_spectrum_x_attachments.DeviceInstance.IsNull() {
-				m_spectrum_x_attachments["deviceInstance"] = item_spectrum_x_attachments.DeviceInstance.ValueInt64()
-			}
-			if !item_spectrum_x_attachments.AttachmentType.IsNull() {
-				m_spectrum_x_attachments["attachmentType"] = item_spectrum_x_attachments.AttachmentType.ValueString()
-			}
-			if !item_spectrum_x_attachments.VirtualFunctionId.IsNull() {
-				m_spectrum_x_attachments["virtualFunctionId"] = item_spectrum_x_attachments.VirtualFunctionId.ValueInt64()
-			}
-			if !item_spectrum_x_attachments.BridgeName.IsNull() {
-				m_spectrum_x_attachments["bridgeName"] = item_spectrum_x_attachments.BridgeName.ValueString()
-			}
-			if !item_spectrum_x_attachments.OvnNetworkName.IsNull() {
-				m_spectrum_x_attachments["ovnNetworkName"] = item_spectrum_x_attachments.OvnNetworkName.ValueString()
-			}
-			items_spectrum_x_attachments[i_spectrum_x_attachments] = m_spectrum_x_attachments
-		}
-		body["spectrumXAttachments"] = items_spectrum_x_attachments
 	}
 	if len(data.DpuExtensionServiceDeployments) > 0 {
 		items_dpu_extension_service_deployments := make([]map[string]interface{}, len(data.DpuExtensionServiceDeployments))
@@ -1975,13 +1733,6 @@ func (r *InstanceResource) Update(ctx context.Context, req resource.UpdateReques
 	data.Description = StringFromAPI(result["description"])
 	data.TenantId = StringFromAPI(result["tenantId"])
 	data.InstanceTypeId = StringFromAPI(result["instanceTypeId"])
-	if rawMap_machine_label_selector := StringMapFromAPI(result["machineLabelSelector"]); rawMap_machine_label_selector != nil {
-		mv, d := types.MapValueFrom(ctx, types.StringType, rawMap_machine_label_selector)
-		diags.Append(d...)
-		data.MachineLabelSelector = mv
-	} else {
-		data.MachineLabelSelector = types.MapNull(types.StringType)
-	}
 	data.VpcId = StringFromAPI(result["vpcId"])
 	if rawSlice_secondary_vpc_ids := StringSliceFromAPI(result["secondaryVpcIds"]); rawSlice_secondary_vpc_ids != nil {
 		lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_secondary_vpc_ids)
@@ -1992,7 +1743,6 @@ func (r *InstanceResource) Update(ctx context.Context, req resource.UpdateReques
 	}
 	data.UserData = StringFromAPI(result["userData"])
 	data.OperatingSystemId = StringFromAPI(result["operatingSystemId"])
-	data.PowerProfile = StringFromAPI(result["powerProfile"])
 	data.NetworkSecurityGroupId = StringFromAPI(result["networkSecurityGroupId"])
 	data.IpxeScript = StringFromAPI(result["ipxeScript"])
 	data.AlwaysBootWithCustomIpxe = BoolFromAPI(result["alwaysBootWithCustomIpxe"])
@@ -2013,8 +1763,6 @@ func (r *InstanceResource) Update(ctx context.Context, req resource.UpdateReques
 			}
 			items_interfaces[i_interfaces].SubnetId = StringFromAPI(m_interfaces["subnetId"])
 			items_interfaces[i_interfaces].VpcPrefixId = StringFromAPI(m_interfaces["vpcPrefixId"])
-			items_interfaces[i_interfaces].VpcId = StringFromAPI(m_interfaces["vpcId"])
-			// ipFamilies: nested field — expand manually if needed
 			items_interfaces[i_interfaces].IpAddress = StringFromAPI(m_interfaces["ipAddress"])
 			items_interfaces[i_interfaces].InlineRoutingProfile = StringFromAPI(m_interfaces["inlineRoutingProfile"])
 			items_interfaces[i_interfaces].IsPhysical = BoolFromAPI(m_interfaces["isPhysical"])
@@ -2044,25 +1792,6 @@ func (r *InstanceResource) Update(ctx context.Context, req resource.UpdateReques
 		data.InfinibandInterfaces = items_infiniband_interfaces
 	} else {
 		data.InfinibandInterfaces = nil
-	}
-	if rawItems_spectrum_x_attachments, ok := result["spectrumXAttachments"].([]interface{}); ok && rawItems_spectrum_x_attachments != nil {
-		items_spectrum_x_attachments := make([]InstanceSpectrumXAttachmentsItem, len(rawItems_spectrum_x_attachments))
-		for i_spectrum_x_attachments, raw_spectrum_x_attachments := range rawItems_spectrum_x_attachments {
-			m_spectrum_x_attachments, _ := raw_spectrum_x_attachments.(map[string]interface{})
-			if m_spectrum_x_attachments == nil {
-				m_spectrum_x_attachments = map[string]interface{}{}
-			}
-			items_spectrum_x_attachments[i_spectrum_x_attachments].SpectrumXPartitionId = StringFromAPI(m_spectrum_x_attachments["spectrumXPartitionId"])
-			items_spectrum_x_attachments[i_spectrum_x_attachments].Device = StringFromAPI(m_spectrum_x_attachments["device"])
-			items_spectrum_x_attachments[i_spectrum_x_attachments].DeviceInstance = Int64FromAPI(m_spectrum_x_attachments["deviceInstance"])
-			items_spectrum_x_attachments[i_spectrum_x_attachments].AttachmentType = StringFromAPI(m_spectrum_x_attachments["attachmentType"])
-			items_spectrum_x_attachments[i_spectrum_x_attachments].VirtualFunctionId = Int64FromAPI(m_spectrum_x_attachments["virtualFunctionId"])
-			items_spectrum_x_attachments[i_spectrum_x_attachments].BridgeName = StringFromAPI(m_spectrum_x_attachments["bridgeName"])
-			items_spectrum_x_attachments[i_spectrum_x_attachments].OvnNetworkName = StringFromAPI(m_spectrum_x_attachments["ovnNetworkName"])
-		}
-		data.SpectrumXAttachments = items_spectrum_x_attachments
-	} else {
-		data.SpectrumXAttachments = nil
 	}
 	if rawItems_dpu_extension_service_deployments, ok := result["dpuExtensionServiceDeployments"].([]interface{}); ok && rawItems_dpu_extension_service_deployments != nil {
 		items_dpu_extension_service_deployments := make([]InstanceDpuExtensionServiceDeploymentsItem, len(rawItems_dpu_extension_service_deployments))
@@ -2213,13 +1942,6 @@ func (r *InstanceResource) populateModel(ctx context.Context, data *InstanceReso
 	data.Description = StringFromAPI(result["description"])
 	data.TenantId = StringFromAPI(result["tenantId"])
 	data.InstanceTypeId = StringFromAPI(result["instanceTypeId"])
-	if rawMap_machine_label_selector := StringMapFromAPI(result["machineLabelSelector"]); rawMap_machine_label_selector != nil {
-		mv, d := types.MapValueFrom(ctx, types.StringType, rawMap_machine_label_selector)
-		diags.Append(d...)
-		data.MachineLabelSelector = mv
-	} else {
-		data.MachineLabelSelector = types.MapNull(types.StringType)
-	}
 	data.VpcId = StringFromAPI(result["vpcId"])
 	if rawSlice_secondary_vpc_ids := StringSliceFromAPI(result["secondaryVpcIds"]); rawSlice_secondary_vpc_ids != nil {
 		lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_secondary_vpc_ids)
@@ -2230,7 +1952,6 @@ func (r *InstanceResource) populateModel(ctx context.Context, data *InstanceReso
 	}
 	data.UserData = StringFromAPI(result["userData"])
 	data.OperatingSystemId = StringFromAPI(result["operatingSystemId"])
-	data.PowerProfile = StringFromAPI(result["powerProfile"])
 	data.NetworkSecurityGroupId = StringFromAPI(result["networkSecurityGroupId"])
 	data.IpxeScript = StringFromAPI(result["ipxeScript"])
 	data.AlwaysBootWithCustomIpxe = BoolFromAPI(result["alwaysBootWithCustomIpxe"])
@@ -2251,8 +1972,6 @@ func (r *InstanceResource) populateModel(ctx context.Context, data *InstanceReso
 			}
 			items_interfaces[i_interfaces].SubnetId = StringFromAPI(m_interfaces["subnetId"])
 			items_interfaces[i_interfaces].VpcPrefixId = StringFromAPI(m_interfaces["vpcPrefixId"])
-			items_interfaces[i_interfaces].VpcId = StringFromAPI(m_interfaces["vpcId"])
-			// ipFamilies: nested field — expand manually if needed
 			items_interfaces[i_interfaces].IpAddress = StringFromAPI(m_interfaces["ipAddress"])
 			items_interfaces[i_interfaces].InlineRoutingProfile = StringFromAPI(m_interfaces["inlineRoutingProfile"])
 			items_interfaces[i_interfaces].IsPhysical = BoolFromAPI(m_interfaces["isPhysical"])
@@ -2282,25 +2001,6 @@ func (r *InstanceResource) populateModel(ctx context.Context, data *InstanceReso
 		data.InfinibandInterfaces = items_infiniband_interfaces
 	} else {
 		data.InfinibandInterfaces = nil
-	}
-	if rawItems_spectrum_x_attachments, ok := result["spectrumXAttachments"].([]interface{}); ok && rawItems_spectrum_x_attachments != nil {
-		items_spectrum_x_attachments := make([]InstanceSpectrumXAttachmentsItem, len(rawItems_spectrum_x_attachments))
-		for i_spectrum_x_attachments, raw_spectrum_x_attachments := range rawItems_spectrum_x_attachments {
-			m_spectrum_x_attachments, _ := raw_spectrum_x_attachments.(map[string]interface{})
-			if m_spectrum_x_attachments == nil {
-				m_spectrum_x_attachments = map[string]interface{}{}
-			}
-			items_spectrum_x_attachments[i_spectrum_x_attachments].SpectrumXPartitionId = StringFromAPI(m_spectrum_x_attachments["spectrumXPartitionId"])
-			items_spectrum_x_attachments[i_spectrum_x_attachments].Device = StringFromAPI(m_spectrum_x_attachments["device"])
-			items_spectrum_x_attachments[i_spectrum_x_attachments].DeviceInstance = Int64FromAPI(m_spectrum_x_attachments["deviceInstance"])
-			items_spectrum_x_attachments[i_spectrum_x_attachments].AttachmentType = StringFromAPI(m_spectrum_x_attachments["attachmentType"])
-			items_spectrum_x_attachments[i_spectrum_x_attachments].VirtualFunctionId = Int64FromAPI(m_spectrum_x_attachments["virtualFunctionId"])
-			items_spectrum_x_attachments[i_spectrum_x_attachments].BridgeName = StringFromAPI(m_spectrum_x_attachments["bridgeName"])
-			items_spectrum_x_attachments[i_spectrum_x_attachments].OvnNetworkName = StringFromAPI(m_spectrum_x_attachments["ovnNetworkName"])
-		}
-		data.SpectrumXAttachments = items_spectrum_x_attachments
-	} else {
-		data.SpectrumXAttachments = nil
 	}
 	if rawItems_dpu_extension_service_deployments, ok := result["dpuExtensionServiceDeployments"].([]interface{}); ok && rawItems_dpu_extension_service_deployments != nil {
 		items_dpu_extension_service_deployments := make([]InstanceDpuExtensionServiceDeploymentsItem, len(rawItems_dpu_extension_service_deployments))

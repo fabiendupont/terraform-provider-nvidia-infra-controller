@@ -30,7 +30,6 @@ type ExpectedRackDataSourceModel struct {
 	SiteId        types.String `tfsdk:"site_id"`
 	RackId        types.String `tfsdk:"rack_id"`
 	RackProfileId types.String `tfsdk:"rack_profile_id"`
-	RackGroupId   types.String `tfsdk:"rack_group_id"`
 	Name          types.String `tfsdk:"name"`
 	Description   types.String `tfsdk:"description"`
 	Labels        types.Map    `tfsdk:"labels"`
@@ -64,12 +63,6 @@ func (d *ExpectedRackDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 				Optional:    false,
 				Computed:    true,
 				Description: "Identifier of the Rack Profile this rack conforms to",
-			},
-			"rack_group_id": schema.StringAttribute{
-				Required:    false,
-				Optional:    false,
-				Computed:    true,
-				Description: "External rack group ID selected and persisted at creation together with rackProfileId. Null for legacy rows without a recorded group; metadata updates preserve it.",
 			},
 			"name": schema.StringAttribute{
 				Required:    false,
@@ -143,7 +136,6 @@ func (d *ExpectedRackDataSource) Read(ctx context.Context, req datasource.ReadRe
 		diags := resp.Diagnostics
 		data.RackId = StringFromAPI(result["rackId"])
 		data.RackProfileId = StringFromAPI(result["rackProfileId"])
-		data.RackGroupId = StringFromAPI(result["rackGroupId"])
 		data.Name = StringFromAPI(result["name"])
 		data.Description = StringFromAPI(result["description"])
 		if rawMap_labels := StringMapFromAPI(result["labels"]); rawMap_labels != nil {
@@ -169,7 +161,6 @@ func (d *ExpectedRackDataSource) Read(ctx context.Context, req datasource.ReadRe
 			diags := resp.Diagnostics
 			data.RackId = StringFromAPI(result["rackId"])
 			data.RackProfileId = StringFromAPI(result["rackProfileId"])
-			data.RackGroupId = StringFromAPI(result["rackGroupId"])
 			data.Name = StringFromAPI(result["name"])
 			data.Description = StringFromAPI(result["description"])
 			if rawMap_labels := StringMapFromAPI(result["labels"]); rawMap_labels != nil {
@@ -191,7 +182,6 @@ func (d *ExpectedRackDataSource) Read(ctx context.Context, req datasource.ReadRe
 func (d *ExpectedRackDataSource) populateModel(ctx context.Context, data *ExpectedRackDataSourceModel, result map[string]interface{}, diags diag.Diagnostics) {
 	data.RackId = StringFromAPI(result["rackId"])
 	data.RackProfileId = StringFromAPI(result["rackProfileId"])
-	data.RackGroupId = StringFromAPI(result["rackGroupId"])
 	data.Name = StringFromAPI(result["name"])
 	data.Description = StringFromAPI(result["description"])
 	if rawMap_labels := StringMapFromAPI(result["labels"]); rawMap_labels != nil {

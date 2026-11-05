@@ -33,23 +33,20 @@ resource "nico_operating_system" "example" {
 - `description` (String) Optional description of the Operating System
 - `image_auth_token` (String) Auth token to retrieve the image from image URL, required if imageAuthType is specified
 - `image_auth_type` (String) Authentication type for image URL, if needed, e.g., basic/bearer/token; required if imageAuthToken is specified
-- `image_disk` (String) Optional whole-disk target that will be overwritten with the image. Accepts `smallest`, `/dev/nvme<controller>n<namespace>`, `/dev/sd<letters>`, `/dev/vd<letters>`, or `/dev/disk/by-id/<identifier>`. `smallest` selects the smallest enumerated whole disk, preferring one with an EFI partition to break a size tie. Partition aliases ending in `-part<digits>` are rejected. When omitted, null, or empty on creation, the Site prefers a disk with an EFI partition, then falls back to `/dev/nvme0n1` or `/dev/sda`.
+- `image_disk` (String) Disk path where the image should be mounted, optional
 - `image_sha` (String) SHA hash of the image file, required for image-based OS
 - `image_url` (String) Original URL from which the Operating System image can be retrieved; required for image-based OS. Cannot be specified if ipxeScript is specified
 - `infrastructure_provider_id` (String) Deprecated: Infrastructure Provider is now inferred from org membership.
-- `ipxe_script` (String) Deprecated: raw iPXE Operating Systems are superseded by Templated iPXE (ipxeTemplateId). iPXE script or URL, only applicable for iPXE-based OS. Cannot be specified if imageUrl is specified.
-- `ipxe_template_artifacts` (Attributes List) Artifacts (kernel, initrd, ISO, ...) for the iPXE OS definition (Templated iPXE only). (see [below for nested schema](#nestedatt--ipxe_template_artifacts))
-- `ipxe_template_id` (String) ID of the iPXE template to use; identifies a Templated iPXE Operating System. Mutually exclusive with ipxeScript and imageUrl.
-- `ipxe_template_parameters` (Attributes List) Parameters passed to the iPXE template (Templated iPXE only). (see [below for nested schema](#nestedatt--ipxe_template_parameters))
+- `ipxe_script` (String) iPXE script or URL, only applicable for iPXE-based OS. Cannot be specified if imageUrl is specified
 - `is_active` (Boolean) Indicates if the Operating System is active
-- `is_cloud_init` (Boolean) Deprecated and ignored: whether the Operating System is cloud-init based. Value now derived from `userData`.
+- `is_cloud_init` (Boolean) Specified when the Operating System is cloud-init based
 - `operating_system_id` (String) Path parameter: operating_system_id.
 - `phone_home_enabled` (Boolean) Indicates whether the Phone Home service should be enabled or disabled for Operating System
 - `root_fs_id` (String) Root filesystem UUID; this or `rootFsLabel` is required for image-based OS
 - `root_fs_label` (String) Root filesystem label; this or `rootFsId` is required for image-based OS
-- `site_ids` (List of String) Target Site for the Operating System. For image-based and Templated iPXE Operating Systems exactly one Site is required, even though this field is an array. The list is fixed at creation and cannot be changed on update. Not applicable to raw iPXE OS.
+- `site_ids` (List of String) Specify only one Site if an Operating System is image-based; more than one Site is not supported.
 - `tenant_id` (String) Deprecated: Tenant is now inferred from org membership.
-- `user_data` (String) User data for the Operating System. Limited to 32768 bytes (32 KiB), measured on the effective value NICo stores rather than the text submitted. Operating System defaults are inherited first, and when phone-home is configured the document is re-serialized with a `phone_home` block added. Re-serialization normalizes indentation and can grow the document, so a request just under the limit may still be rejected.
+- `user_data` (String) User data for the Operating System
 
 ### Read-Only
 
@@ -60,28 +57,6 @@ resource "nico_operating_system" "example" {
 - `status_history` (Attributes List) History of status changes over time (see [below for nested schema](#nestedatt--status_history))
 - `type` (String) Type of the Operating System
 - `updated` (String) Date/time when the Operating System was updated
-
-<a id="nestedatt--ipxe_template_artifacts"></a>
-### Nested Schema for `ipxe_template_artifacts`
-
-Read-Only:
-
-- `auth_token` (String) Optional auth token. Redacted in API responses.
-- `auth_type` (String) Optional auth type: Basic or Bearer
-- `cache_strategy` (String) How to handle caching for this artifact
-- `name` (String) Artifact name
-- `sha` (String) Optional SHA256 checksum
-- `url` (String) Original URL for the artifact
-
-
-<a id="nestedatt--ipxe_template_parameters"></a>
-### Nested Schema for `ipxe_template_parameters`
-
-Read-Only:
-
-- `name` (String) Parameter name (used as a variable in the template)
-- `value` (String) Parameter value
-
 
 <a id="nestedatt--site_associations"></a>
 ### Nested Schema for `site_associations`
@@ -112,13 +87,11 @@ Read-Only:
 
 Read-Only:
 
-- `dps_power_management` (Boolean) Whether this Site accepts non-empty power resource groups and power profiles for DPS power management. When false, omission and explicit clearing remain allowed.
 - `flow` (Boolean) Whether the Site supports Flow-based operations
 - `image_based_operating_system` (Boolean) Whether the Site supports image-based operating system provisioning
 - `native_networking` (Boolean) Whether the Site supports native networking
 - `network_security_group` (Boolean) Whether the Site supports Network Security Groups
 - `nv_link_partition` (Boolean) Whether the Site supports NVLink partitioning
-- `vpc_slaac` (Boolean) Whether the latest successfully stored Site configuration inventory reports that Core supports VPCs with SLAAC enabled. False also represents a missing Site configuration or an inventory report that omits the capability. This value is managed by Site configuration inventory and cannot be updated through the Site API.
 
 
 

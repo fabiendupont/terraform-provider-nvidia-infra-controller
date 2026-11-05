@@ -36,7 +36,6 @@ output "expected_rack_name" {
 - `description` (String) Human-readable description of the Expected Rack
 - `labels` (Map of String) User-defined key-value pairs for organizing and categorizing Expected Racks. Well-known keys (`chassis.*`, `location.*`) are used to convey chassis identity and physical location.
 - `name` (String) Human-readable name of the Expected Rack
-- `rack_group_id` (String) External rack group ID selected and persisted at creation together with rackProfileId. Null for legacy rows without a recorded group; metadata updates preserve it.
 - `rack_id` (String) Operator-supplied identifier for the rack (string, not UUID). Unique within a Site.
 - `rack_profile_id` (String) Identifier of the Rack Profile this rack conforms to
 - `updated` (String) ISO 8601 datetime when the Expected Rack was last updated

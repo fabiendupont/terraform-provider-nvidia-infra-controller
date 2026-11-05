@@ -41,16 +41,13 @@ output "operating_system_name" {
 - `description` (String) Optional description of the Operating System
 - `image_auth_token` (String) Auth token to retrieve the image from image URL
 - `image_auth_type` (String) Authentication type for image URL, e.g., 'Basic' or 'Bearer'
-- `image_disk` (String) Whole-disk target that will be overwritten with the image. Accepts `smallest`, `/dev/nvme<controller>n<namespace>`, `/dev/sd<letters>`, `/dev/vd<letters>`, or `/dev/disk/by-id/<identifier>`. `smallest` selects the smallest enumerated whole disk, preferring one with an EFI partition to break a size tie. Partition aliases ending in `-part<digits>` are rejected. An empty stored value means the Site prefers a disk with an EFI partition, then falls back to `/dev/nvme0n1` or `/dev/sda`.
+- `image_disk` (String) Disk path where the image should be mounted
 - `image_sha` (String) SHA hash of the image file, only present for image-based OS
 - `image_url` (String) Original URL from which the Operating System image can be retrieved
 - `infrastructure_provider_id` (String) Specified if a Provider owns the Operating System
 - `ipxe_script` (String) iPXE script or URL, only applicable for iPXE-based Operating System
-- `ipxe_template_artifacts` (Attributes List) Artifacts for the iPXE OS definition (Templated iPXE only). authToken is redacted. (see [below for nested schema](#nestedatt--ipxe_template_artifacts))
-- `ipxe_template_id` (String) ID of the iPXE template used, only present for Templated iPXE Operating System
-- `ipxe_template_parameters` (Attributes List) Parameters passed to the iPXE template (Templated iPXE only) (see [below for nested schema](#nestedatt--ipxe_template_parameters))
 - `is_active` (Boolean) Indicates if the Operating System is active
-- `is_cloud_init` (Boolean) Whether the Operating System is cloud-init based; true if there is non-empty `userData`, false otherwise.
+- `is_cloud_init` (Boolean) Specified when the Operating System is cloud-init based
 - `name` (String) Name of the Operating System
 - `phone_home_enabled` (Boolean) Indicates whether the Phone Home service should be enabled or disabled for Operating System
 - `root_fs_id` (String) Root filesystem UUID, only applicable for image-based Operating System
@@ -60,28 +57,6 @@ output "operating_system_name" {
 - `tenant_id` (String) Specified if a Tenant owns the Operating System
 - `updated` (String) Date/time when the Operating System was updated
 - `user_data` (String) User data for the Operating System
-
-<a id="nestedatt--ipxe_template_artifacts"></a>
-### Nested Schema for `ipxe_template_artifacts`
-
-Read-Only:
-
-- `auth_token` (String) Optional auth token. Redacted in API responses.
-- `auth_type` (String) Optional auth type: Basic or Bearer
-- `cache_strategy` (String) How to handle caching for this artifact
-- `name` (String) Artifact name
-- `sha` (String) Optional SHA256 checksum
-- `url` (String) Original URL for the artifact
-
-
-<a id="nestedatt--ipxe_template_parameters"></a>
-### Nested Schema for `ipxe_template_parameters`
-
-Read-Only:
-
-- `name` (String) Parameter name (used as a variable in the template)
-- `value` (String) Parameter value
-
 
 <a id="nestedatt--site_associations"></a>
 ### Nested Schema for `site_associations`
@@ -112,13 +87,11 @@ Read-Only:
 
 Read-Only:
 
-- `dps_power_management` (Boolean) Whether this Site accepts non-empty power resource groups and power profiles for DPS power management. When false, omission and explicit clearing remain allowed.
 - `flow` (Boolean) Whether the Site supports Flow-based operations
 - `image_based_operating_system` (Boolean) Whether the Site supports image-based operating system provisioning
 - `native_networking` (Boolean) Whether the Site supports native networking
 - `network_security_group` (Boolean) Whether the Site supports Network Security Groups
 - `nv_link_partition` (Boolean) Whether the Site supports NVLink partitioning
-- `vpc_slaac` (Boolean) Whether the latest successfully stored Site configuration inventory reports that Core supports VPCs with SLAAC enabled. False also represents a missing Site configuration or an inventory report that omits the capability. This value is managed by Site configuration inventory and cannot be updated through the Site API.
 
 
 

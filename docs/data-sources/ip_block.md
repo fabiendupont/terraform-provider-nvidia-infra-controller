@@ -29,11 +29,11 @@ output "ip_block_name" {
 
 - `id` (String) ID of the resource to retrieve. When set, returns a single resource.
 - `include_usage_stats` (String) Include IP Block usage stats in response
-- `infrastructure_provider_id` (String) Filter IP Blocks by Infrastructure Provider ID. Deprecated: Infrastructure Provider is now inferred from the org's membership.
+- `infrastructure_provider_id` (String) Filter IP Blocks by Infrastructure Provider ID
 - `query` (String) Search for matches across all IP Blocks. Input will be matched against name, description, and status fields
 - `site_id` (String) Filter IP Blocks by Site ID
 - `status` (String) Filter IP Blocks by Status
-- `tenant_id` (String) Filter IP Blocks by Tenant ID. Deprecated: Tenant is now inferred from the org's membership.
+- `tenant_id` (String) Filter IP Blocks by Tenant ID
 
 ### Read-Only
 
@@ -66,6 +66,6 @@ Read-Only:
 
 - `acquired_i_ps` (Number) Number of individual IP addresses acquired from the block
 - `acquired_prefixes` (Number) Total number of prefixes (of any size) acquired from this block
-- `available_i_ps` (Number) Total number of IP addresses in the block (acquired and unused), capped at 2,147,483,647. An IP Block allocated to one child prefix of the same size reports zero.
+- `available_i_ps` (Number) Total number of IP addresses in the block (acquired and unused)
 - `available_prefixes` (List of String) Example prefixes available to acquire
-- `available_smallest_prefixes` (Number) Number of complete `/30` IPv4 prefixes or `/126` IPv6 prefixes remaining after acquired child prefixes are excluded. Both prefix sizes contain four addresses. The count is capped at 2,147,483,647. The `acquiredIPs` count is not subtracted.
+- `available_smallest_prefixes` (Number) Total number of /30 prefixes that can still be acquired from this block (only reduced if prefixes are acquired, not reduced by acquired IPs)

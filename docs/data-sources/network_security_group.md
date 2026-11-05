@@ -65,13 +65,13 @@ Read-Only:
 
 - `action` (String) Action applied when traffic matches the rule
 - `destination_port_range` (String) Destination port or port range matched by the rule
-- `destination_prefix` (String) Destination IPv4 or IPv6 CIDR prefix matched by the rule. Must use the same IP version as sourcePrefix.
+- `destination_prefix` (String) Destination CIDR prefix matched by the rule
 - `direction` (String) Traffic direction the rule applies to
 - `name` (String) Name of the Network Security Group rule
 - `priority` (Number) Rule priority used to order evaluation
-- `protocol` (String) Network protocol matched by the rule. ICMP requires IPv4 prefixes; ICMP6 requires IPv6 prefixes. TCP, UDP, and ANY support either IP version.
+- `protocol` (String) Network protocol matched by the rule
 - `source_port_range` (String) Source port or port range matched by the rule
-- `source_prefix` (String) Source IPv4 or IPv6 CIDR prefix matched by the rule. Must use the same IP version as destinationPrefix.
+- `source_prefix` (String) Source CIDR prefix matched by the rule
 
 
 <a id="nestedatt--status_history"></a>

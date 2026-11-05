@@ -30,7 +30,6 @@ type DpuExtensionServiceResourceModel struct {
 	Name                  types.String                      `tfsdk:"name"`
 	Description           types.String                      `tfsdk:"description"`
 	ServiceType           types.String                      `tfsdk:"service_type"`
-	DpuTarget             types.String                      `tfsdk:"dpu_target"`
 	SiteId                types.String                      `tfsdk:"site_id"`
 	Data                  types.String                      `tfsdk:"data"`
 	Credentials           *DpuExtensionServiceCredentials   `tfsdk:"credentials"`
@@ -72,7 +71,7 @@ func (r *DpuExtensionServiceResource) Metadata(_ context.Context, req resource.M
 
 func (r *DpuExtensionServiceResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "DPU Extension Service allows users to run custom services in the DPUs of their Instances. KubernetesPod is delivered through the DPU agent; DpfHelmChart is reconciled through DPF.",
+		Description: "DPU Extension Service allows users to run custom services in the DPUs of their Instances. Currently K8s pods are the only supported service type.",
 		Attributes: map[string]schema.Attribute{
 			// id is always computed
 			"id": schema.StringAttribute{Computed: true, Description: "The resource ID."},
@@ -94,12 +93,6 @@ func (r *DpuExtensionServiceResource) Schema(_ context.Context, _ resource.Schem
 				Computed:    false,
 				Description: "Type of the DPU Extension Service",
 			},
-			"dpu_target": schema.StringAttribute{
-				Required:    false,
-				Optional:    true,
-				Computed:    true,
-				Description: "Required for DpfHelmChart services and unsupported for KubernetesPod services",
-			},
 			"site_id": schema.StringAttribute{
 				Required:    true,
 				Optional:    false,
@@ -110,13 +103,13 @@ func (r *DpuExtensionServiceResource) Schema(_ context.Context, _ resource.Schem
 				Required:    true,
 				Optional:    false,
 				Computed:    false,
-				Description: "Deployment specification as a string, limited to 131072 UTF-8 bytes. Use a YAML/JSON Pod manifest for KubernetesPod or JSON-encoded Helm configuration for DpfHelmChart. The object schema documents the Helm structure; requests must still send a string.",
+				Description: "Deployment spec for the DPU Extension Service",
 			},
 			"credentials": schema.SingleNestedAttribute{
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "Credentials to download resources specified in DPU Extension Service data; unsupported for DpfHelmChart",
+				Description: "Credentials to download resources specified in DPU Extension Service data",
 				Attributes: map[string]schema.Attribute{
 					"registry_url": schema.StringAttribute{
 						Required:    false,
@@ -142,7 +135,7 @@ func (r *DpuExtensionServiceResource) Schema(_ context.Context, _ resource.Schem
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "Observability configuration for the DPU Extension Service version; unsupported for DpfHelmChart",
+				Description: "Observability configuration for the DPU Extension Service version",
 				Attributes: map[string]schema.Attribute{
 					"configs": schema.ListNestedAttribute{
 						Required:    false,
@@ -256,9 +249,6 @@ func (r *DpuExtensionServiceResource) Create(ctx context.Context, req resource.C
 	if !data.ServiceType.IsNull() && !data.ServiceType.IsUnknown() {
 		body["serviceType"] = data.ServiceType.ValueString()
 	}
-	if !data.DpuTarget.IsNull() && !data.DpuTarget.IsUnknown() {
-		body["dpuTarget"] = data.DpuTarget.ValueString()
-	}
 	if !data.SiteId.IsNull() && !data.SiteId.IsUnknown() {
 		body["siteId"] = data.SiteId.ValueString()
 	}
@@ -296,7 +286,6 @@ func (r *DpuExtensionServiceResource) Create(ctx context.Context, req resource.C
 	data.Name = StringFromAPI(result["name"])
 	data.Description = StringFromAPI(result["description"])
 	data.ServiceType = StringFromAPI(result["serviceType"])
-	data.DpuTarget = StringFromAPI(result["dpuTarget"])
 	data.SiteId = StringFromAPI(result["siteId"])
 	data.Data = StringFromAPI(result["data"])
 	if rawObj_credentials, ok := result["credentials"].(map[string]interface{}); ok {
@@ -348,7 +337,6 @@ func (r *DpuExtensionServiceResource) Read(ctx context.Context, req resource.Rea
 	data.Name = StringFromAPI(result["name"])
 	data.Description = StringFromAPI(result["description"])
 	data.ServiceType = StringFromAPI(result["serviceType"])
-	data.DpuTarget = StringFromAPI(result["dpuTarget"])
 	data.SiteId = StringFromAPI(result["siteId"])
 	data.Data = StringFromAPI(result["data"])
 	if rawObj_credentials, ok := result["credentials"].(map[string]interface{}); ok {
@@ -425,7 +413,6 @@ func (r *DpuExtensionServiceResource) Update(ctx context.Context, req resource.U
 	data.Name = StringFromAPI(result["name"])
 	data.Description = StringFromAPI(result["description"])
 	data.ServiceType = StringFromAPI(result["serviceType"])
-	data.DpuTarget = StringFromAPI(result["dpuTarget"])
 	data.SiteId = StringFromAPI(result["siteId"])
 	data.Data = StringFromAPI(result["data"])
 	if rawObj_credentials, ok := result["credentials"].(map[string]interface{}); ok {
@@ -472,7 +459,6 @@ func (r *DpuExtensionServiceResource) populateModel(ctx context.Context, data *D
 	data.Name = StringFromAPI(result["name"])
 	data.Description = StringFromAPI(result["description"])
 	data.ServiceType = StringFromAPI(result["serviceType"])
-	data.DpuTarget = StringFromAPI(result["dpuTarget"])
 	data.SiteId = StringFromAPI(result["siteId"])
 	data.Data = StringFromAPI(result["data"])
 	if rawObj_credentials, ok := result["credentials"].(map[string]interface{}); ok {

@@ -27,10 +27,7 @@ output "task_name" {
 
 ### Optional
 
-- `active_only` (String) Restrict results to non-terminal Tasks.
 - `id` (String) ID of the resource to retrieve. When set, returns a single resource.
-- `include_report` (String) Include the per-task execution report on each returned Task.
-- `site_id` (String) ID of the Site whose Tasks are returned.
 
 ### Read-Only
 

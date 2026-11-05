@@ -27,10 +27,6 @@ type MachineResource struct {
 
 type MachineResourceModel struct {
 	Id                       types.String                     `tfsdk:"id"`
-	Tags                     types.List                       `tfsdk:"tags"`
-	AllowedTests             types.List                       `tfsdk:"allowed_tests"`
-	RunUnverifiedTests       types.Bool                       `tfsdk:"run_unverified_tests"`
-	Contexts                 types.List                       `tfsdk:"contexts"`
 	InstanceTypeId           types.String                     `tfsdk:"instance_type_id"`
 	ClearInstanceType        types.Bool                       `tfsdk:"clear_instance_type"`
 	SetMaintenanceMode       types.Bool                       `tfsdk:"set_maintenance_mode"`
@@ -52,7 +48,6 @@ type MachineResourceModel struct {
 	MachineInterfaces        []MachineMachineInterfacesItem   `tfsdk:"machine_interfaces"`
 	AssociatedDpuMachineIds  types.List                       `tfsdk:"associated_dpu_machine_ids"`
 	PlacementInRack          *MachinePlacementInRack          `tfsdk:"placement_in_rack"`
-	ScoutVersion             types.String                     `tfsdk:"scout_version"`
 	Health                   *MachineHealth                   `tfsdk:"health"`
 	Metadata                 *MachineMetadata                 `tfsdk:"metadata"`
 	Status                   types.String                     `tfsdk:"status"`
@@ -61,7 +56,6 @@ type MachineResourceModel struct {
 	Created                  types.String                     `tfsdk:"created"`
 	Updated                  types.String                     `tfsdk:"updated"`
 	MachineId                types.String                     `tfsdk:"machine_id"`
-	Source                   types.String                     `tfsdk:"source"`
 }
 
 type MachineOnlineRepair struct {
@@ -147,7 +141,6 @@ type MachineMetadata struct {
 	Gpus                 []MachineMetadataGpusItem                 `tfsdk:"gpus"`
 	NetworkInterfaces    []MachineMetadataNetworkInterfacesItem    `tfsdk:"network_interfaces"`
 	InfinibandInterfaces []MachineMetadataInfinibandInterfacesItem `tfsdk:"infiniband_interfaces"`
-	LifecycleState       types.String                              `tfsdk:"lifecycle_state"`
 }
 
 type MachineMetadataDmiData struct {
@@ -217,33 +210,6 @@ func (r *MachineResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 		Attributes: map[string]schema.Attribute{
 			// id is always computed
 			"id": schema.StringAttribute{Computed: true, Description: "The resource ID."},
-			"tags": schema.ListAttribute{
-				ElementType: types.StringType,
-				Required:    false,
-				Optional:    true,
-				Computed:    true,
-				Description: "Tags used to select validation tests.",
-			},
-			"allowed_tests": schema.ListAttribute{
-				ElementType: types.StringType,
-				Required:    false,
-				Optional:    true,
-				Computed:    true,
-				Description: "Validation test names allowed for this run.",
-			},
-			"run_unverified_tests": schema.BoolAttribute{
-				Required:    false,
-				Optional:    true,
-				Computed:    true,
-				Description: "Whether unverified validation tests may run.",
-			},
-			"contexts": schema.ListAttribute{
-				ElementType: types.StringType,
-				Required:    false,
-				Optional:    true,
-				Computed:    true,
-				Description: "Contexts used to select validation tests.",
-			},
 			"instance_type_id": schema.StringAttribute{
 				Required:    false,
 				Optional:    true,
@@ -371,7 +337,7 @@ func (r *MachineResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
-				Description: "ID of the associated Instance, or null when unassigned. The association remains during termination until Instance inventory confirms deletion. A non-null value precludes Ready status.",
+				Description: "ID of the Instance if this Machine is assigned to one",
 			},
 			"tenant_id": schema.StringAttribute{
 				Required:    false,
@@ -602,12 +568,6 @@ func (r *MachineResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 					},
 				},
 			},
-			"scout_version": schema.StringAttribute{
-				Required:    false,
-				Optional:    false,
-				Computed:    true,
-				Description: "Scout version reported by the Machine, if known",
-			},
 			"health": schema.SingleNestedAttribute{
 				Required:    false,
 				Optional:    false,
@@ -775,7 +735,7 @@ func (r *MachineResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 								Required:    false,
 								Optional:    false,
 								Computed:    true,
-								Description: "IPv4 or IPv6 address of the Machine BMC",
+								Description: "IP address of the Machine BMC",
 							},
 							"mac": schema.StringAttribute{
 								Required:    false,
@@ -959,25 +919,19 @@ func (r *MachineResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 							},
 						},
 					},
-					"lifecycle_state": schema.StringAttribute{
-						Required:    false,
-						Optional:    false,
-						Computed:    true,
-						Description: "Lifecycle state details for the Machine",
-					},
 				},
 			},
 			"status": schema.StringAttribute{
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
-				Description: "Machine status combines the observed Core lifecycle with REST Instance assignment. A Ready Machine becomes InUse when REST assigns it, and remains InUse if Core reports Ready while the REST assignment still exists. Error, Maintenance, Initializing, and other non-Ready states retain precedence. When Instance deletion clears the assignment, InUse returns to Ready only if the retained Core snapshot reports Ready; otherwise fresh Machine inventory establishes the next status. Ready is not a reservation and does not guarantee that a subsequent Instance creation will succeed.",
+				Description: "Status represents the status of the machine",
 			},
 			"is_usable_by_tenant": schema.BoolAttribute{
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
-				Description: "Indicates whether the machine is usable by or currently in use by a tenant. It does not indicate that a Machine is available for Instance creation.",
+				Description: "Indicates whether the machine is usable by or currently in use by a tenant.",
 			},
 			"status_history": schema.ListNestedAttribute{
 				Required:    false,
@@ -1031,12 +985,6 @@ func (r *MachineResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 				Computed:    true,
 				Description: "Path parameter: machine_id.",
 			},
-			"source": schema.StringAttribute{
-				Required:    false,
-				Optional:    true,
-				Computed:    true,
-				Description: "Path parameter: source.",
-			},
 		},
 	}
 }
@@ -1067,7 +1015,7 @@ func (r *MachineResource) Read(ctx context.Context, req resource.ReadRequest, re
 		return
 	}
 
-	url := r.client.ResolvePath("/v2/org/{org}/nico/machine/{machineId}/health-report/{source}", map[string]string{"machineId": data.MachineId.ValueString(), "source": data.Id.ValueString()})
+	url := r.client.ResolvePath("/v2/org/{org}/nico/machine/{machineId}", map[string]string{"machineId": data.Id.ValueString()})
 	result, err := r.client.Get(ctx, url)
 	if err != nil {
 		resp.Diagnostics.AddError("Error reading Machine", err.Error())
@@ -1080,28 +1028,6 @@ func (r *MachineResource) Read(ctx context.Context, req resource.ReadRequest, re
 
 	data.Id = StringFromAPI(result["id"])
 	diags := resp.Diagnostics
-	if rawSlice_tags := StringSliceFromAPI(result["tags"]); rawSlice_tags != nil {
-		lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_tags)
-		diags.Append(d...)
-		data.Tags = lv
-	} else {
-		data.Tags = types.ListNull(types.StringType)
-	}
-	if rawSlice_allowed_tests := StringSliceFromAPI(result["allowedTests"]); rawSlice_allowed_tests != nil {
-		lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_allowed_tests)
-		diags.Append(d...)
-		data.AllowedTests = lv
-	} else {
-		data.AllowedTests = types.ListNull(types.StringType)
-	}
-	data.RunUnverifiedTests = BoolFromAPI(result["runUnverifiedTests"])
-	if rawSlice_contexts := StringSliceFromAPI(result["contexts"]); rawSlice_contexts != nil {
-		lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_contexts)
-		diags.Append(d...)
-		data.Contexts = lv
-	} else {
-		data.Contexts = types.ListNull(types.StringType)
-	}
 	data.InstanceTypeId = StringFromAPI(result["instanceTypeId"])
 	data.ClearInstanceType = BoolFromAPI(result["clearInstanceType"])
 	data.SetMaintenanceMode = BoolFromAPI(result["setMaintenanceMode"])
@@ -1206,7 +1132,6 @@ func (r *MachineResource) Read(ctx context.Context, req resource.ReadRequest, re
 	} else {
 		data.PlacementInRack = nil
 	}
-	data.ScoutVersion = StringFromAPI(result["scoutVersion"])
 	if rawObj_health, ok := result["health"].(map[string]interface{}); ok {
 		obj_health := &MachineHealth{}
 		obj_health.Source = StringFromAPI(rawObj_health["source"])
@@ -1225,7 +1150,6 @@ func (r *MachineResource) Read(ctx context.Context, req resource.ReadRequest, re
 		// gpus: nested field — expand manually if needed
 		// networkInterfaces: nested field — expand manually if needed
 		// infinibandInterfaces: nested field — expand manually if needed
-		obj_metadata.LifecycleState = StringFromAPI(rawObj_metadata["lifecycleState"])
 		_ = rawObj_metadata
 		data.Metadata = obj_metadata
 	} else {
@@ -1252,7 +1176,6 @@ func (r *MachineResource) Read(ctx context.Context, req resource.ReadRequest, re
 	data.Created = StringFromAPI(result["created"])
 	data.Updated = StringFromAPI(result["updated"])
 	data.MachineId = StringFromAPI(result["machine_id"])
-	data.Source = StringFromAPI(result["source"])
 	_ = diags
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -1305,7 +1228,7 @@ func (r *MachineResource) Update(ctx context.Context, req resource.UpdateRequest
 		body["healthIssue"] = m_health_issue
 	}
 
-	url := r.client.ResolvePath("/v2/org/{org}/nico/machine/{machineId}/health-report/{source}", map[string]string{"machineId": data.MachineId.ValueString(), "source": data.Id.ValueString()})
+	url := r.client.ResolvePath("/v2/org/{org}/nico/machine/{machineId}", map[string]string{"machineId": data.Id.ValueString()})
 	result, err := r.client.Patch(ctx, url, body)
 	if err != nil {
 		resp.Diagnostics.AddError("Error updating Machine", err.Error())
@@ -1314,28 +1237,6 @@ func (r *MachineResource) Update(ctx context.Context, req resource.UpdateRequest
 
 	data.Id = StringFromAPI(result["id"])
 	diags := resp.Diagnostics
-	if rawSlice_tags := StringSliceFromAPI(result["tags"]); rawSlice_tags != nil {
-		lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_tags)
-		diags.Append(d...)
-		data.Tags = lv
-	} else {
-		data.Tags = types.ListNull(types.StringType)
-	}
-	if rawSlice_allowed_tests := StringSliceFromAPI(result["allowedTests"]); rawSlice_allowed_tests != nil {
-		lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_allowed_tests)
-		diags.Append(d...)
-		data.AllowedTests = lv
-	} else {
-		data.AllowedTests = types.ListNull(types.StringType)
-	}
-	data.RunUnverifiedTests = BoolFromAPI(result["runUnverifiedTests"])
-	if rawSlice_contexts := StringSliceFromAPI(result["contexts"]); rawSlice_contexts != nil {
-		lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_contexts)
-		diags.Append(d...)
-		data.Contexts = lv
-	} else {
-		data.Contexts = types.ListNull(types.StringType)
-	}
 	data.InstanceTypeId = StringFromAPI(result["instanceTypeId"])
 	data.ClearInstanceType = BoolFromAPI(result["clearInstanceType"])
 	data.SetMaintenanceMode = BoolFromAPI(result["setMaintenanceMode"])
@@ -1440,7 +1341,6 @@ func (r *MachineResource) Update(ctx context.Context, req resource.UpdateRequest
 	} else {
 		data.PlacementInRack = nil
 	}
-	data.ScoutVersion = StringFromAPI(result["scoutVersion"])
 	if rawObj_health, ok := result["health"].(map[string]interface{}); ok {
 		obj_health := &MachineHealth{}
 		obj_health.Source = StringFromAPI(rawObj_health["source"])
@@ -1459,7 +1359,6 @@ func (r *MachineResource) Update(ctx context.Context, req resource.UpdateRequest
 		// gpus: nested field — expand manually if needed
 		// networkInterfaces: nested field — expand manually if needed
 		// infinibandInterfaces: nested field — expand manually if needed
-		obj_metadata.LifecycleState = StringFromAPI(rawObj_metadata["lifecycleState"])
 		_ = rawObj_metadata
 		data.Metadata = obj_metadata
 	} else {
@@ -1486,7 +1385,6 @@ func (r *MachineResource) Update(ctx context.Context, req resource.UpdateRequest
 	data.Created = StringFromAPI(result["created"])
 	data.Updated = StringFromAPI(result["updated"])
 	data.MachineId = StringFromAPI(result["machine_id"])
-	data.Source = StringFromAPI(result["source"])
 	_ = diags
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -1498,7 +1396,7 @@ func (r *MachineResource) Delete(ctx context.Context, req resource.DeleteRequest
 		return
 	}
 
-	url := r.client.ResolvePath("/v2/org/{org}/nico/machine/{machineId}/health-report/{source}", map[string]string{"machineId": data.MachineId.ValueString(), "source": data.Id.ValueString()})
+	url := r.client.ResolvePath("/v2/org/{org}/nico/machine/{machineId}", map[string]string{"machineId": data.Id.ValueString()})
 	err := r.client.Delete(ctx, url, nil)
 	if err != nil {
 		resp.Diagnostics.AddError("Error deleting Machine", err.Error())
@@ -1506,28 +1404,6 @@ func (r *MachineResource) Delete(ctx context.Context, req resource.DeleteRequest
 }
 
 func (r *MachineResource) populateModel(ctx context.Context, data *MachineResourceModel, result map[string]interface{}, diags diag.Diagnostics) {
-	if rawSlice_tags := StringSliceFromAPI(result["tags"]); rawSlice_tags != nil {
-		lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_tags)
-		diags.Append(d...)
-		data.Tags = lv
-	} else {
-		data.Tags = types.ListNull(types.StringType)
-	}
-	if rawSlice_allowed_tests := StringSliceFromAPI(result["allowedTests"]); rawSlice_allowed_tests != nil {
-		lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_allowed_tests)
-		diags.Append(d...)
-		data.AllowedTests = lv
-	} else {
-		data.AllowedTests = types.ListNull(types.StringType)
-	}
-	data.RunUnverifiedTests = BoolFromAPI(result["runUnverifiedTests"])
-	if rawSlice_contexts := StringSliceFromAPI(result["contexts"]); rawSlice_contexts != nil {
-		lv, d := types.ListValueFrom(ctx, types.StringType, rawSlice_contexts)
-		diags.Append(d...)
-		data.Contexts = lv
-	} else {
-		data.Contexts = types.ListNull(types.StringType)
-	}
 	data.InstanceTypeId = StringFromAPI(result["instanceTypeId"])
 	data.ClearInstanceType = BoolFromAPI(result["clearInstanceType"])
 	data.SetMaintenanceMode = BoolFromAPI(result["setMaintenanceMode"])
@@ -1632,7 +1508,6 @@ func (r *MachineResource) populateModel(ctx context.Context, data *MachineResour
 	} else {
 		data.PlacementInRack = nil
 	}
-	data.ScoutVersion = StringFromAPI(result["scoutVersion"])
 	if rawObj_health, ok := result["health"].(map[string]interface{}); ok {
 		obj_health := &MachineHealth{}
 		obj_health.Source = StringFromAPI(rawObj_health["source"])
@@ -1651,7 +1526,6 @@ func (r *MachineResource) populateModel(ctx context.Context, data *MachineResour
 		// gpus: nested field — expand manually if needed
 		// networkInterfaces: nested field — expand manually if needed
 		// infinibandInterfaces: nested field — expand manually if needed
-		obj_metadata.LifecycleState = StringFromAPI(rawObj_metadata["lifecycleState"])
 		_ = rawObj_metadata
 		data.Metadata = obj_metadata
 	} else {
@@ -1678,6 +1552,5 @@ func (r *MachineResource) populateModel(ctx context.Context, data *MachineResour
 	data.Created = StringFromAPI(result["created"])
 	data.Updated = StringFromAPI(result["updated"])
 	data.MachineId = StringFromAPI(result["machine_id"])
-	data.Source = StringFromAPI(result["source"])
 	_ = diags
 }

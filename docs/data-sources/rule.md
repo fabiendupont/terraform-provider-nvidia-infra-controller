@@ -37,8 +37,8 @@ output "rule_name" {
 - `description` (String) Optional free-form description.
 - `is_default` (Boolean) Whether this rule is currently the default for its `(operationType, operationCode)` tuple.
 - `name` (String) Human-readable name of the rule. Required and non-empty.
-- `operation_code` (String) Operation code within the operation type. For `PowerControl`, accepted values are `power_on`, `force_power_on`, `power_off`, `force_power_off`, `restart`, `force_restart`, `warm_reset`, and `cold_reset`. For `FirmwareControl`, accepted values are `upgrade`, `downgrade`, and `rollback`. The server validates the code against the selected type. Immutable after creation.
-- `rule_definition` (Attributes) Executable definition of a rule. Structurally identical to Flow's own rule schema, so an existing YAML rule file maps across field for field. The fields declared here use `camelCase` (`componentType`, `mainOperation`, `pollInterval`) rather than the `snake_case` of Flow's YAML; keys inside the free-form `parameters` map pass through unchanged and stay `snake_case` (`expected_status`, `component_types`). (see [below for nested schema](#nestedatt--rule_definition))
+- `operation_code` (String) Operation code within the operation type (e.g. `power_on`, `power_off`, `upgrade`). Server-side validated against Flow's allow-list for the type. Immutable after creation.
+- `rule_definition` (Attributes) Executable definition of a rule. Mirrors Flow's wire schema 1:1 so existing YAML rule files can be converted to JSON without any key renaming (nested fields use `snake_case`). (see [below for nested schema](#nestedatt--rule_definition))
 - `updated` (String) Timestamp when the rule was last updated.
 
 <a id="nestedatt--rule_definition"></a>
@@ -54,7 +54,7 @@ Read-Only:
 
 Read-Only:
 
-- `component_type` (String) Component type this step targets. Validated against Flow's component-type set: `Compute`, `NVSwitch`, `PowerShelf`, `ToRSwitch`, `UMS`, `CDU`. Matched case-insensitively.
+- `component_type` (String) Component type this step targets (e.g. `Compute`, `NVLSwitch`, `PowerShelf`). Validated against Flow's component-type set.
 - `delay_after` (String) Deprecated legacy field — sleep duration after this step, as a Go duration string. Prefer encoding the wait as an explicit `Sleep` post-operation action.
 - `main_operation` (Attributes) Configuration for a single action within a step. (see [below for nested schema](#nestedatt--rule_definition--steps--main_operation))
 - `max_parallel` (Number) Maximum number of components of this type processed concurrently. `0` means unlimited, `1` means strictly sequential.
@@ -70,7 +70,7 @@ Read-Only:
 Read-Only:
 
 - `name` (String) Executor-agnostic action name. Server-side validated; unknown names fail the rule definition.
-- `parameters` (Map of String) Action-specific parameters. Validated server-side against the action's schema. Examples:   - `Sleep`: `{ duration: "30s" }`   - `PowerControl`: `{ operation: "power_on" }` — an operation code,     not a power state; optional within a `PowerControl` rule, where     the operation is taken from the Task   - `VerifyPowerStatus`: `{ expected_status: "on" }`   - `VerifyReachability`: `{ component_types: ["Compute"], require_all: true }`   - `FirmwareControl`: `{ poll_interval: "10s", poll_timeout: "30m" }`
+- `parameters` (Map of String) Action-specific parameters. Validated server-side against the action's schema. Examples:   - `Sleep`: `{ duration: "30s" }`   - `PowerControl`: `{ operation: "on" }`   - `VerifyPowerStatus`: `{ expected_status: "on" }`   - `VerifyReachability`: `{ component_types: ["Compute"], require_all: true }`   - `FirmwareControl`: `{ poll_interval: "10s", poll_timeout: "30m" }`
 - `poll_interval` (String) Poll interval for actions that loop (e.g. `FirmwareControl`, `VerifyPowerStatus`) as a Go duration string.
 - `timeout` (String) Optional per-action timeout override as a Go duration string (e.g. `30s`, `2m`).
 
@@ -81,7 +81,7 @@ Read-Only:
 Read-Only:
 
 - `name` (String) Executor-agnostic action name. Server-side validated; unknown names fail the rule definition.
-- `parameters` (Map of String) Action-specific parameters. Validated server-side against the action's schema. Examples:   - `Sleep`: `{ duration: "30s" }`   - `PowerControl`: `{ operation: "power_on" }` — an operation code,     not a power state; optional within a `PowerControl` rule, where     the operation is taken from the Task   - `VerifyPowerStatus`: `{ expected_status: "on" }`   - `VerifyReachability`: `{ component_types: ["Compute"], require_all: true }`   - `FirmwareControl`: `{ poll_interval: "10s", poll_timeout: "30m" }`
+- `parameters` (Map of String) Action-specific parameters. Validated server-side against the action's schema. Examples:   - `Sleep`: `{ duration: "30s" }`   - `PowerControl`: `{ operation: "on" }`   - `VerifyPowerStatus`: `{ expected_status: "on" }`   - `VerifyReachability`: `{ component_types: ["Compute"], require_all: true }`   - `FirmwareControl`: `{ poll_interval: "10s", poll_timeout: "30m" }`
 - `poll_interval` (String) Poll interval for actions that loop (e.g. `FirmwareControl`, `VerifyPowerStatus`) as a Go duration string.
 - `timeout` (String) Optional per-action timeout override as a Go duration string (e.g. `30s`, `2m`).
 
@@ -92,7 +92,7 @@ Read-Only:
 Read-Only:
 
 - `name` (String) Executor-agnostic action name. Server-side validated; unknown names fail the rule definition.
-- `parameters` (Map of String) Action-specific parameters. Validated server-side against the action's schema. Examples:   - `Sleep`: `{ duration: "30s" }`   - `PowerControl`: `{ operation: "power_on" }` — an operation code,     not a power state; optional within a `PowerControl` rule, where     the operation is taken from the Task   - `VerifyPowerStatus`: `{ expected_status: "on" }`   - `VerifyReachability`: `{ component_types: ["Compute"], require_all: true }`   - `FirmwareControl`: `{ poll_interval: "10s", poll_timeout: "30m" }`
+- `parameters` (Map of String) Action-specific parameters. Validated server-side against the action's schema. Examples:   - `Sleep`: `{ duration: "30s" }`   - `PowerControl`: `{ operation: "on" }`   - `VerifyPowerStatus`: `{ expected_status: "on" }`   - `VerifyReachability`: `{ component_types: ["Compute"], require_all: true }`   - `FirmwareControl`: `{ poll_interval: "10s", poll_timeout: "30m" }`
 - `poll_interval` (String) Poll interval for actions that loop (e.g. `FirmwareControl`, `VerifyPowerStatus`) as a Go duration string.
 - `timeout` (String) Optional per-action timeout override as a Go duration string (e.g. `30s`, `2m`).
 

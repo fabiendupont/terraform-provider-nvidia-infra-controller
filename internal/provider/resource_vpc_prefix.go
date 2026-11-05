@@ -30,9 +30,9 @@ type VpcPrefixResourceModel struct {
 	Name          types.String                 `tfsdk:"name"`
 	VpcId         types.String                 `tfsdk:"vpc_id"`
 	IpBlockId     types.String                 `tfsdk:"ip_block_id"`
-	Prefix        types.String                 `tfsdk:"prefix"`
 	PrefixLength  types.Int64                  `tfsdk:"prefix_length"`
 	SiteId        types.String                 `tfsdk:"site_id"`
+	Prefix        types.String                 `tfsdk:"prefix"`
 	Status        types.String                 `tfsdk:"status"`
 	UsageStats    *VpcPrefixUsageStats         `tfsdk:"usage_stats"`
 	StatusHistory []VpcPrefixStatusHistoryItem `tfsdk:"status_history"`
@@ -82,25 +82,25 @@ func (r *VpcPrefixResource) Schema(_ context.Context, _ resource.SchemaRequest, 
 				Required:    true,
 				Optional:    false,
 				Computed:    false,
-				Description: "ID of the Ready tenant IPv4 or IPv6 IP Block to allocate the VPC Prefix from. The block must be at the FNN VPC's Site.",
-			},
-			"prefix": schema.StringAttribute{
-				Required:    false,
-				Optional:    true,
-				Computed:    true,
-				Description: "Exact network-aligned IPv4 or IPv6 CIDR to reserve. Accepted IPv6 text is canonicalized before persistence and response. IPv4 accepts `/8` through `/31`. IPv6 accepts `/8` through `/63` when the FNN VPC has `slaacEnabled=true`, or `/8` through `/126` otherwise. The CIDR must be contained by the selected IP Block, match its address family, and not overlap an existing reservation. An IPv4-mapped IPv6 CIDR is not accepted. Mutually exclusive with `prefixLength`.",
+				Description: "ID of the IP Block to allocate the VPC Prefix from",
 			},
 			"prefix_length": schema.Int64Attribute{
-				Required:    false,
-				Optional:    true,
-				Computed:    true,
-				Description: "Prefix length for automatic allocation. IPv4 accepts 8 through 31. IPv6 accepts 8 through 63 when the FNN VPC has `slaacEnabled=true`, or 8 through 126 otherwise. The selected IP Block must contain a prefix of the requested length. Mutually exclusive with `prefix`.",
+				Required:    true,
+				Optional:    false,
+				Computed:    false,
+				Description: "Prefix length for the VPC Prefix. Valid range is 8 to 31, and max usable value depends on prefix length of parent IP Block.",
 			},
 			"site_id": schema.StringAttribute{
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
 				Description: "ID of the Site the VPC Prefix belongs to",
+			},
+			"prefix": schema.StringAttribute{
+				Required:    false,
+				Optional:    false,
+				Computed:    true,
+				Description: "The network prefix including prefix length in CIDR notation",
 			},
 			"status": schema.StringAttribute{
 				Required:    false,
@@ -112,13 +112,13 @@ func (r *VpcPrefixResource) Schema(_ context.Context, _ resource.SchemaRequest, 
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
-				Description: "Present when query parameter `includeUsageStats=true` and the VPC Prefix has IPv4. This statistic reports IPv4 usage only. IP usage counts two addresses per associated Ethernet interface, while prefix usage counts each distinct `/31` containing an assigned IPv4 address.",
+				Description: "Present when query parameter `includeUsageStats=true`. Prefix and IP usage data is derived by evaluating associated Ethernet interfaces. Each Interface associated with a VPC Prefix consumes a `/31` prefix.",
 				Attributes: map[string]schema.Attribute{
 					"available_i_ps": schema.Int64Attribute{
 						Required:    false,
 						Optional:    false,
 						Computed:    true,
-						Description: "Total number of IP addresses in the block (acquired and unused), capped at 2,147,483,647. An IP Block allocated to one child prefix of the same size reports zero. ",
+						Description: "Total number of IP addresses in the block (acquired and unused)",
 					},
 					"acquired_i_ps": schema.Int64Attribute{
 						Required:    false,
@@ -137,7 +137,7 @@ func (r *VpcPrefixResource) Schema(_ context.Context, _ resource.SchemaRequest, 
 						Required:    false,
 						Optional:    false,
 						Computed:    true,
-						Description: "Number of complete `/30` IPv4 prefixes or `/126` IPv6 prefixes remaining after acquired child prefixes are excluded. Both prefix sizes contain four addresses. The count is capped at 2,147,483,647. The `acquiredIPs` count is not subtracted. ",
+						Description: "Total number of /30 prefixes that can still be acquired from this block (only reduced if prefixes are acquired, not reduced by acquired IPs) ",
 					},
 					"acquired_prefixes": schema.Int64Attribute{
 						Required:    false,
@@ -235,9 +235,6 @@ func (r *VpcPrefixResource) Create(ctx context.Context, req resource.CreateReque
 	if !data.IpBlockId.IsNull() && !data.IpBlockId.IsUnknown() {
 		body["ipBlockId"] = data.IpBlockId.ValueString()
 	}
-	if !data.Prefix.IsNull() && !data.Prefix.IsUnknown() {
-		body["prefix"] = data.Prefix.ValueString()
-	}
 	if !data.PrefixLength.IsNull() && !data.PrefixLength.IsUnknown() {
 		body["prefixLength"] = data.PrefixLength.ValueInt64()
 	}
@@ -254,9 +251,9 @@ func (r *VpcPrefixResource) Create(ctx context.Context, req resource.CreateReque
 	data.Name = StringFromAPI(result["name"])
 	data.VpcId = StringFromAPI(result["vpcId"])
 	data.IpBlockId = StringFromAPI(result["ipBlockId"])
-	data.Prefix = StringFromAPI(result["prefix"])
 	data.PrefixLength = Int64FromAPI(result["prefixLength"])
 	data.SiteId = StringFromAPI(result["siteId"])
+	data.Prefix = StringFromAPI(result["prefix"])
 	data.Status = StringFromAPI(result["status"])
 	if rawObj_usage_stats, ok := result["usageStats"].(map[string]interface{}); ok {
 		obj_usage_stats := &VpcPrefixUsageStats{}
@@ -316,9 +313,9 @@ func (r *VpcPrefixResource) Read(ctx context.Context, req resource.ReadRequest, 
 	data.Name = StringFromAPI(result["name"])
 	data.VpcId = StringFromAPI(result["vpcId"])
 	data.IpBlockId = StringFromAPI(result["ipBlockId"])
-	data.Prefix = StringFromAPI(result["prefix"])
 	data.PrefixLength = Int64FromAPI(result["prefixLength"])
 	data.SiteId = StringFromAPI(result["siteId"])
+	data.Prefix = StringFromAPI(result["prefix"])
 	data.Status = StringFromAPI(result["status"])
 	if rawObj_usage_stats, ok := result["usageStats"].(map[string]interface{}); ok {
 		obj_usage_stats := &VpcPrefixUsageStats{}
@@ -379,9 +376,9 @@ func (r *VpcPrefixResource) Update(ctx context.Context, req resource.UpdateReque
 	data.Name = StringFromAPI(result["name"])
 	data.VpcId = StringFromAPI(result["vpcId"])
 	data.IpBlockId = StringFromAPI(result["ipBlockId"])
-	data.Prefix = StringFromAPI(result["prefix"])
 	data.PrefixLength = Int64FromAPI(result["prefixLength"])
 	data.SiteId = StringFromAPI(result["siteId"])
+	data.Prefix = StringFromAPI(result["prefix"])
 	data.Status = StringFromAPI(result["status"])
 	if rawObj_usage_stats, ok := result["usageStats"].(map[string]interface{}); ok {
 		obj_usage_stats := &VpcPrefixUsageStats{}
@@ -436,9 +433,9 @@ func (r *VpcPrefixResource) populateModel(ctx context.Context, data *VpcPrefixRe
 	data.Name = StringFromAPI(result["name"])
 	data.VpcId = StringFromAPI(result["vpcId"])
 	data.IpBlockId = StringFromAPI(result["ipBlockId"])
-	data.Prefix = StringFromAPI(result["prefix"])
 	data.PrefixLength = Int64FromAPI(result["prefixLength"])
 	data.SiteId = StringFromAPI(result["siteId"])
+	data.Prefix = StringFromAPI(result["prefix"])
 	data.Status = StringFromAPI(result["status"])
 	if rawObj_usage_stats, ok := result["usageStats"].(map[string]interface{}); ok {
 		obj_usage_stats := &VpcPrefixUsageStats{}

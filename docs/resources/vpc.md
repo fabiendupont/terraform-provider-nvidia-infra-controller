@@ -15,8 +15,6 @@ VPC defines the networking isolation boundary for Tenant's Instances.
 ```terraform
 resource "nico_vpc" "example" {
   site_id                        = "site-id-uuid"
-  if_version_match               = "if-version-match-value"
-  expected_inactive_vni          = 0
   name                           = "name-value"
   description                    = "description-value"
   labels                         = {
@@ -30,72 +28,32 @@ resource "nico_vpc" "example" {
 
 ### Required
 
-- `expected_inactive_vni` (Number) Exact retained VNI observed with `ifVersionMatch`. It must match the VPC's inactive allocation and differ from its active VNI.
-- `if_version_match` (String) Exact Core VPC version from routing-state inspection used for the release decision, in `V<counter>-T<microseconds>` format. Missing or malformed versions are rejected. A stale version returns 412; after an ambiguous release, that error does not prove whether the previous release committed.
+- `name` (String) Name of the VPC
 
 ### Optional
 
-- `description` (String) Updated description of the VPC
-- `labels` (Map of String) Update labels of the VPC. Up to 10 key-value pairs can be specified. The labels will be replaced with the labels sent in the request. Any labels not included in the request will be removed. To retain existing labels, fetch them first and include them in this request.
-- `name` (String) Updated name of the VPC
+- `description` (String) Optional description for the VPC
+- `labels` (Map of String) String key-value pairs describing VPC labels. Up to 10 key-value pairs can be specified
 - `network_security_group_id` (String) ID of the Network Security Group to attach to the VPC
-- `nv_link_logical_partition_id` (String) ID of the default NVLink Logical Partition that GPUs for all Instances in the VPC will attach to. Can only be updated if VPC currently has no active Instances
-- `power_resource_group` (String) Power resource group to associate with the VPC. A non-empty value requires the Site's `dpsPowerManagement` capability to be `true`. Omission or `null` preserves the current association; an empty string clears it when DPS power management is disabled.
-- `routing_profile_overrides` (String) Replaces the current inline routing-profile definition when present. Requires `TargetedInstanceCreation` to be effective for the Tenant at the VPC's Site. Omission or `null` preserves the current definition. An empty object restores inheritance for every property; a partial object replaces the previous definition and inherits its omitted properties from the named profile.
+- `network_virtualization_type` (String) Network virtualization type of the VPC. If no value is specified, then defaults to `FNN` if Site has native networking enabled, or `ETHERNET_VIRTUALIZER` if native networking is disabled. Flat VPCs hold instances on zero-DPU hosts (or hosts with their DPU in NIC mode) and are never auto-selected -- `FLAT` must be specified explicitly.
+- `nv_link_logical_partition_id` (String) ID of the default NVLink Logical Partition that GPUs for all Instances in the VPC will attach to
+- `routing_profile` (String) Specify routing profile for the VPC. Only supported when `networkVirtualizationType` is set to `FNN`, or when `networkVirtualizationType` is omitted and Site has Native Networking enabled. Requires Tenant to have elevated privilege. Current accepted values are `privileged-internal`, `internal`, and `external`.
+- `site_id` (String) ID of the Site where the VPC should be created
+- `vni` (Number) Explicitly requested VNI for the VPC
 - `vpc_id` (String) Path parameter: vpc_id.
 
 ### Read-Only
 
 - `controller_vpc_id` (String) Legacy attribute, contains the same value as ID
 - `created` (String) Date/time when VPC was created
-- `effective_routing_profile` (Attributes) Fully resolved routing profile last reported by Core for the VPC. This property is included only when the requesting Tenant has effective TargetedInstanceCreation permission for the VPC's Site. (see [below for nested schema](#nestedatt--effective_routing_profile))
 - `id` (String) The resource ID.
 - `network_security_group_propagation_details` (Attributes) Propagation details for the attached Network Security Group (see [below for nested schema](#nestedatt--network_security_group_propagation_details))
-- `network_virtualization_type` (String) Network virtualization type of the VPC. Flat VPCs hold instances on zero-DPU hosts (or hosts with their DPU in NIC mode); their interfaces are bound to underlay (HostInband) network segments and NICo does not drive their data plane.
 - `org` (String) Organization the VPC belongs to
 - `requested_vni` (Number) Explicitly requested VNI for the VPC if one was requested at creation time
-- `routing_profile` (String) Routing profile type for the VPC. Populated when Site has Native Networking enabled and network virtualization type is `FNN`.
-- `site_id` (String) ID of the Site the VPC belongs to
-- `slaac_enabled` (Boolean) Whether this VPC uses SLAAC allocation mode for instance IPv6 interfaces. When true, Core allocates a `/64` to each interface that includes IPv6 and retains the prefix without assigning a concrete IPv6 host address. This value is fixed when the VPC is created. NICo does not yet configure router advertisements (RAs); that support is tracked by https://github.com/NVIDIA/infra-controller/issues/2398.
 - `status` (String) Status of the VPC
 - `status_history` (Attributes List) History of status changes for the VPC (see [below for nested schema](#nestedatt--status_history))
 - `tenant_id` (String) ID of the Tenant the VPC belongs to
 - `updated` (String) Date/time when VPC was last updated
-- `vni` (Number) Active VNI assigned to the VPC
-
-<a id="nestedatt--effective_routing_profile"></a>
-### Nested Schema for `effective_routing_profile`
-
-Read-Only:
-
-- `accepted_leaks_from_underlay` (List of String) accepted_leaks_from_underlay attribute.
-- `access_tier` (Number) Operator-controlled access tier inherited from the named profile.
-- `allowed_anycast_prefixes` (List of String) allowed_anycast_prefixes attribute.
-- `internal` (Boolean) Operator-controlled internal-routing classification inherited from the named profile.
-- `leak_default_route_from_underlay` (Boolean) leak_default_route_from_underlay attribute.
-- `leak_tenant_host_routes_to_underlay` (Boolean) leak_tenant_host_routes_to_underlay attribute.
-- `route_target_imports` (Attributes List) route_target_imports attribute. (see [below for nested schema](#nestedatt--effective_routing_profile--route_target_imports))
-- `route_targets_on_exports` (Attributes List) route_targets_on_exports attribute. (see [below for nested schema](#nestedatt--effective_routing_profile--route_targets_on_exports))
-- `tenant_leak_communities_accepted` (Boolean) tenant_leak_communities_accepted attribute.
-
-<a id="nestedatt--effective_routing_profile--route_target_imports"></a>
-### Nested Schema for `effective_routing_profile.route_target_imports`
-
-Read-Only:
-
-- `asn` (Number) Autonomous system number.
-- `vni` (Number) Route-target VNI.
-
-
-<a id="nestedatt--effective_routing_profile--route_targets_on_exports"></a>
-### Nested Schema for `effective_routing_profile.route_targets_on_exports`
-
-Read-Only:
-
-- `asn` (Number) Autonomous system number.
-- `vni` (Number) Route-target VNI.
-
-
 
 <a id="nestedatt--network_security_group_propagation_details"></a>
 ### Nested Schema for `network_security_group_propagation_details`

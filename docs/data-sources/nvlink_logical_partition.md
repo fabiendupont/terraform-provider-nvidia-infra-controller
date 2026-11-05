@@ -32,7 +32,7 @@ output "nvlink_logical_partition_name" {
 - `include_stats` (String) Include NVLink Logical Partition Stats in response.
 - `include_vpcs` (String) Include VPCs in response.
 - `instance_id` (String) Filter NVLink Interfaces by Instance ID.  Can be specified multiple times to filter on more than one ID.
-- `nv_link_domain_id` (String) Filter NVLink Interfaces by Core-reported NVLink domain UUID, not the rack group ID returned by the Domain API. Can be specified multiple times to filter on more than one UUID.
+- `nv_link_domain_id` (String) Filter NVLink Interfaces by NVLink Domain ID.  Can be specified multiple times to filter on more than one ID.
 - `nv_link_logical_partition_id` (String) Filter NVLink Interfaces by NVLink Logical Partition ID.  Can be specified multiple times to filter on more than one ID.
 - `query` (String) Search for matches across all NVLink Logical Partitions. Input will be matched against name, description, and status fields
 - `site_id` (String) Filter NVLink Logical Partitions by Site

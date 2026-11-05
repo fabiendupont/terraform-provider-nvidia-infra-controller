@@ -32,7 +32,6 @@ type ExpectedMachineResourceModel struct {
 	DefaultBmcPassword       types.String                         `tfsdk:"default_bmc_password"`
 	ChassisSerialNumber      types.String                         `tfsdk:"chassis_serial_number"`
 	FallbackDpuSerialNumbers types.List                           `tfsdk:"fallback_dpu_serial_numbers"`
-	Interfaces               []ExpectedMachineInterfacesItem      `tfsdk:"interfaces"`
 	SkuId                    types.String                         `tfsdk:"sku_id"`
 	RackId                   types.String                         `tfsdk:"rack_id"`
 	BmcIpAddress             types.String                         `tfsdk:"bmc_ip_address"`
@@ -55,18 +54,6 @@ type ExpectedMachineResourceModel struct {
 	ExpectedMachineId        types.String                         `tfsdk:"expected_machine_id"`
 }
 
-type ExpectedMachineInterfacesItem struct {
-	MacAddress         types.String `tfsdk:"mac_address"`
-	NicType            types.String `tfsdk:"nic_type"`
-	FixedIp            types.String `tfsdk:"fixed_ip"`
-	FixedMask          types.String `tfsdk:"fixed_mask"`
-	FixedGateway       types.String `tfsdk:"fixed_gateway"`
-	Primary            types.Bool   `tfsdk:"primary"`
-	NetworkSegmentType types.String `tfsdk:"network_segment_type"`
-	Role               types.String `tfsdk:"role"`
-	IpAllocation       types.String `tfsdk:"ip_allocation"`
-}
-
 type ExpectedMachineHostLifecycleProfile struct {
 	DisableLockdown types.Bool `tfsdk:"disable_lockdown"`
 }
@@ -74,12 +61,11 @@ type ExpectedMachineHostLifecycleProfile struct {
 type ExpectedMachineSku struct {
 	Id                   types.String                  `tfsdk:"id"`
 	SiteId               types.String                  `tfsdk:"site_id"`
-	Description          types.String                  `tfsdk:"description"`
-	SchemaVersion        types.Int64                   `tfsdk:"schema_version"`
 	DeviceType           types.String                  `tfsdk:"device_type"`
 	AssociatedMachineIds types.List                    `tfsdk:"associated_machine_ids"`
 	Components           *ExpectedMachineSkuComponents `tfsdk:"components"`
 	Created              types.String                  `tfsdk:"created"`
+	Updated              types.String                  `tfsdk:"updated"`
 }
 
 type ExpectedMachineSkuComponents struct {
@@ -114,33 +100,27 @@ type ExpectedMachineSkuComponentsMemoryItem struct {
 }
 
 type ExpectedMachineSkuComponentsStorageItem struct {
-	Vendor      types.String `tfsdk:"vendor"`
-	Model       types.String `tfsdk:"model"`
-	CapacityMb  types.Int64  `tfsdk:"capacity_mb"`
-	CountValue  types.Int64  `tfsdk:"count_value"`
-	MinSizeMiB  types.Int64  `tfsdk:"min_size_mi_b"`
-	MaxSizeMiB  types.Int64  `tfsdk:"max_size_mi_b"`
-	PciPatterns types.List   `tfsdk:"pci_patterns"`
+	Vendor     types.String `tfsdk:"vendor"`
+	Model      types.String `tfsdk:"model"`
+	CapacityMb types.Int64  `tfsdk:"capacity_mb"`
+	CountValue types.Int64  `tfsdk:"count_value"`
 }
 
 type ExpectedMachineSkuComponentsChassis struct {
-	Vendor       types.String `tfsdk:"vendor"`
-	Model        types.String `tfsdk:"model"`
-	Architecture types.String `tfsdk:"architecture"`
+	Vendor types.String `tfsdk:"vendor"`
+	Model  types.String `tfsdk:"model"`
 }
 
 type ExpectedMachineSkuComponentsEthernetDevicesItem struct {
-	Vendor      types.String `tfsdk:"vendor"`
-	Model       types.String `tfsdk:"model"`
-	CountValue  types.Int64  `tfsdk:"count_value"`
-	IsConnected types.Bool   `tfsdk:"is_connected"`
+	Vendor     types.String `tfsdk:"vendor"`
+	Model      types.String `tfsdk:"model"`
+	CountValue types.Int64  `tfsdk:"count_value"`
 }
 
 type ExpectedMachineSkuComponentsInfinibandDevicesItem struct {
-	Vendor          types.String `tfsdk:"vendor"`
-	Model           types.String `tfsdk:"model"`
-	CountValue      types.Int64  `tfsdk:"count_value"`
-	InactiveDevices types.List   `tfsdk:"inactive_devices"`
+	Vendor     types.String `tfsdk:"vendor"`
+	Model      types.String `tfsdk:"model"`
+	CountValue types.Int64  `tfsdk:"count_value"`
 }
 
 type ExpectedMachineSkuComponentsTpmItem struct {
@@ -173,19 +153,19 @@ func (r *ExpectedMachineResource) Schema(_ context.Context, _ resource.SchemaReq
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "The Expected Machine's BMC MAC address is immutable after creation. Omit this field, or provide another case/separator spelling of the current MAC as a compatibility no-op.",
+				Description: "MAC address of the Expected Machine's BMC (Baseboard Management Controller)",
 			},
 			"default_bmc_username": schema.StringAttribute{
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "Username for accessing the Expected Machine's BMC. Omission or null preserves the value. A non-empty value can be supplied without defaultBmcPassword.",
+				Description: "Username for accessing the Expected Machine's BMC",
 			},
 			"default_bmc_password": schema.StringAttribute{
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "Password for accessing the Expected Machine's BMC. Omission or null preserves the value. A non-empty value can be supplied without defaultBmcUsername.",
+				Description: "Password for accessing the Expected Machine's BMC",
 			},
 			"chassis_serial_number": schema.StringAttribute{
 				Required:    false,
@@ -199,70 +179,6 @@ func (r *ExpectedMachineResource) Schema(_ context.Context, _ resource.SchemaReq
 				Optional:    true,
 				Computed:    true,
 				Description: "Serial numbers of the Expected Machine's fallback DPUs (Data Processing Units)",
-			},
-			"interfaces": schema.ListNestedAttribute{
-				Required:    false,
-				Optional:    true,
-				Computed:    true,
-				Description: "Complete expected host NIC list. Omission or null preserves the current list; an explicit empty list clears it.",
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"mac_address": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "MAC address of the expected interface. Accepts six colon- or hyphen-separated octets in either case; stored and returned in uppercase colon-separated form, for example AA:BB:CC:DD:EE:FF. The same MAC may have separate IPv4 and IPv6 declarations.",
-						},
-						"nic_type": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Optional NIC type. Use `CX9` for ConnectX-9 interfaces on Astra hosts.",
-						},
-						"fixed_ip": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Optional fixed IPv4 or IPv6 address for the interface. REST preserves repeated MAC declarations without enforcing uniqueness by MAC and address family; Core applies allocation validation.",
-						},
-						"fixed_mask": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Optional legacy mask string, forwarded unchanged. Omission or null clears it when replacing the declaration.",
-						},
-						"fixed_gateway": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Optional IPv4 or IPv6 gateway. Omission, null, or an empty string clears it when replacing the declaration.",
-						},
-						"primary": schema.BoolAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Host boot-interface selection. At most one Host interface per machine may set true. Omission or null clears the declaration. DpuOs and DpuBmc must omit it; HostBmc also accepts false.",
-						},
-						"network_segment_type": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Optional segment constraint that takes precedence over nicType. Omission or null clears it. For explicit allocation policies and DPU roles it constrains relay-selected or fixed-address segments; legacy Host declarations without an explicit policy use it only for initial DHCP segment selection.",
-						},
-						"role": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "Interface owner. On create, omission, null, or Unspecified means Host. On update, omission or null preserves a matching stored role; Unspecified resets it to Host. At most one HostBmc is allowed, with the same MAC as bmcMacAddress.",
-						},
-						"ip_allocation": schema.StringAttribute{
-							Required:    false,
-							Optional:    false,
-							Computed:    true,
-							Description: "On create, omission, null, or Unspecified infers Fixed from fixedIp, otherwise Retained for HostBmc and Dynamic for other roles. On update, omission or null preserves a matching stored policy while fixedIp presence is unchanged; Unspecified resets inference. Fixed requires fixedIp; Dynamic and Retained forbid it. Explicit Fixed, inferred DPU Fixed, and inferred HostBmc Fixed with a segment constraint require a containing managed prefix; legacy Host or inferred HostBmc Fixed without a constraint may use static assignments. Retained keeps a DHCP-allocated address for the interface row lifetime.",
-						},
-					},
-				},
 			},
 			"sku_id": schema.StringAttribute{
 				Required:    false,
@@ -280,7 +196,7 @@ func (r *ExpectedMachineResource) Schema(_ context.Context, _ resource.SchemaReq
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "Optional BMC IP address (IPv4 or IPv6). A non-empty address sets the value and pre-allocates a reserved IP for the BMC. An empty string clears the value. Omission or null preserves the current value.",
+				Description: "Optional BMC IP address (IPv4 or IPv6). When set, pre-allocates a reserved IP for the BMC.",
 			},
 			"name": schema.StringAttribute{
 				Required:    false,
@@ -328,7 +244,7 @@ func (r *ExpectedMachineResource) Schema(_ context.Context, _ resource.SchemaReq
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "When true, this host is eligible for DPF-based provisioning. Optional. Omission or null leaves the existing setting unchanged. An explicit true or false value updates the setting.",
+				Description: "When true, this host is eligible for DPF-based provisioning.",
 			},
 			"labels": schema.MapAttribute{
 				ElementType: types.StringType,
@@ -374,18 +290,6 @@ func (r *ExpectedMachineResource) Schema(_ context.Context, _ resource.SchemaReq
 						Optional:    false,
 						Computed:    true,
 						Description: "ID of the Site this SKU belongs to",
-					},
-					"description": schema.StringAttribute{
-						Required:    false,
-						Optional:    false,
-						Computed:    true,
-						Description: "Human-readable SKU description",
-					},
-					"schema_version": schema.Int64Attribute{
-						Required:    false,
-						Optional:    false,
-						Computed:    true,
-						Description: "Core SKU schema version when available",
 					},
 					"device_type": schema.StringAttribute{
 						Required:    false,
@@ -513,44 +417,25 @@ func (r *ExpectedMachineResource) Schema(_ context.Context, _ resource.SchemaReq
 											Required:    false,
 											Optional:    false,
 											Computed:    true,
-											Description: "Storage vendor used for schema version 4 matching. Read-only in REST mutation requests and preserved in responses for legacy SKUs. Schema version 5 does not use this field.",
+											Description: "Vendor of the storage device",
 										},
 										"model": schema.StringAttribute{
 											Required:    false,
 											Optional:    false,
 											Computed:    true,
-											Description: "Informational storage model. Starting with the 2.1 release, NICo does not use this field for storage matching or validation.",
+											Description: "Model of the storage device",
 										},
 										"capacity_mb": schema.Int64Attribute{
 											Required:    false,
 											Optional:    false,
 											Computed:    true,
-											Description: "Storage capacity in megabytes used for schema version 4 matching. Read-only in REST mutation requests and preserved in responses for legacy SKUs. Schema version 5 uses minSizeMiB and maxSizeMiB instead.",
+											Description: "Capacity in megabytes",
 										},
 										"count_value": schema.Int64Attribute{
 											Required:    false,
 											Optional:    false,
 											Computed:    true,
 											Description: "Number of storage devices present",
-										},
-										"min_size_mi_b": schema.Int64Attribute{
-											Required:    false,
-											Optional:    false,
-											Computed:    true,
-											Description: "Inclusive minimum size in MiB for each storage device. Null or omission means no lower bound. Used for SKU schema version 5 and later.",
-										},
-										"max_size_mi_b": schema.Int64Attribute{
-											Required:    false,
-											Optional:    false,
-											Computed:    true,
-											Description: "Inclusive maximum size in MiB for each storage device. Null or omission means no upper bound. Used for SKU schema version 5 and later.",
-										},
-										"pci_patterns": schema.ListAttribute{
-											ElementType: types.StringType,
-											Required:    false,
-											Optional:    false,
-											Computed:    true,
-											Description: "Regular expressions matched against each drive's sysfs PCI path. An empty or omitted list disables PCI location matching. Used for SKU schema version 5 and later.  The matched path is the NVMe controller's sysfs DEVPATH with its trailing kernel-assigned `nvmeN` node removed, for example `/devices/pci0000:00/0000:64:00.0/0000:65:00.0/nvme`, because that node changes with probe order. Patterns that anchor on the node (such as `nvme0$`) never match; end them at `/nvme` instead.",
 										},
 									},
 								},
@@ -573,19 +458,13 @@ func (r *ExpectedMachineResource) Schema(_ context.Context, _ resource.SchemaReq
 										Computed:    true,
 										Description: "Model of the chassis",
 									},
-									"architecture": schema.StringAttribute{
-										Required:    false,
-										Optional:    false,
-										Computed:    true,
-										Description: "Architecture of the chassis",
-									},
 								},
 							},
 							"ethernet_devices": schema.ListNestedAttribute{
 								Required:    false,
 								Optional:    false,
 								Computed:    true,
-								Description: "Read-only Ethernet device components reported by Core. Omit this property from REST mutation requests; null and an empty array are accepted for compatibility, while a non-empty array is rejected with HTTP 400.",
+								Description: "Ethernet device components",
 								NestedObject: schema.NestedAttributeObject{
 									Attributes: map[string]schema.Attribute{
 										"vendor": schema.StringAttribute{
@@ -605,12 +484,6 @@ func (r *ExpectedMachineResource) Schema(_ context.Context, _ resource.SchemaReq
 											Optional:    false,
 											Computed:    true,
 											Description: "Number of ethernet devices present",
-										},
-										"is_connected": schema.BoolAttribute{
-											Required:    false,
-											Optional:    false,
-											Computed:    true,
-											Description: "Whether the ethernet device is connected",
 										},
 									},
 								},
@@ -639,13 +512,6 @@ func (r *ExpectedMachineResource) Schema(_ context.Context, _ resource.SchemaReq
 											Optional:    false,
 											Computed:    true,
 											Description: "Number of infiniband devices present",
-										},
-										"inactive_devices": schema.ListAttribute{
-											ElementType: types.Int64Type,
-											Required:    false,
-											Optional:    false,
-											Computed:    true,
-											Description: "Zero-based indexes of inactive devices",
 										},
 									},
 								},
@@ -678,7 +544,13 @@ func (r *ExpectedMachineResource) Schema(_ context.Context, _ resource.SchemaReq
 						Required:    false,
 						Optional:    false,
 						Computed:    true,
-						Description: "ISO 8601 datetime when the SKU was created, using the Site-reported timestamp when available",
+						Description: "ISO 8601 datetime when the SKU was created",
+					},
+					"updated": schema.StringAttribute{
+						Required:    false,
+						Optional:    false,
+						Computed:    true,
+						Description: "ISO 8601 datetime when the SKU was last updated",
 					},
 				},
 			},
@@ -811,27 +683,6 @@ func (r *ExpectedMachineResource) Create(ctx context.Context, req resource.Creat
 	} else {
 		data.FallbackDpuSerialNumbers = types.ListNull(types.StringType)
 	}
-	if rawItems_interfaces, ok := result["interfaces"].([]interface{}); ok && rawItems_interfaces != nil {
-		items_interfaces := make([]ExpectedMachineInterfacesItem, len(rawItems_interfaces))
-		for i_interfaces, raw_interfaces := range rawItems_interfaces {
-			m_interfaces, _ := raw_interfaces.(map[string]interface{})
-			if m_interfaces == nil {
-				m_interfaces = map[string]interface{}{}
-			}
-			items_interfaces[i_interfaces].MacAddress = StringFromAPI(m_interfaces["macAddress"])
-			items_interfaces[i_interfaces].NicType = StringFromAPI(m_interfaces["nicType"])
-			items_interfaces[i_interfaces].FixedIp = StringFromAPI(m_interfaces["fixedIp"])
-			items_interfaces[i_interfaces].FixedMask = StringFromAPI(m_interfaces["fixedMask"])
-			items_interfaces[i_interfaces].FixedGateway = StringFromAPI(m_interfaces["fixedGateway"])
-			items_interfaces[i_interfaces].Primary = BoolFromAPI(m_interfaces["primary"])
-			items_interfaces[i_interfaces].NetworkSegmentType = StringFromAPI(m_interfaces["networkSegmentType"])
-			items_interfaces[i_interfaces].Role = StringFromAPI(m_interfaces["role"])
-			items_interfaces[i_interfaces].IpAllocation = StringFromAPI(m_interfaces["ipAllocation"])
-		}
-		data.Interfaces = items_interfaces
-	} else {
-		data.Interfaces = nil
-	}
 	data.SkuId = StringFromAPI(result["skuId"])
 	data.RackId = StringFromAPI(result["rackId"])
 	data.BmcIpAddress = StringFromAPI(result["bmcIpAddress"])
@@ -863,12 +714,11 @@ func (r *ExpectedMachineResource) Create(ctx context.Context, req resource.Creat
 		obj_sku := &ExpectedMachineSku{}
 		obj_sku.Id = StringFromAPI(rawObj_sku["id"])
 		obj_sku.SiteId = StringFromAPI(rawObj_sku["siteId"])
-		obj_sku.Description = StringFromAPI(rawObj_sku["description"])
-		obj_sku.SchemaVersion = Int64FromAPI(rawObj_sku["schemaVersion"])
 		obj_sku.DeviceType = StringFromAPI(rawObj_sku["deviceType"])
 		// associatedMachineIds: nested field — expand manually if needed
 		// components: nested field — expand manually if needed
 		obj_sku.Created = StringFromAPI(rawObj_sku["created"])
+		obj_sku.Updated = StringFromAPI(rawObj_sku["updated"])
 		_ = rawObj_sku
 		data.Sku = obj_sku
 	} else {
@@ -928,27 +778,6 @@ func (r *ExpectedMachineResource) Read(ctx context.Context, req resource.ReadReq
 	} else {
 		data.FallbackDpuSerialNumbers = types.ListNull(types.StringType)
 	}
-	if rawItems_interfaces, ok := result["interfaces"].([]interface{}); ok && rawItems_interfaces != nil {
-		items_interfaces := make([]ExpectedMachineInterfacesItem, len(rawItems_interfaces))
-		for i_interfaces, raw_interfaces := range rawItems_interfaces {
-			m_interfaces, _ := raw_interfaces.(map[string]interface{})
-			if m_interfaces == nil {
-				m_interfaces = map[string]interface{}{}
-			}
-			items_interfaces[i_interfaces].MacAddress = StringFromAPI(m_interfaces["macAddress"])
-			items_interfaces[i_interfaces].NicType = StringFromAPI(m_interfaces["nicType"])
-			items_interfaces[i_interfaces].FixedIp = StringFromAPI(m_interfaces["fixedIp"])
-			items_interfaces[i_interfaces].FixedMask = StringFromAPI(m_interfaces["fixedMask"])
-			items_interfaces[i_interfaces].FixedGateway = StringFromAPI(m_interfaces["fixedGateway"])
-			items_interfaces[i_interfaces].Primary = BoolFromAPI(m_interfaces["primary"])
-			items_interfaces[i_interfaces].NetworkSegmentType = StringFromAPI(m_interfaces["networkSegmentType"])
-			items_interfaces[i_interfaces].Role = StringFromAPI(m_interfaces["role"])
-			items_interfaces[i_interfaces].IpAllocation = StringFromAPI(m_interfaces["ipAllocation"])
-		}
-		data.Interfaces = items_interfaces
-	} else {
-		data.Interfaces = nil
-	}
 	data.SkuId = StringFromAPI(result["skuId"])
 	data.RackId = StringFromAPI(result["rackId"])
 	data.BmcIpAddress = StringFromAPI(result["bmcIpAddress"])
@@ -980,12 +809,11 @@ func (r *ExpectedMachineResource) Read(ctx context.Context, req resource.ReadReq
 		obj_sku := &ExpectedMachineSku{}
 		obj_sku.Id = StringFromAPI(rawObj_sku["id"])
 		obj_sku.SiteId = StringFromAPI(rawObj_sku["siteId"])
-		obj_sku.Description = StringFromAPI(rawObj_sku["description"])
-		obj_sku.SchemaVersion = Int64FromAPI(rawObj_sku["schemaVersion"])
 		obj_sku.DeviceType = StringFromAPI(rawObj_sku["deviceType"])
 		// associatedMachineIds: nested field — expand manually if needed
 		// components: nested field — expand manually if needed
 		obj_sku.Created = StringFromAPI(rawObj_sku["created"])
+		obj_sku.Updated = StringFromAPI(rawObj_sku["updated"])
 		_ = rawObj_sku
 		data.Sku = obj_sku
 	} else {
@@ -1041,41 +869,6 @@ func (r *ExpectedMachineResource) Update(ctx context.Context, req resource.Updat
 		var sl_fallback_dpu_serial_numbers []string
 		data.FallbackDpuSerialNumbers.ElementsAs(ctx, &sl_fallback_dpu_serial_numbers, false)
 		body["fallbackDPUSerialNumbers"] = sl_fallback_dpu_serial_numbers
-	}
-	if len(data.Interfaces) > 0 {
-		items_interfaces := make([]map[string]interface{}, len(data.Interfaces))
-		for i_interfaces, item_interfaces := range data.Interfaces {
-			m_interfaces := map[string]interface{}{}
-			if !item_interfaces.MacAddress.IsNull() {
-				m_interfaces["macAddress"] = item_interfaces.MacAddress.ValueString()
-			}
-			if !item_interfaces.NicType.IsNull() {
-				m_interfaces["nicType"] = item_interfaces.NicType.ValueString()
-			}
-			if !item_interfaces.FixedIp.IsNull() {
-				m_interfaces["fixedIp"] = item_interfaces.FixedIp.ValueString()
-			}
-			if !item_interfaces.FixedMask.IsNull() {
-				m_interfaces["fixedMask"] = item_interfaces.FixedMask.ValueString()
-			}
-			if !item_interfaces.FixedGateway.IsNull() {
-				m_interfaces["fixedGateway"] = item_interfaces.FixedGateway.ValueString()
-			}
-			if !item_interfaces.Primary.IsNull() {
-				m_interfaces["primary"] = item_interfaces.Primary.ValueBool()
-			}
-			if !item_interfaces.NetworkSegmentType.IsNull() {
-				m_interfaces["networkSegmentType"] = item_interfaces.NetworkSegmentType.ValueString()
-			}
-			if !item_interfaces.Role.IsNull() {
-				m_interfaces["role"] = item_interfaces.Role.ValueString()
-			}
-			if !item_interfaces.IpAllocation.IsNull() {
-				m_interfaces["ipAllocation"] = item_interfaces.IpAllocation.ValueString()
-			}
-			items_interfaces[i_interfaces] = m_interfaces
-		}
-		body["interfaces"] = items_interfaces
 	}
 	if !data.SkuId.IsNull() && !data.SkuId.IsUnknown() {
 		body["skuId"] = data.SkuId.ValueString()
@@ -1143,27 +936,6 @@ func (r *ExpectedMachineResource) Update(ctx context.Context, req resource.Updat
 	} else {
 		data.FallbackDpuSerialNumbers = types.ListNull(types.StringType)
 	}
-	if rawItems_interfaces, ok := result["interfaces"].([]interface{}); ok && rawItems_interfaces != nil {
-		items_interfaces := make([]ExpectedMachineInterfacesItem, len(rawItems_interfaces))
-		for i_interfaces, raw_interfaces := range rawItems_interfaces {
-			m_interfaces, _ := raw_interfaces.(map[string]interface{})
-			if m_interfaces == nil {
-				m_interfaces = map[string]interface{}{}
-			}
-			items_interfaces[i_interfaces].MacAddress = StringFromAPI(m_interfaces["macAddress"])
-			items_interfaces[i_interfaces].NicType = StringFromAPI(m_interfaces["nicType"])
-			items_interfaces[i_interfaces].FixedIp = StringFromAPI(m_interfaces["fixedIp"])
-			items_interfaces[i_interfaces].FixedMask = StringFromAPI(m_interfaces["fixedMask"])
-			items_interfaces[i_interfaces].FixedGateway = StringFromAPI(m_interfaces["fixedGateway"])
-			items_interfaces[i_interfaces].Primary = BoolFromAPI(m_interfaces["primary"])
-			items_interfaces[i_interfaces].NetworkSegmentType = StringFromAPI(m_interfaces["networkSegmentType"])
-			items_interfaces[i_interfaces].Role = StringFromAPI(m_interfaces["role"])
-			items_interfaces[i_interfaces].IpAllocation = StringFromAPI(m_interfaces["ipAllocation"])
-		}
-		data.Interfaces = items_interfaces
-	} else {
-		data.Interfaces = nil
-	}
 	data.SkuId = StringFromAPI(result["skuId"])
 	data.RackId = StringFromAPI(result["rackId"])
 	data.BmcIpAddress = StringFromAPI(result["bmcIpAddress"])
@@ -1195,12 +967,11 @@ func (r *ExpectedMachineResource) Update(ctx context.Context, req resource.Updat
 		obj_sku := &ExpectedMachineSku{}
 		obj_sku.Id = StringFromAPI(rawObj_sku["id"])
 		obj_sku.SiteId = StringFromAPI(rawObj_sku["siteId"])
-		obj_sku.Description = StringFromAPI(rawObj_sku["description"])
-		obj_sku.SchemaVersion = Int64FromAPI(rawObj_sku["schemaVersion"])
 		obj_sku.DeviceType = StringFromAPI(rawObj_sku["deviceType"])
 		// associatedMachineIds: nested field — expand manually if needed
 		// components: nested field — expand manually if needed
 		obj_sku.Created = StringFromAPI(rawObj_sku["created"])
+		obj_sku.Updated = StringFromAPI(rawObj_sku["updated"])
 		_ = rawObj_sku
 		data.Sku = obj_sku
 	} else {
@@ -1255,27 +1026,6 @@ func (r *ExpectedMachineResource) populateModel(ctx context.Context, data *Expec
 	} else {
 		data.FallbackDpuSerialNumbers = types.ListNull(types.StringType)
 	}
-	if rawItems_interfaces, ok := result["interfaces"].([]interface{}); ok && rawItems_interfaces != nil {
-		items_interfaces := make([]ExpectedMachineInterfacesItem, len(rawItems_interfaces))
-		for i_interfaces, raw_interfaces := range rawItems_interfaces {
-			m_interfaces, _ := raw_interfaces.(map[string]interface{})
-			if m_interfaces == nil {
-				m_interfaces = map[string]interface{}{}
-			}
-			items_interfaces[i_interfaces].MacAddress = StringFromAPI(m_interfaces["macAddress"])
-			items_interfaces[i_interfaces].NicType = StringFromAPI(m_interfaces["nicType"])
-			items_interfaces[i_interfaces].FixedIp = StringFromAPI(m_interfaces["fixedIp"])
-			items_interfaces[i_interfaces].FixedMask = StringFromAPI(m_interfaces["fixedMask"])
-			items_interfaces[i_interfaces].FixedGateway = StringFromAPI(m_interfaces["fixedGateway"])
-			items_interfaces[i_interfaces].Primary = BoolFromAPI(m_interfaces["primary"])
-			items_interfaces[i_interfaces].NetworkSegmentType = StringFromAPI(m_interfaces["networkSegmentType"])
-			items_interfaces[i_interfaces].Role = StringFromAPI(m_interfaces["role"])
-			items_interfaces[i_interfaces].IpAllocation = StringFromAPI(m_interfaces["ipAllocation"])
-		}
-		data.Interfaces = items_interfaces
-	} else {
-		data.Interfaces = nil
-	}
 	data.SkuId = StringFromAPI(result["skuId"])
 	data.RackId = StringFromAPI(result["rackId"])
 	data.BmcIpAddress = StringFromAPI(result["bmcIpAddress"])
@@ -1307,12 +1057,11 @@ func (r *ExpectedMachineResource) populateModel(ctx context.Context, data *Expec
 		obj_sku := &ExpectedMachineSku{}
 		obj_sku.Id = StringFromAPI(rawObj_sku["id"])
 		obj_sku.SiteId = StringFromAPI(rawObj_sku["siteId"])
-		obj_sku.Description = StringFromAPI(rawObj_sku["description"])
-		obj_sku.SchemaVersion = Int64FromAPI(rawObj_sku["schemaVersion"])
 		obj_sku.DeviceType = StringFromAPI(rawObj_sku["deviceType"])
 		// associatedMachineIds: nested field — expand manually if needed
 		// components: nested field — expand manually if needed
 		obj_sku.Created = StringFromAPI(rawObj_sku["created"])
+		obj_sku.Updated = StringFromAPI(rawObj_sku["updated"])
 		_ = rawObj_sku
 		data.Sku = obj_sku
 	} else {
