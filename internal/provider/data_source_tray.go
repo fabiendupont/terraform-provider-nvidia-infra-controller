@@ -26,26 +26,29 @@ type TrayDataSource struct {
 }
 
 type TrayDataSourceModel struct {
-	Id              types.String     `tfsdk:"id"`
-	SiteId          types.String     `tfsdk:"site_id"`
-	RackId          types.String     `tfsdk:"rack_id"`
-	RackName        types.String     `tfsdk:"rack_name"`
-	Type            types.String     `tfsdk:"type"`
-	ComponentId     types.String     `tfsdk:"component_id"`
-	SlotId          types.String     `tfsdk:"slot_id"`
-	Name            types.String     `tfsdk:"name"`
-	Manufacturer    types.String     `tfsdk:"manufacturer"`
-	ActiveOnly      types.String     `tfsdk:"active_only"`
-	IncludeReport   types.String     `tfsdk:"include_report"`
-	Model           types.String     `tfsdk:"model"`
-	SerialNumber    types.String     `tfsdk:"serial_number"`
-	Description     types.String     `tfsdk:"description"`
-	FirmwareVersion types.String     `tfsdk:"firmware_version"`
-	PowerState      types.String     `tfsdk:"power_state"`
-	OperationStatus types.String     `tfsdk:"operation_status"`
-	LeakStatus      types.String     `tfsdk:"leak_status"`
-	Position        *TrayDsPosition  `tfsdk:"position"`
-	Bmcs            []TrayDsBmcsItem `tfsdk:"bmcs"`
+	Id                 types.String     `tfsdk:"id"`
+	SiteId             types.String     `tfsdk:"site_id"`
+	RackId             types.String     `tfsdk:"rack_id"`
+	RackName           types.String     `tfsdk:"rack_name"`
+	Type               types.String     `tfsdk:"type"`
+	SlotId             types.String     `tfsdk:"slot_id"`
+	Name               types.String     `tfsdk:"name"`
+	Manufacturer       types.String     `tfsdk:"manufacturer"`
+	ActiveOnly         types.String     `tfsdk:"active_only"`
+	IncludeReport      types.String     `tfsdk:"include_report"`
+	Model              types.String     `tfsdk:"model"`
+	SerialNumber       types.String     `tfsdk:"serial_number"`
+	Description        types.String     `tfsdk:"description"`
+	FirmwareVersion    types.String     `tfsdk:"firmware_version"`
+	PowerState         types.String     `tfsdk:"power_state"`
+	OperationStatus    types.String     `tfsdk:"operation_status"`
+	LeakStatus         types.String     `tfsdk:"leak_status"`
+	LeakHandlingStatus types.String     `tfsdk:"leak_handling_status"`
+	Position           *TrayDsPosition  `tfsdk:"position"`
+	Bmcs               []TrayDsBmcsItem `tfsdk:"bmcs"`
+	NvLinkDomainId     types.String     `tfsdk:"nv_link_domain_id"`
+	TaskStats          *TrayDsTaskStats `tfsdk:"task_stats"`
+	Health             types.String     `tfsdk:"health"`
 }
 
 type TrayDsPosition struct {
@@ -58,6 +61,11 @@ type TrayDsBmcsItem struct {
 	Type       types.String `tfsdk:"type"`
 	MacAddress types.String `tfsdk:"mac_address"`
 	IpAddress  types.String `tfsdk:"ip_address"`
+}
+
+type TrayDsTaskStats struct {
+	PendingTaskCount types.Int64 `tfsdk:"pending_task_count"`
+	ActiveTaskCount  types.Int64 `tfsdk:"active_task_count"`
 }
 
 func (d *TrayDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -91,13 +99,7 @@ func (d *TrayDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "Filter by tray type",
-			},
-			"component_id": schema.StringAttribute{
-				Required:    false,
-				Optional:    true,
-				Computed:    true,
-				Description: "Filter by component ID. Can be specified multiple times to filter on more than one component ID. Requires 'type' parameter.",
+				Description: "Filter by tray type. When `id` is specified, the type disambiguates component IDs shared by different component types.",
 			},
 			"slot_id": schema.StringAttribute{
 				Required:    false,
@@ -171,6 +173,12 @@ func (d *TrayDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 				Computed:    true,
 				Description: "Whether the tray is considered leaking coolant",
 			},
+			"leak_handling_status": schema.StringAttribute{
+				Required:    false,
+				Optional:    false,
+				Computed:    true,
+				Description: "Flow's leakage-handling status. Unknown means Flow could not determine the status; None means no supported handling task exists; ShuttingDown means a forced-shutdown task is waiting, pending, or running; Down means it completed; and Failed means the latest supported handling task failed or was terminated. Down describes handling progress, not the component's current power state.",
+			},
 			"position": schema.SingleNestedAttribute{
 				Required:    false,
 				Optional:    false,
@@ -225,6 +233,38 @@ func (d *TrayDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 					},
 				},
 			},
+			"nv_link_domain_id": schema.StringAttribute{
+				Required:    false,
+				Optional:    false,
+				Computed:    true,
+				Description: "Domain external ID (rack group ID) containing this Tray's Rack. Null when no rack-group Domain is assigned.",
+			},
+			"task_stats": schema.SingleNestedAttribute{
+				Required:    false,
+				Optional:    false,
+				Computed:    true,
+				Description: "Counts of non-terminal tasks currently associated with a rack or tray. Rack stats include component-scoped tasks on the rack; tray stats include only tasks that explicitly target the tray.",
+				Attributes: map[string]schema.Attribute{
+					"pending_task_count": schema.Int64Attribute{
+						Required:    false,
+						Optional:    false,
+						Computed:    true,
+						Description: "Number of associated tasks in Waiting or Pending state.",
+					},
+					"active_task_count": schema.Int64Attribute{
+						Required:    false,
+						Optional:    false,
+						Computed:    true,
+						Description: "Number of associated tasks in Running state.",
+					},
+				},
+			},
+			"health": schema.StringAttribute{
+				Required:    false,
+				Optional:    false,
+				Computed:    true,
+				Description: "Latest Core aggregate health snapshot synchronized by Flow. Null when Core reports no aggregate health, including before the first successful inventory sync.",
+			},
 		},
 	}
 }
@@ -252,7 +292,7 @@ func (d *TrayDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 	}
 
 	if !data.Id.IsNull() && !data.Id.IsUnknown() && data.Id.ValueString() != "" {
-		url := d.client.ResolvePath("/v2/org/{org}/nico/tray/{id}", map[string]string{"id": data.Id.ValueString()})
+		url := d.client.ResolvePath("/v2/org/{org}/nico/tray/{id}/health-report/{source}", map[string]string{"id": data.Id.ValueString(), "source": data.Id.ValueString()})
 		result, err := d.client.Get(ctx, url)
 		if err != nil {
 			resp.Diagnostics.AddError("Error reading Tray", err.Error())
@@ -271,6 +311,7 @@ func (d *TrayDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 		data.PowerState = StringFromAPI(result["powerState"])
 		data.OperationStatus = StringFromAPI(result["operationStatus"])
 		data.LeakStatus = StringFromAPI(result["leakStatus"])
+		data.LeakHandlingStatus = StringFromAPI(result["leakHandlingStatus"])
 		if rawObj_position, ok := result["position"].(map[string]interface{}); ok {
 			obj_position := &TrayDsPosition{}
 			obj_position.SlotId = Int64FromAPI(rawObj_position["slotId"])
@@ -296,6 +337,17 @@ func (d *TrayDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 		} else {
 			data.Bmcs = nil
 		}
+		data.NvLinkDomainId = StringFromAPI(result["nvLinkDomainId"])
+		if rawObj_task_stats, ok := result["taskStats"].(map[string]interface{}); ok {
+			obj_task_stats := &TrayDsTaskStats{}
+			obj_task_stats.PendingTaskCount = Int64FromAPI(rawObj_task_stats["pendingTaskCount"])
+			obj_task_stats.ActiveTaskCount = Int64FromAPI(rawObj_task_stats["activeTaskCount"])
+			_ = rawObj_task_stats
+			data.TaskStats = obj_task_stats
+		} else {
+			data.TaskStats = nil
+		}
+		data.Health = StringFromAPI(result["health"])
 		_ = diags
 	} else if true {
 		url := d.client.ResolvePath("/v2/org/{org}/nico/tray/{id}/task", map[string]string{"id": data.Id.ValueString()})
@@ -315,6 +367,7 @@ func (d *TrayDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 			data.PowerState = StringFromAPI(result["powerState"])
 			data.OperationStatus = StringFromAPI(result["operationStatus"])
 			data.LeakStatus = StringFromAPI(result["leakStatus"])
+			data.LeakHandlingStatus = StringFromAPI(result["leakHandlingStatus"])
 			if rawObj_position, ok := result["position"].(map[string]interface{}); ok {
 				obj_position := &TrayDsPosition{}
 				obj_position.SlotId = Int64FromAPI(rawObj_position["slotId"])
@@ -340,6 +393,17 @@ func (d *TrayDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 			} else {
 				data.Bmcs = nil
 			}
+			data.NvLinkDomainId = StringFromAPI(result["nvLinkDomainId"])
+			if rawObj_task_stats, ok := result["taskStats"].(map[string]interface{}); ok {
+				obj_task_stats := &TrayDsTaskStats{}
+				obj_task_stats.PendingTaskCount = Int64FromAPI(rawObj_task_stats["pendingTaskCount"])
+				obj_task_stats.ActiveTaskCount = Int64FromAPI(rawObj_task_stats["activeTaskCount"])
+				_ = rawObj_task_stats
+				data.TaskStats = obj_task_stats
+			} else {
+				data.TaskStats = nil
+			}
+			data.Health = StringFromAPI(result["health"])
 			_ = diags
 		}
 	}
@@ -355,6 +419,7 @@ func (d *TrayDataSource) populateModel(ctx context.Context, data *TrayDataSource
 	data.PowerState = StringFromAPI(result["powerState"])
 	data.OperationStatus = StringFromAPI(result["operationStatus"])
 	data.LeakStatus = StringFromAPI(result["leakStatus"])
+	data.LeakHandlingStatus = StringFromAPI(result["leakHandlingStatus"])
 	if rawObj_position, ok := result["position"].(map[string]interface{}); ok {
 		obj_position := &TrayDsPosition{}
 		obj_position.SlotId = Int64FromAPI(rawObj_position["slotId"])
@@ -380,5 +445,16 @@ func (d *TrayDataSource) populateModel(ctx context.Context, data *TrayDataSource
 	} else {
 		data.Bmcs = nil
 	}
+	data.NvLinkDomainId = StringFromAPI(result["nvLinkDomainId"])
+	if rawObj_task_stats, ok := result["taskStats"].(map[string]interface{}); ok {
+		obj_task_stats := &TrayDsTaskStats{}
+		obj_task_stats.PendingTaskCount = Int64FromAPI(rawObj_task_stats["pendingTaskCount"])
+		obj_task_stats.ActiveTaskCount = Int64FromAPI(rawObj_task_stats["activeTaskCount"])
+		_ = rawObj_task_stats
+		data.TaskStats = obj_task_stats
+	} else {
+		data.TaskStats = nil
+	}
+	data.Health = StringFromAPI(result["health"])
 	_ = diags
 }

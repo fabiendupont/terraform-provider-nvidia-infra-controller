@@ -31,13 +31,13 @@ type SubnetResourceModel struct {
 	Description                types.String              `tfsdk:"description"`
 	VpcId                      types.String              `tfsdk:"vpc_id"`
 	Ipv4BlockId                types.String              `tfsdk:"ipv4_block_id"`
-	Ipv6BlockId                types.String              `tfsdk:"ipv6_block_id"`
 	PrefixLength               types.Int64               `tfsdk:"prefix_length"`
 	SiteId                     types.String              `tfsdk:"site_id"`
 	ControllerNetworkSegmentId types.String              `tfsdk:"controller_network_segment_id"`
 	Ipv4Prefix                 types.String              `tfsdk:"ipv4_prefix"`
 	Ipv4Gateway                types.String              `tfsdk:"ipv4_gateway"`
 	Ipv6Prefix                 types.String              `tfsdk:"ipv6_prefix"`
+	Ipv6BlockId                types.String              `tfsdk:"ipv6_block_id"`
 	Ipv6Gateway                types.String              `tfsdk:"ipv6_gateway"`
 	Mtu                        types.Int64               `tfsdk:"mtu"`
 	RoutingType                types.String              `tfsdk:"routing_type"`
@@ -90,25 +90,19 @@ func (r *SubnetResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
-				Description: "ID of the VPC containing the Subnet",
+				Description: "ID of the Ethernet virtualizer VPC containing the Subnet",
 			},
 			"ipv4_block_id": schema.StringAttribute{
-				Required:    false,
-				Optional:    true,
-				Computed:    true,
-				Description: "ID of the derived Tenant IPv4 Block from an Allocation",
-			},
-			"ipv6_block_id": schema.StringAttribute{
-				Required:    false,
-				Optional:    true,
-				Computed:    true,
-				Description: "ID of the derived Tenant IPv6 Block from an Allocation",
+				Required:    true,
+				Optional:    false,
+				Computed:    false,
+				Description: "ID of the Ready, derived Tenant IPv4 Block from an Allocation",
 			},
 			"prefix_length": schema.Int64Attribute{
 				Required:    true,
 				Optional:    false,
 				Computed:    false,
-				Description: "Length of the prefix",
+				Description: "Length of the IPv4 prefix, from 8 through 30",
 			},
 			"site_id": schema.StringAttribute{
 				Required:    false,
@@ -139,6 +133,12 @@ func (r *SubnetResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 				Optional:    false,
 				Computed:    true,
 				Description: "Prefix of the network in CIDR notation",
+			},
+			"ipv6_block_id": schema.StringAttribute{
+				Required:    false,
+				Optional:    false,
+				Computed:    true,
+				Description: "ID of the derived Tenant IPv6 Block from an Allocation",
 			},
 			"ipv6_gateway": schema.StringAttribute{
 				Required:    false,
@@ -174,7 +174,7 @@ func (r *SubnetResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 						Required:    false,
 						Optional:    false,
 						Computed:    true,
-						Description: "Total number of IP addresses in the block (acquired and unused)",
+						Description: "Total number of IP addresses in the block (acquired and unused), capped at 2,147,483,647. An IP Block allocated to one child prefix of the same size reports zero. ",
 					},
 					"acquired_i_ps": schema.Int64Attribute{
 						Required:    false,
@@ -193,7 +193,7 @@ func (r *SubnetResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 						Required:    false,
 						Optional:    false,
 						Computed:    true,
-						Description: "Total number of /30 prefixes that can still be acquired from this block (only reduced if prefixes are acquired, not reduced by acquired IPs) ",
+						Description: "Number of complete `/30` IPv4 prefixes or `/126` IPv6 prefixes remaining after acquired child prefixes are excluded. Both prefix sizes contain four addresses. The count is capped at 2,147,483,647. The `acquiredIPs` count is not subtracted. ",
 					},
 					"acquired_prefixes": schema.Int64Attribute{
 						Required:    false,
@@ -294,9 +294,6 @@ func (r *SubnetResource) Create(ctx context.Context, req resource.CreateRequest,
 	if !data.Ipv4BlockId.IsNull() && !data.Ipv4BlockId.IsUnknown() {
 		body["ipv4BlockId"] = data.Ipv4BlockId.ValueString()
 	}
-	if !data.Ipv6BlockId.IsNull() && !data.Ipv6BlockId.IsUnknown() {
-		body["ipv6BlockId"] = data.Ipv6BlockId.ValueString()
-	}
 	if !data.PrefixLength.IsNull() && !data.PrefixLength.IsUnknown() {
 		body["prefixLength"] = data.PrefixLength.ValueInt64()
 	}
@@ -314,13 +311,13 @@ func (r *SubnetResource) Create(ctx context.Context, req resource.CreateRequest,
 	data.Description = StringFromAPI(result["description"])
 	data.VpcId = StringFromAPI(result["vpcId"])
 	data.Ipv4BlockId = StringFromAPI(result["ipv4BlockId"])
-	data.Ipv6BlockId = StringFromAPI(result["ipv6BlockId"])
 	data.PrefixLength = Int64FromAPI(result["prefixLength"])
 	data.SiteId = StringFromAPI(result["siteId"])
 	data.ControllerNetworkSegmentId = StringFromAPI(result["controllerNetworkSegmentId"])
 	data.Ipv4Prefix = StringFromAPI(result["ipv4Prefix"])
 	data.Ipv4Gateway = StringFromAPI(result["ipv4Gateway"])
 	data.Ipv6Prefix = StringFromAPI(result["ipv6Prefix"])
+	data.Ipv6BlockId = StringFromAPI(result["ipv6BlockId"])
 	data.Ipv6Gateway = StringFromAPI(result["ipv6Gateway"])
 	data.Mtu = Int64FromAPI(result["mtu"])
 	data.RoutingType = StringFromAPI(result["routingType"])
@@ -384,13 +381,13 @@ func (r *SubnetResource) Read(ctx context.Context, req resource.ReadRequest, res
 	data.Description = StringFromAPI(result["description"])
 	data.VpcId = StringFromAPI(result["vpcId"])
 	data.Ipv4BlockId = StringFromAPI(result["ipv4BlockId"])
-	data.Ipv6BlockId = StringFromAPI(result["ipv6BlockId"])
 	data.PrefixLength = Int64FromAPI(result["prefixLength"])
 	data.SiteId = StringFromAPI(result["siteId"])
 	data.ControllerNetworkSegmentId = StringFromAPI(result["controllerNetworkSegmentId"])
 	data.Ipv4Prefix = StringFromAPI(result["ipv4Prefix"])
 	data.Ipv4Gateway = StringFromAPI(result["ipv4Gateway"])
 	data.Ipv6Prefix = StringFromAPI(result["ipv6Prefix"])
+	data.Ipv6BlockId = StringFromAPI(result["ipv6BlockId"])
 	data.Ipv6Gateway = StringFromAPI(result["ipv6Gateway"])
 	data.Mtu = Int64FromAPI(result["mtu"])
 	data.RoutingType = StringFromAPI(result["routingType"])
@@ -458,13 +455,13 @@ func (r *SubnetResource) Update(ctx context.Context, req resource.UpdateRequest,
 	data.Description = StringFromAPI(result["description"])
 	data.VpcId = StringFromAPI(result["vpcId"])
 	data.Ipv4BlockId = StringFromAPI(result["ipv4BlockId"])
-	data.Ipv6BlockId = StringFromAPI(result["ipv6BlockId"])
 	data.PrefixLength = Int64FromAPI(result["prefixLength"])
 	data.SiteId = StringFromAPI(result["siteId"])
 	data.ControllerNetworkSegmentId = StringFromAPI(result["controllerNetworkSegmentId"])
 	data.Ipv4Prefix = StringFromAPI(result["ipv4Prefix"])
 	data.Ipv4Gateway = StringFromAPI(result["ipv4Gateway"])
 	data.Ipv6Prefix = StringFromAPI(result["ipv6Prefix"])
+	data.Ipv6BlockId = StringFromAPI(result["ipv6BlockId"])
 	data.Ipv6Gateway = StringFromAPI(result["ipv6Gateway"])
 	data.Mtu = Int64FromAPI(result["mtu"])
 	data.RoutingType = StringFromAPI(result["routingType"])
@@ -523,13 +520,13 @@ func (r *SubnetResource) populateModel(ctx context.Context, data *SubnetResource
 	data.Description = StringFromAPI(result["description"])
 	data.VpcId = StringFromAPI(result["vpcId"])
 	data.Ipv4BlockId = StringFromAPI(result["ipv4BlockId"])
-	data.Ipv6BlockId = StringFromAPI(result["ipv6BlockId"])
 	data.PrefixLength = Int64FromAPI(result["prefixLength"])
 	data.SiteId = StringFromAPI(result["siteId"])
 	data.ControllerNetworkSegmentId = StringFromAPI(result["controllerNetworkSegmentId"])
 	data.Ipv4Prefix = StringFromAPI(result["ipv4Prefix"])
 	data.Ipv4Gateway = StringFromAPI(result["ipv4Gateway"])
 	data.Ipv6Prefix = StringFromAPI(result["ipv6Prefix"])
+	data.Ipv6BlockId = StringFromAPI(result["ipv6BlockId"])
 	data.Ipv6Gateway = StringFromAPI(result["ipv6Gateway"])
 	data.Mtu = Int64FromAPI(result["mtu"])
 	data.RoutingType = StringFromAPI(result["routingType"])

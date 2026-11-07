@@ -33,6 +33,7 @@ type ExpectedRackResourceModel struct {
 	Name          types.String `tfsdk:"name"`
 	Description   types.String `tfsdk:"description"`
 	Labels        types.Map    `tfsdk:"labels"`
+	RackGroupId   types.String `tfsdk:"rack_group_id"`
 	Created       types.String `tfsdk:"created"`
 	Updated       types.String `tfsdk:"updated"`
 }
@@ -60,10 +61,10 @@ func (r *ExpectedRackResource) Schema(_ context.Context, _ resource.SchemaReques
 				Description: "Operator-supplied identifier for the rack (string, not UUID). Must be non-empty and unique within the Site.",
 			},
 			"rack_profile_id": schema.StringAttribute{
-				Required:    true,
-				Optional:    false,
-				Computed:    false,
-				Description: "Identifier of the Rack Profile this rack conforms to. Must be non-empty.",
+				Required:    false,
+				Optional:    true,
+				Computed:    true,
+				Description: "Ignored compatibility field. Core derives the profile from the matching ExpectedRackGroup; omit this field.",
 			},
 			"name": schema.StringAttribute{
 				Required:    false,
@@ -83,6 +84,12 @@ func (r *ExpectedRackResource) Schema(_ context.Context, _ resource.SchemaReques
 				Optional:    true,
 				Computed:    true,
 				Description: "User-defined key-value pairs for organizing and categorizing Expected Racks. Well-known keys (`chassis.*`, `location.*`) are used to convey chassis identity and physical location.",
+			},
+			"rack_group_id": schema.StringAttribute{
+				Required:    false,
+				Optional:    false,
+				Computed:    true,
+				Description: "External rack group ID selected and persisted at creation together with rackProfileId. Null for legacy rows without a recorded group; metadata updates preserve it.",
 			},
 			"created": schema.StringAttribute{
 				Required:    false,
@@ -165,6 +172,7 @@ func (r *ExpectedRackResource) Create(ctx context.Context, req resource.CreateRe
 	} else {
 		data.Labels = types.MapNull(types.StringType)
 	}
+	data.RackGroupId = StringFromAPI(result["rackGroupId"])
 	data.Created = StringFromAPI(result["created"])
 	data.Updated = StringFromAPI(result["updated"])
 	_ = diags
@@ -203,6 +211,7 @@ func (r *ExpectedRackResource) Read(ctx context.Context, req resource.ReadReques
 	} else {
 		data.Labels = types.MapNull(types.StringType)
 	}
+	data.RackGroupId = StringFromAPI(result["rackGroupId"])
 	data.Created = StringFromAPI(result["created"])
 	data.Updated = StringFromAPI(result["updated"])
 	_ = diags
@@ -259,6 +268,7 @@ func (r *ExpectedRackResource) Update(ctx context.Context, req resource.UpdateRe
 	} else {
 		data.Labels = types.MapNull(types.StringType)
 	}
+	data.RackGroupId = StringFromAPI(result["rackGroupId"])
 	data.Created = StringFromAPI(result["created"])
 	data.Updated = StringFromAPI(result["updated"])
 	_ = diags
@@ -292,6 +302,7 @@ func (r *ExpectedRackResource) populateModel(ctx context.Context, data *Expected
 	} else {
 		data.Labels = types.MapNull(types.StringType)
 	}
+	data.RackGroupId = StringFromAPI(result["rackGroupId"])
 	data.Created = StringFromAPI(result["created"])
 	data.Updated = StringFromAPI(result["updated"])
 	_ = diags

@@ -205,7 +205,7 @@ func (d *ExpectedPowerShelfDataSource) Read(ctx context.Context, req datasource.
 		data.Updated = StringFromAPI(result["updated"])
 		_ = diags
 	} else if true {
-		url := d.client.ResolvePath("/v2/org/{org}/nico/expected-power-shelf", map[string]string{})
+		url := d.client.ResolvePath("/v2/org/{org}/nico/expected-power-shelf/all", map[string]string{})
 		items, err := d.client.List(ctx, url, map[string]string{})
 		if err != nil {
 			resp.Diagnostics.AddError("Error listing Expected Power Shelf", err.Error())

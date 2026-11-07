@@ -16,7 +16,6 @@ Expected Rack identifies a Rack that is expected to be discovered at a Site. Inf
 resource "nico_expected_rack" "example" {
   site_id                        = "site-id-value"
   rack_id                        = "rack-id-value"
-  rack_profile_id                = "rack-profile-id-value"
   name                           = "name-value"
   description                    = "description-value"
   labels                         = {
@@ -31,7 +30,6 @@ resource "nico_expected_rack" "example" {
 ### Required
 
 - `rack_id` (String) Operator-supplied identifier for the rack (string, not UUID). Must be non-empty and unique within the Site.
-- `rack_profile_id` (String) Identifier of the Rack Profile this rack conforms to. Must be non-empty.
 - `site_id` (String) ID of the Site the Expected Rack belongs to
 
 ### Optional
@@ -39,9 +37,11 @@ resource "nico_expected_rack" "example" {
 - `description` (String) Human-readable description of the Expected Rack
 - `labels` (Map of String) User-defined key-value pairs for organizing and categorizing Expected Racks. Well-known keys (`chassis.*`, `location.*`) are used to convey chassis identity and physical location.
 - `name` (String) Human-readable name of the Expected Rack
+- `rack_profile_id` (String) Ignored compatibility field. Core derives the profile from the matching ExpectedRackGroup; omit this field.
 
 ### Read-Only
 
 - `created` (String) ISO 8601 datetime when the Expected Rack was created
 - `id` (String) The resource ID.
+- `rack_group_id` (String) External rack group ID selected and persisted at creation together with rackProfileId. Null for legacy rows without a recorded group; metadata updates preserve it.
 - `updated` (String) ISO 8601 datetime when the Expected Rack was last updated

@@ -241,7 +241,7 @@ func (r *ExpectedPowerShelfResource) Create(ctx context.Context, req resource.Cr
 		body["labels"] = m_labels
 	}
 
-	url := r.client.ResolvePath("/v2/org/{org}/nico/expected-power-shelf", map[string]string{})
+	url := r.client.ResolvePath("/v2/org/{org}/nico/expected-power-shelf/all", map[string]string{})
 	result, err := r.client.Post(ctx, url, body)
 	if err != nil {
 		resp.Diagnostics.AddError("Error creating Expected Power Shelf", err.Error())

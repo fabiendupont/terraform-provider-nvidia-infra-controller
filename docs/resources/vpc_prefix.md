@@ -18,7 +18,6 @@ resource "nico_vpc_prefix" "example" {
   site_id                        = "site-id-uuid"
   name                           = "name-value"
   ip_block_id                    = "ip-block-id-value"
-  prefix_length                  = 0
 }
 ```
 
@@ -27,12 +26,13 @@ resource "nico_vpc_prefix" "example" {
 
 ### Required
 
-- `ip_block_id` (String) ID of the IP Block to allocate the VPC Prefix from
+- `ip_block_id` (String) ID of the Ready tenant IPv4 or IPv6 IP Block to allocate the VPC Prefix from. The block must be at the FNN VPC's Site.
 - `name` (String) Human readable name for the VPC Prefix
-- `prefix_length` (Number) Prefix length for the VPC Prefix. Valid range is 8 to 31, and max usable value depends on prefix length of parent IP Block.
 
 ### Optional
 
+- `prefix` (String) Exact network-aligned IPv4 or IPv6 CIDR to reserve. Accepted IPv6 text is canonicalized before persistence and response. IPv4 accepts `/8` through `/31`. IPv6 accepts `/8` through `/63` when the FNN VPC has `slaacEnabled=true`, or `/8` through `/126` otherwise. The CIDR must be contained by the selected IP Block, match its address family, and not overlap an existing reservation. An IPv4-mapped IPv6 CIDR is not accepted. Mutually exclusive with `prefixLength`.
+- `prefix_length` (Number) Prefix length for automatic allocation. IPv4 accepts 8 through 31. IPv6 accepts 8 through 63 when the FNN VPC has `slaacEnabled=true`, or 8 through 126 otherwise. The selected IP Block must contain a prefix of the requested length. Mutually exclusive with `prefix`.
 - `vpc_id` (String) ID of the VPC
 - `vpc_prefix_id` (String) Path parameter: vpc_prefix_id.
 
@@ -40,12 +40,11 @@ resource "nico_vpc_prefix" "example" {
 
 - `created` (String) Date and time when the VPC Prefix was created
 - `id` (String) The resource ID.
-- `prefix` (String) The network prefix including prefix length in CIDR notation
 - `site_id` (String) ID of the Site the VPC Prefix belongs to
 - `status` (String) Status of the VPC Prefix
 - `status_history` (Attributes List) Details of 20 most recent status changes (see [below for nested schema](#nestedatt--status_history))
 - `updated` (String) Date and time when the VPC Prefix was updated
-- `usage_stats` (Attributes) Present when query parameter `includeUsageStats=true`. Prefix and IP usage data is derived by evaluating associated Ethernet interfaces. Each Interface associated with a VPC Prefix consumes a `/31` prefix. (see [below for nested schema](#nestedatt--usage_stats))
+- `usage_stats` (Attributes) Present when query parameter `includeUsageStats=true` and the VPC Prefix has IPv4. This statistic reports IPv4 usage only. IP usage counts two addresses per associated Ethernet interface, while prefix usage counts each distinct `/31` containing an assigned IPv4 address. (see [below for nested schema](#nestedatt--usage_stats))
 
 <a id="nestedatt--status_history"></a>
 ### Nested Schema for `status_history`
@@ -65,6 +64,6 @@ Read-Only:
 
 - `acquired_i_ps` (Number) Number of individual IP addresses acquired from the block
 - `acquired_prefixes` (Number) Total number of prefixes (of any size) acquired from this block
-- `available_i_ps` (Number) Total number of IP addresses in the block (acquired and unused)
+- `available_i_ps` (Number) Total number of IP addresses in the block (acquired and unused), capped at 2,147,483,647. An IP Block allocated to one child prefix of the same size reports zero.
 - `available_prefixes` (List of String) Example prefixes available to acquire
-- `available_smallest_prefixes` (Number) Total number of /30 prefixes that can still be acquired from this block (only reduced if prefixes are acquired, not reduced by acquired IPs)
+- `available_smallest_prefixes` (Number) Number of complete `/30` IPv4 prefixes or `/126` IPv6 prefixes remaining after acquired child prefixes are excluded. Both prefix sizes contain four addresses. The count is capped at 2,147,483,647. The `acquiredIPs` count is not subtracted.
